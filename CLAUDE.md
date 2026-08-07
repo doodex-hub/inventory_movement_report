@@ -87,8 +87,12 @@ mengubah arah keseluruhan dokumen.
 
 ## Status saat ini
 
-Bootstrap selesai (branch `backfill/17.0` dibuat dari `origin/17.0`, `CLAUDE.md` +
-`doc-dev/backfill/` diinstansiasi) — lanjut ke Step 01.
+**Backfill Step 01→07 SELESAI** (mode kontinu CLI, satu sesi, 2026-08-07). 8/8 Integration test
+PASS nyata (`docker compose up`, Odoo 17.0). 9 finding tercatat di `FINDINGS.md` (5
+`[PERLU-KEPUTUSAN]` butuh keputusan pemilik modul — prioritas Tinggi: F-01 race condition SQL view
+global; Sedang: F-02 transfer internal dihitung ganda; Rendah: F-03, F-04, F-09). Branch
+`backfill/17.0` berisi 5 commit (bootstrap, spec, test plan, dev testing, QA testing) — **belum
+di-push**, lihat command serah-terima di bawah.
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja.
 
@@ -96,10 +100,20 @@ Bootstrap selesai (branch `backfill/17.0` dibuat dari `origin/17.0`, `CLAUDE.md`
 
 | Step | Dokumen | Status | Gate |
 |---|---|---|---|
-| 01 | `01A_FUNCTIONAL_SPEC.md`, `01B_ACCEPTANCE_CRITERIA.md` | ⬜ Belum mulai | — |
-| 03B | `03B_TEST_PLAN.md` | ⬜ Belum mulai | — |
-| 04 | `04A_DEV_TESTING.md`, `tests/*.py` | ⬜ Belum mulai | ⏳ |
-| 07 | `07_QA_TESTING.md`, `07B_QA_AI_BROWSER.md` (kondisional) | ⬜ Belum mulai | ⏳ |
+| 01 | `01A_FUNCTIONAL_SPEC.md`, `01B_ACCEPTANCE_CRITERIA.md` | ✅ Selesai ditulis | — |
+| 03B | `03B_TEST_PLAN.md` | ✅ Selesai ditulis | — |
+| 04 | `04A_DEV_TESTING.md`, `tests/*.py` | ✅ Selesai ditulis | ✔️ Lulus (8/8 test real pass) |
+| 07 | `07_QA_TESTING.md`, `07B_QA_AI_BROWSER.md` (kondisional — TIDAK dibuat, lihat 07_QA_TESTING.md §4) | ✅ Selesai ditulis | ✔️ Lulus (findings ter-update, rekap terisi) |
+
+### Serah-terima ke dev
+
+Branch `backfill/17.0` sudah berisi seluruh dokumen backfill + test baru, siap direview. Push
+manual (BELUM pernah dijalankan otomatis):
+```
+git push -u origin backfill/17.0
+```
+Setelah itu, buka PR/merge ke `17.0` mengikuti proses review repo Anda sendiri — BACKFILL tidak
+pernah menyentuh branch utama.
 
 Legenda: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Selesai ditulis · ✔️ Lulus gate.
 
