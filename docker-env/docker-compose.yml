@@ -1,0 +1,38 @@
+# docker-env/docker-compose.yml — BACKFILL Mode B/C, product_history_report
+# Instantiated from doc-dev-backfill/templates/docker-compose.yml.template
+name: product_history_report_backfill
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:17.0
+    depends_on:
+      - db
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    ports:
+      - "8090:8069"
+    volumes:
+      - D:/Kuncoro/doodex/repo/product-history-report-17/product_history_report:/mnt/extra-addons/product_history_report
+      - ./logs:/var/log/odoo
+    command: >
+      odoo -d product_history_report_test
+      -i product_history_report
+      --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+      --test-enable
+      --test-tags=/product_history_report
+      --stop-after-init
+      --logfile=/var/log/odoo/odoo.log
+
+volumes:
+  db-data:

@@ -21,7 +21,9 @@
 | F-04 | ACL `stock.history.view` beri write/create/unlink=1 pada model SQL view (`_auto=False`) tanpa `group_id` | `[PERLU-KEPUTUSAN]` | Rendah |
 | F-05 | Dua `ir.actions.act_window` (`*2`) tidak terhubung menu manapun — kemungkinan sisa dev | `[HASIL-BACA]` | Rendah |
 | F-06 | Import `odoo.http.request` tidak terpakai di `stock_history_view.py` | `[HASIL-BACA]` | Rendah |
-| F-07 | Verifikasi tabrakan nama method `action_open_stock_history` vs Odoo core belum bisa digrep (belum ada container hidup) | `[HASIL-BACA]` | — (limitasi tool, lihat §Limitasi) |
+| F-07 | ✅ RESOLVED — tabrakan nama method `action_open_stock_history` vs Odoo core: 0 match (diverifikasi Step 04) | `[DIKONFIRMASI]` | — |
+| F-08 | Lesson metodologi test: `_action_done()` langsung (tanpa `button_validate()`) tidak menuntaskan move Odoo 17 | `[HASIL-BACA]` | N/A |
+| F-09 | ORM cache stale kalau `recreate_view()` dipanggil >1x dalam environment yang sama | `[PERLU-KEPUTUSAN]` | Rendah |
 
 ---
 
@@ -130,9 +132,62 @@ memakai `request` di isi file. Dead import, tidak berefek fungsional.
 
 ## Limitasi Tool
 
-- **F-07 — Cek tabrakan nama method vs Odoo core belum diverifikasi lewat grep source nyata.**
-  Step 01 ditulis sebelum container Mode B/C (Step 04) hidup, jadi tidak ada checkout Odoo
-  core/image Docker ter-connect untuk `grep -rn "def action_open_stock_history"`. Nama method
-  dinilai unik/spesifik modul ini (menyebut konsep "stock_history" yang modul ini perkenalkan
-  sendiri), risiko dinilai rendah secara `[HASIL-BACA]` — TAPI belum dikonfirmasi definitif.
-  **WAJIB re-cek begitu container Step 04 hidup** sebelum finding ini dianggap tuntas.
+*(kosong — F-07, satu-satunya limitasi tool yang tercatat di Step 01, sudah RESOLVED di Step 04
+lewat grep langsung ke image `odoo:17.0`: `docker run --rm odoo:17.0 grep -rn "def action_open_stock_history" /usr/lib/python3/dist-packages/odoo/addons/` → 0 match, tidak ada tabrakan.)*
+
+---
+
+## Update Step 04 — Findings Dikonfirmasi Lewat Eksekusi Nyata
+
+Kedua finding berikut, sebelumnya `[PERLU-KEPUTUSAN]` berdasar baca kode saja, **sekarang
+dikonfirmasi sebagai perilaku NYATA** lewat test Integration real (`tests/test_product_history_report.py`,
+lihat `test/04A_DEV_TESTING.md` §3 untuk detail eksekusi):
+
+- **F-02** (transfer internal→internal dihitung ganda income+outcome): dikonfirmasi
+  `test_ac_03_02_internal_transfer_counted_as_both_income_and_outcome` — move 20 unit masuk
+  (supplier→internal) lalu 4 unit transfer internal→internal menghasilkan `income>=24` (20+4)
+  DAN `outcome>=4` pada bulan yang sama, PERSIS seperti dugaan di BR-03. Tag tetap
+  `[PERLU-KEPUTUSAN]` (masih perlu keputusan pemilik modul apakah ini disengaja), tapi provenance
+  klaimnya naik dari `[HASIL-BACA]` murni menjadi dikonfirmasi eksekusi.
+- **F-04** (ACL `stock.history.view` terbuka untuk semua user internal): dikonfirmasi
+  `test_ac_05_01_read_open_for_user_without_inventory_group` — user baru TANPA grup
+  `stock.group_stock_user` berhasil `search()`/baca `stock.history.view`. Bagian
+  write/create/unlink (AC-05-02) juga dikonfirmasi: `create()` langsung ke model ini GAGAL
+  (exception) karena `_auto=False` (SQL view Postgres, bukan tabel biasa) — sesuai dugaan di BR-06.
+
+**Temuan baru dari eksekusi (bukan dari baca kode Step 01):**
+
+### F-08 — `stock.move._action_confirm()/_action_assign()/_action_done()` langsung (tanpa `stock.picking.button_validate()`) tidak menuntaskan move di Odoo 17
+**Tag:** `[HASIL-BACA]` (temuan tentang perilaku Odoo core/testing, BUKAN bug modul —
+dicatat di sini karena ditemukan selama backfill modul ini, kandidat promosi ke
+`knowledge/`, lihat `doc-dev-backfill/records/product_history_report/SUMMARY.md`)
+**Lokasi:** N/A (bukan kode modul — ditemukan saat menulis `tests/test_product_history_report.py`)
+**Deskripsi:** Memanggil method internal `stock.move` (`_action_confirm`, `_action_assign`,
+`_action_done`) langsung pada `stock.move` yang dibuat tanpa `stock.picking` menghasilkan
+`move.state`/`move_line.picked` yang TERBACA benar via ORM cache tepat setelah pemanggilan, TAPI
+kolom di database sebenarnya tetap `state='draft'`/`picked=False` (dibuktikan lewat query SQL
+mentah dalam transaksi yang sama). Jalur resmi yang benar-benar menuntaskan move adalah
+`stock.picking.button_validate()` (setara tombol "Validate" UI Inventory).
+**Dampak:** Relevan untuk PENULISAN TEST BACKFILL lain yang butuh membuat `stock.move` "done"
+secara programatik — bukan bug `product_history_report` sendiri (modul ini tidak pernah membuat
+stock move, hanya MEMBACA yang sudah ada).
+**Keputusan pemilik modul:** N/A — catatan metodologi test, bukan finding modul yang butuh keputusan.
+
+### F-09 — `stock.history.view` (`_auto=False`) rawan ORM cache stale kalau `recreate_view()` dipanggil >1 kali dalam environment yang sama
+**Tag:** `[PERLU-KEPUTUSAN]` (terkait F-01)
+**Lokasi:** `product_history_report/models/stock_history_view.py:24-26`
+**Deskripsi:** Karena `recreate_view()` melakukan DROP+CREATE VIEW lewat SQL mentah (bypass ORM),
+dan primary key baris (`product_template_id`+`YYYYMMDD`) deterministik per produk, ORM `search()`/
+`read()` yang dipanggil lagi dalam environment/transaksi yang SAMA setelah `recreate_view()` kedua
+bisa menyajikan field value dari cache lama (dibuktikan lewat test `test_ac_04_01`, butuh
+`invalidate_model()` eksplisit supaya assertion valid). Di alur produksi normal (klik tombol form =
+request/environment baru tiap kali), ini TIDAK bermasalah — tapi berisiko nyata kalau
+`action_open_stock_history()`/`recreate_view()` pernah dipanggil berulang dalam SATU environment
+yang bertahan lama (mis. `odoo shell` interaktif, server action yang memproses banyak produk
+berurutan dalam satu transaksi, atau RPC batch client yang menahan koneksi/env).
+**Dampak:** Silent — user/proses bisa melihat data BASI (dari produk/company sebelumnya) tanpa
+error, kalau skenario di atas terjadi.
+**Rekomendasi:** opsional — tambah `self.env['stock.history.view'].invalidate_model()` di akhir
+`recreate_view()` sendiri (bagian dari kode modul, BUKAN test) supaya aman di semua skenario
+pemanggilan, tidak hanya bergantung pada request/environment baru tiap klik.
+**Keputusan pemilik modul:** *(kosong — diisi manusia)*
