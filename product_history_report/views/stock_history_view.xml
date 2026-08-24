@@ -48,7 +48,7 @@
         <field name="name">stock.history.tree.view2</field>
         <field name="model">stock.history.view</field>
         <field name="arch" type="xml">
-            <tree string="stock history">
+            <list string="stock history">
                 <field name="date"/>
                 <field name="product_template_id"/>
                 <field name="categ_id"/>
@@ -56,21 +56,21 @@
                 <field name="income"/>
                 <field name="outcome"/>
                 <field name="qty"/>
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="action_stock_history_graph2" model="ir.actions.act_window">
         <field name="name">stock history</field>
         <field name="res_model">stock.history.view</field>
-        <field name="view_mode">graph,tree,pivot</field>
+        <field name="view_mode">graph,list,pivot</field>
         <field name="context">{'graph_mode':'bar'}</field>
     </record>
 
     <record id="action_stock_history_tree2" model="ir.actions.act_window">
         <field name="name">stock history</field>
         <field name="res_model">stock.history.view</field>
-        <field name="view_mode">tree,pivot,graph</field>
+        <field name="view_mode">list,pivot,graph</field>
     </record>
 
 

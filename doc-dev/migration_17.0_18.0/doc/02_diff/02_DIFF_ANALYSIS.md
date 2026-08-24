@@ -43,7 +43,9 @@ Simbol yang dipakai/di-inherit modul ini, dicek langsung terhadap `native-target
 | DIFF-10 | `controllers/controllers.py` (boilerplate, semua di-comment) | N/A | **Tidak berubah** | Tidak ada dampak — file ini tidak expose route apapun di kedua versi | `01b_BASELINE_SPEC.md` BSL — sudah dicatat sebagai dead code, bukan target migrasi aktif |
 | DIFF-11 | `models/product_template.py:3`, `models/stock_history_view.py:3` `from odoo.http import request` (tidak dipakai) | N/A | **Tidak berubah** | Dead import, aman dihapus sebagai cleanup opsional (bukan migrasi wajib) — lihat `01b_BASELINE_SPEC.md` BSL-011 | — |
 
-**Kesimpulan §1:** Modul ini murni backend SQL-view + 1 method Python + 2 view XML. Hanya **DIFF-01/DIFF-02** yang genuinely install-blocking (keduanya sisi dari perubahan `<tree>`→`<list>` yang sama) — sisanya konfirmasi stabil, tidak perlu perubahan kode.
+| DIFF-12 | `tests/test_product_history_report.py:27` `cls.env['product.template'].create({'name': ..., 'type': 'product'})` | `product.template.type` — selection value `'product'` dihapus | **Rename (test-blocking, ditemukan lewat eksekusi G1 nyata, BUKAN review statis)** | `setUpClass` test GAGAL total (`ValueError: Wrong value for product.template.type: 'product'`) — SEMUA 8 test di file ini tidak bisa jalan sama sekali (gagal di `setUpClass`, bukan cuma 1 test) sampai diperbaiki. Bukan bug modul (`product_history_report` tidak pernah set `type='product'` di kode produksinya sendiri), murni fixture test lama | Dikonfirmasi eksekusi nyata `docker compose up` (G1, Odoo 18.0 resmi) + cek langsung `odoo18/addons/product/models/product_template.py:57-68` (`selection=[('consu','Goods'),('service','Service'),('combo','Combo')]`, TIDAK ADA `'product'` lagi) dan `odoo18/addons/stock/models/product.py:691` (field baru `is_storable` Boolean, ditambahkan modul `stock`, menggantikan peran `type='product'` untuk produk storable/tracked) |
+
+**Kesimpulan §1:** Modul ini murni backend SQL-view + 1 method Python + 2 view XML. **DIFF-01/DIFF-02** (install-blocking, sisi dari `<tree>`→`<list>` yang sama) dan **DIFF-12** (test-blocking, ditemukan lewat eksekusi G1 nyata bukan review statis) adalah tiga perubahan wajib — sisanya konfirmasi stabil, tidak perlu perubahan kode produksi.
 
 ## 2. Kompatibilitas Dependency (OCA/Third-Party)
 
@@ -66,3 +68,4 @@ Tidak ada dependency OCA/third-party (dikonfirmasi `01a_MIGRATION_INTAKE.md` §0
 | DIFF-01/DIFF-02 — `<tree>`/`view_mode` token `tree` | **Tinggi (install-blocking)** | Wajib fix di Step 6 Fase C (view migration) sebelum modul bisa install sama sekali di 18.0 |
 | DIFF-03 — `view_type: 'form'` dead key | Rendah | Opsional dibersihkan, tidak wajib |
 | DIFF-04 s/d DIFF-11 | Tidak ada / sangat rendah | Semua dikonfirmasi stabil lewat cek langsung ke `native-target` |
+| DIFF-12 — `product.template.type='product'` di test fixture | **Tinggi (test-blocking, semua 8 test)** | Ditemukan lewat eksekusi G1 nyata (bukan review statis) — wajib fix `is_storable=True` sebelum Step 9 bisa jalan |

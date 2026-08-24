@@ -24,7 +24,7 @@ class TestProductHistoryReport(TransactionCase):
         })
         cls.product = cls.env['product.template'].create({
             'name': 'BACKFILL Test Product',
-            'type': 'product',
+            'is_storable': True,
         })
 
     def _picking_type_for(self, src, dest, company):
@@ -100,7 +100,7 @@ class TestProductHistoryReport(TransactionCase):
     def test_ac_01_02_action_open_stock_history_returns_expected_action(self):
         action = self.product.action_open_stock_history()
         self.assertEqual(action['res_model'], 'stock.history.view')
-        self.assertEqual(action['view_mode'], 'graph,pivot,tree')
+        self.assertEqual(action['view_mode'], 'graph,pivot,list')
         self.assertIn('domain', action)
 
     # --- AC-02-01 : qty running-sum memasukkan saldo dari histori > 13 bulan ---

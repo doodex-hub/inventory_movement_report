@@ -102,7 +102,7 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 ## Status saat ini
 
-Step 1 **lulus gate** (commit `fb720bf`). Step 2/3 selesai ditulis, Step 4 **lulus gate**: satu-satunya perubahan kode wajib adalah `<tree>`→`<list>` (3 titik) + bump manifest version — modul ini murni backend/SQL-view, tidak ada JS/Owl/controller. Selanjutnya: Step 5 (Acceptance Criteria & Test Plan) sedang dikerjakan, lalu Step 6 (Code Migration).
+Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716`). Step 5 (AC & Test Plan) selesai, Step 6 (Code Migration) selesai — fix `<tree>`→`<list>` (3 titik) + manifest version + 1 fix baru yang ditemukan lewat eksekusi G1 nyata (`product.template.type='product'` dihapus 18.0, ganti `is_storable`, lihat DIFF-12). Step 8 (Code Review) **lulus gate** (0 issue Critical), Step 9 (Dev Testing) **lulus gate** (8/8 integration test PASS di Odoo 18.0 real container, termasuk verifikasi 3 bug source MF-01..MF-03 tetap identik). Selanjutnya: Step 10 (QA Testing) — perlu dev/QA klik manual di instance 18.0 (tidak bisa dieksekusi AI tanpa instance hidup interaktif), Step 11 (UAT).
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -114,11 +114,11 @@ Step 1 **lulus gate** (commit `fb720bf`). Step 2/3 selesai ditulis, Step 4 **lul
 | 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ✅ Selesai ditulis | Tidak ada gate formal |
 | 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ✅ Selesai ditulis | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (21/21 file cover, 3 butuh perubahan) |
-| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | 🔄 Sedang dikerjakan | — |
-| 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — |
+| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ✅ Selesai ditulis | — |
+| 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ✅ Selesai (tree→list 3 titik + fix DIFF-12 + manifest version) | — |
 | 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
-| 8 | Code Review | `08_CODE_REVIEW.md` | ⬜ Belum mulai | — |
-| 9 | Dev Testing | `09_DEV_TESTING.md` | ⬜ Belum mulai | — |
+| 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (0 🔴, 1 🟡, 3 🔵 — semua warisan source) |
+| 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (8/8 test PASS, Odoo 18.0 nyata) |
 | 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |
 | 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
 

@@ -26,7 +26,7 @@ class ProductTemplate(models.Model):
             'res_model': 'stock.history.view',
             'type': 'ir.actions.act_window',
             'view_type': 'form',
-            'view_mode': 'graph,pivot,tree',
+            'view_mode': 'graph,pivot,list',
             'domain': [('id', 'in', list_stock_history_obj.ids)],
             'target': 'current',
         }
