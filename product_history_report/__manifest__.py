@@ -27,4 +27,10 @@
     'application': False,
     'images': ['static/description/banner.png'],
     'license': 'LGPL-3',
+
+    'assets': {
+        'web.assets_tests': [
+            'product_history_report/static/tests/tours/*.js',
+        ],
+    },
 }

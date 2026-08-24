@@ -2,7 +2,7 @@
 
 **Level:** Smoke — kalau ini gagal: STOP, jangan lanjut deploy/testing lain, balik ke Step 9 atau eskalasi ke dev.
 **Estimasi waktu:** ~2 menit.
-**Sumber:** S-01 di `../10_BUSINESS_FLOW_MIGRATION.md`.
+**Sumber:** S-01 di `../10_BUSINESS_FLOW_MIGRATION.md` — sudah PASS lewat Tour test otomatis (`static/tests/tours/stock_history_tour.js`). Checklist ini tetap disediakan untuk re-verifikasi manual kapan saja (deploy/hotfix), bukan berarti wajib diulang.
 
 ```
 1. Login ke Odoo 18.0 (admin/admin di instance QA, atau kredensial dev di instance lain).

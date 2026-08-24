@@ -102,7 +102,7 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 ## Status saat ini
 
-Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716`). Step 5 (AC & Test Plan) selesai, Step 6 (Code Migration) selesai — fix `<tree>`→`<list>` (3 titik) + manifest version + 1 fix baru yang ditemukan lewat eksekusi G1 nyata (`product.template.type='product'` dihapus 18.0, ganti `is_storable`, lihat DIFF-12). Step 8 (Code Review) **lulus gate** (0 issue Critical), Step 9 (Dev Testing) **lulus gate** (8/8 integration test PASS di Odoo 18.0 real container, termasuk verifikasi 3 bug source MF-01..MF-03 tetap identik). Step 10 (QA Testing): draft skenario S-01..S-06 + `human_qa/` sudah ditulis. AI-interaktif dicoba 2 jalur (Claude Browser pane, DAN Claude in Chrome/Chrome asli dev) — KEDUANYA gagal render dengan root cause sama (`odoo.isReady` macet `false` meski semua 1030 modul JS termuat, tab otomasi selalu `document.hidden=true`), dikonfirmasi ini limitasi environment browser automation untuk Owl webclient Odoo 18, bukan bug modul — detail penelusuran di `10_BUSINESS_FLOW_MIGRATION.md`, dicatat juga sebagai lesson tooling di `migration-records/product_history_report_17.0_18.0/SUMMARY.md`. **Instance Odoo 18.0 QA sudah hidup di `http://localhost:8091` (admin/admin, docker-env/) — menunggu dev klik manual S-01..S-05** (S-06 sudah lulus lewat test otomatis Step 9). Setelah dev konfirmasi, lanjut Step 11 (UAT).
+Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716`). Step 5 (AC & Test Plan) dan Step 6 (Code Migration) selesai — fix `<tree>`→`<list>` (3 titik) + manifest version + fix `product.template.type='product'`→`is_storable` (DIFF-12, ditemukan lewat eksekusi G1 nyata). Step 8 (Code Review) **lulus gate** (0 issue Critical). Step 9 (Dev Testing) **lulus gate**: 8 test Integration PASS + 1 Tour test baru (`stock_history_tour.js`, `HttpCase.start_tour`, klik nyata lewat headless Chrome yang dikelola Odoo sendiri) — total **9/9 PASS**. AI-interaktif via browser automation eksternal (Claude Browser pane, Claude in Chrome) sempat gagal total (root cause: `odoo.isReady` macet karena tab otomasi selalu `document.hidden=true`) — tapi Tour test Odoo native TERBUKTI JALAN (bukan kena masalah itu, headless Chrome-nya dikelola proses test sendiri). Step 10 (QA Testing) **lulus gate**: S-01 (Smoke) dikonfirmasi Tour test, S-02..S-06 dikonfirmasi Integration test Step 9 — **tidak ada satupun skenario yang akhirnya butuh klik manual dev**, instance docker sudah dimatikan. Detail penelusuran + lesson tooling di `10_qa/10_BUSINESS_FLOW_MIGRATION.md` dan `migration-records/product_history_report_17.0_18.0/SUMMARY.md`. Step 11 (UAT): draft `11_UAT_CHECKLIST.md` sudah ditulis (bahasa awam, T-01..T-03) — **menunggu business user/PM/FA menjalankan sendiri + sign-off**, AI tidak pernah mengisi Actual/Status/Sign-off.
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -118,9 +118,9 @@ Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716
 | 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ✅ Selesai (tree→list 3 titik + fix DIFF-12 + manifest version) | — |
 | 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (0 🔴, 1 🟡, 3 🔵 — semua warisan source) |
-| 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (8/8 test PASS, Odoo 18.0 nyata) |
-| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | 🔄 Draft ditulis | ⏳ Menunggu dev jalankan S-01..S-05 manual (instance QA hidup di localhost:8091) |
-| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
+| 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (9/9 test PASS termasuk Tour, Odoo 18.0 nyata) |
+| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | ✔️ Disetujui | ✔️ Lulus (S-01 via Tour test otomatis, S-02..S-06 via Integration test — tidak ada yang butuh klik manual) |
+| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ✅ Draft ditulis | ⏳ Menunggu eksekusi tangan sendiri + sign-off business user/PM/FA |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.
 

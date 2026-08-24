@@ -1,6 +1,6 @@
 # docker-env/docker-compose.yml — Migration 17.0->18.0, product_history_report
-# G1 install test (Fase A2/A3 checkpoint) + Step 9 Dev Testing, target-codebase (Odoo 18.0)
-# Modul tidak punya Tour test (01a_MIGRATION_INTAKE.md §2b) -> pakai image resmi langsung, skip build.
+# G1 install test (Fase A2/A3 checkpoint) + Step 9 Dev Testing + Tour test (Mode D), Odoo 18.0.
+# Pakai build: Dockerfile.target (google-chrome-stable + websocket-client) untuk Tour headless.
 name: product_history_report_migration_18
 
 services:
@@ -14,7 +14,10 @@ services:
       - target_db_data:/var/lib/postgresql/data
 
   odoo_target:
-    image: odoo:18.0
+    build:
+      context: .
+      dockerfile: Dockerfile.target
+    shm_size: '2gb'
     depends_on:
       - db_target
     environment:
@@ -27,9 +30,12 @@ services:
       - D:/Kuncoro/doodex/repo/inventory-movement-report-migration-18/product_history_report:/mnt/extra-addons/product_history_report
       - ./logs:/var/log/odoo
     command: >
-      odoo -d product_history_report_qa
+      odoo -d product_history_report_target
       -i product_history_report
       --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+      --test-enable
+      --test-tags=/product_history_report
+      --stop-after-init
       --logfile=/var/log/odoo/odoo_target.log
 
 volumes:

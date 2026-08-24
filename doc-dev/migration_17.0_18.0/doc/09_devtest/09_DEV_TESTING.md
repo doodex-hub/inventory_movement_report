@@ -53,6 +53,20 @@ Modul tidak punya Owl/JS (`01a_MIGRATION_INTAKE.md` §2b, Fase E N/A) — tidak 
 
 **Hasil eksekusi run #2 (final):** `0 failed, 0 error(s) of 8 tests` — dikonfirmasi silang jumlah baris log `Starting TestProductHistoryReport.*` = 8 (exact match jumlah method, bukan false-pass tag-filter kosong).
 
+## Addendum — Tour Test Ditambahkan (2026-08-24, setelah gate awal)
+
+**Revisi §"Applicability Check Fase E" di atas:** tidak ada Owl/JS CUSTOM di modul ini (tetap benar), TAPI Tour test (`HttpCase.start_tour`) tidak memerlukan Owl/JS custom — Tour bisa menguji alur klik UI standar apapun. Ditambahkan SETELAH gate Step 9/10 awal karena AI-interaktif (browser automation eksternal, lihat `10_qa/10_BUSINESS_FLOW_MIGRATION.md`) gagal total akibat limitasi environment — Tour test (headless Chrome yang dikelola Odoo SENDIRI via `HttpCase`, bukan automation eksternal) dipakai sebagai gantinya untuk memverifikasi S-01 (Smoke, `10_qa/10_BUSINESS_FLOW_MIGRATION.md`) secara genuinely otomatis, bukan cuma baca arch XML statis (`test_ac_01_01`).
+
+**File baru:** `static/tests/tours/stock_history_tour.js` + `tests/test_stock_history_tour.py`. Manifest ditambah key `assets.web.assets_tests` (wajib untuk registrasi Tour, TIDAK ada di 17.0 karena modul belum punya Tour — ini penambahan test infrastructure, bukan perubahan business logic, sesuai `03_MIGRATION_SPEC.md` §4 "boleh: menambah test baru").
+
+**Alur yang diuji (real click, real browser, dikelola Odoo sendiri):** buka apps menu → Inventory → Products menu → search produk fixture → klik kartu kanban produk → klik dropdown "More" (tombol Stock History collapse ke sana karena button box penuh — dikonfirmasi perilaku IDENTIK di `native-source`/17.0, bukan regresi migrasi) → klik "Stock History" → assert breadcrumb berganti jadi "Stocks Histories" (window action `target: 'current'` benar-benar terbuka, bukan cuma dict Python yang benar).
+
+**2 percobaan gagal sebelum lulus** (dicatat sebagai lesson, bukan disembunyikan):
+1. Percobaan 1: trigger `.o_data_cell:contains(...)` — GAGAL, default Products view adalah **Kanban**, bukan list, jadi `.o_data_cell` tidak pernah match. Fix: pakai search bar (`.o_searchview_input`, `run: "edit ..."` + `"press Enter"`) lalu `.o_kanban_record:contains(...)`.
+2. Percobaan 2: trigger `button:contains("Stock History")` langsung — GAGAL, tombol collapse ke dropdown **"More"** (`.o_button_more`) karena button box produk ini sudah penuh (On Hand/Forecasted/Documents/Reordering Rules). Fix: klik `.o_button_more` dulu, baru `.o_dropdown_more button:contains("Stock History")`.
+
+**Hasil final:** `0 failed, 0 error(s) of 9 tests` (8 test lama + 1 Tour baru), Tour selesai 11/11 langkah PASS.
+
 ## Kontribusi ke Knowledge Base
 
 - [x] Ada — DIFF-12 (`product.template.type='product'` dihapus 18.0, ganti `is_storable`) ditemukan lewat kegagalan test run #1 di step ini (Fase G2, digabung dengan step 6) — sudah dicatat `migration-tool/migration-records/product_history_report_17.0_18.0/SUMMARY.md` CAND-01.
