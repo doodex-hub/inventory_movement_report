@@ -102,7 +102,7 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 ## Status saat ini
 
-Step 1 — Intake & Scope, baru dimulai. Belum ada dokumen `doc-dev/migration_17.0_18.0/doc/` yang ditulis. Bootstrap repo (branch `migration/18.0` dari `backfill/17.0`, source-codebase sibling folder pada branch `migration/17.0_source`, `.claude/settings.json` Mode Git dengan path terisi) sudah selesai.
+Step 1 **lulus gate** (commit `fb720bf`). Step 2/3 selesai ditulis, Step 4 **lulus gate**: satu-satunya perubahan kode wajib adalah `<tree>`→`<list>` (3 titik) + bump manifest version — modul ini murni backend/SQL-view, tidak ada JS/Owl/controller. Selanjutnya: Step 5 (Acceptance Criteria & Test Plan) sedang dikerjakan, lalu Step 6 (Code Migration).
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -110,11 +110,11 @@ Step 1 — Intake & Scope, baru dimulai. Belum ada dokumen `doc-dev/migration_17
 
 | # | Step | Dokumen | Status | Gate |
 |---|---|---|---|---|
-| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | 🔄 Sedang dikerjakan | ⏳ Menunggu review user |
-| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ⬜ Belum mulai | Tidak ada gate formal |
-| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
-| 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |
-| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ⬜ Belum mulai | — |
+| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ✔️ Disetujui | ✔️ Lulus (commit `fb720bf`) |
+| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ✅ Selesai ditulis | Tidak ada gate formal |
+| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ✅ Selesai ditulis | — |
+| 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (21/21 file cover, 3 butuh perubahan) |
+| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | 🔄 Sedang dikerjakan | — |
 | 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — |
 | 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ⬜ Belum mulai | — |
