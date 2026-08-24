@@ -1,127 +1,156 @@
-# CLAUDE.md — product_history_report (doc-dev backfill)
+# CLAUDE.md — product_history_report migration (17.0 → 18.0)
 
 ---
 
 ## Identitas
 
-Kamu adalah **BACKFILL copilot** — tugasmu membuat dokumentasi dev standar Doodex secara
-**retroaktif** untuk modul berikut:
+Kamu adalah migration copilot untuk project migrasi Odoo custom module berikut:
 
 - **Modul:** product_history_report
-- **Path:** `product_history_report/` (root repo `product-history-report-17` ≠ root addon —
-  addon ada di sub-folder, sama seperti kasus `purchase_product_optional`. Semua dokumen BACKFILL
-  tetap di ROOT REPO, bukan di dalam `product_history_report/`, mengikuti konvensi "Konsistensi
-  folder lintas environment" di `doc-dev-backfill/templates/CLAUDE_TEMPLATE.md`)
-- **Odoo version:** 17.0
-- **Depends:** base, stock
+- **Versi:** 17.0 → 18.0
+- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target)
+- **Source masih aktif dikembangkan selama migrasi?** Tidak — source module dibekukan selama migrasi berjalan.
 - **Environment eksekusi:** Claude Code CLI
-- **Status dokumentasi sebelum backfill:** tidak ada doc/tests sama sekali (tidak ada `doc-dev/`,
-  tidak ada folder `tests/` di modul)
-- **Git eksekusi:** Ya — dev sudah dikonfirmasi eksplisit menerima ini sebagai fitur belum
-  divalidasi (per 2026-08-06, `doc-dev-backfill/ai-doc/OVERVIEW.md` §10)
-- **Git source ref:** `origin/17.0` (dev sebut eksplisit di prompt awal — "sumber branch origin
-  17.0"). Branch kerja: `backfill/17.0`, sudah dibuat dari `origin/17.0` (commit `7905d82`) pada
-  2026-08-07.
-- **Mulai:** 2026-08-07
+- **Git eksekusi:** Ya. Mode Git aktif (lihat `ai-doc/USAGE_GUIDE.md` "Mode Git" di `migration-tool` untuk prosedur lengkap + pengaman wajib) — AI boleh menjalankan sebagian command git (`fetch`/`checkout`/`clone`/`commit`), TIDAK PERNAH `push`/merge/force-push, dan cuma untuk `target-codebase` (repo ini) + bootstrap `source-codebase` (sudah selesai, lihat di bawah). Konsekuensi: AI WAJIB auto-commit di `target-codebase` tepat setelah tiap gate (Step 1/4/8/9/10/11) dinyatakan lulus — `git push` tetap 100% manual dev.
+- **Mulai:** 2026-08-24
 
-Begitu sesi ini dibuka, langsung kenalkan diri sebagai BACKFILL copilot dan lanjutkan dari "Status
-saat ini" di bawah — jangan tunggu user menjelaskan project dari nol.
+Begitu sesi ini dibuka, langsung kenalkan diri sebagai migration copilot dan lanjutkan dari "Status saat ini" di bawah — jangan tunggu user menjelaskan project dari nol.
 
-> **Larangan git — DEFAULT tetap berlaku, kecuali opt-in eksplisit:** karena `Git eksekusi` = Ya
-> DAN `Environment eksekusi` = Claude Code CLI, Mode Git (`doc-dev-backfill/ai-doc/PLAYBOOK.md`
-> §"Mode Git") berlaku untuk repo modul ini. `Git eksekusi` TIDAK PERNAH memengaruhi repo
-> `doc-dev-backfill` — repo itu punya mekanisme git terpisah sendiri.
->
-> **Serah-terima ke dev selalu eksplisit** — command persis + langkah bernomor SAAT ITU JUGA.
-> `git push`/merge/force-push TIDAK PERNAH dijalankan otomatis.
+> **Larangan mutlak (default): JANGAN jalankan command `git` apapun di REPO MANAPUN yang terhubung ke project ini** — `migration-tool`, `source-codebase`, `native-source`/`native-target` — KECUALI di `target-codebase` (repo ini) sesuai batas Mode Git di atas. Command non-git (`ls`/`find`/`grep`/`diff`/`cat`) tetap aman dipakai kapan saja. Larangan `push`/merge/force-push/PR otomatis tetap mutlak walau Mode Git aktif.
+
+> **Setiap kali menyerahkan aksi ke dev (git push, jalankan docker, install test, dst) — beri langkah bernomor konkret SAAT ITU JUGA, bukan cuma "sudah disiapkan, tinggal kamu jalankan".**
+
+---
+
+## Catatan penting — modul ini punya riwayat doc-dev-backfill
+
+Repo ini sebelumnya dipakai untuk kerja **doc-dev-backfill** (dokumentasi retroaktif product_history_report 17.0, Step 01-07 selesai) sebelum project migrasi 17→18 ini dimulai. Dokumen itu diarsipkan, BUKAN dihapus, di `doc-dev/backfill/` (termasuk `doc-dev/backfill/CLAUDE.md` — CLAUDE.md lama, sekarang non-aktif) — isinya (`doc-dev/backfill/spec/`, `doc-dev/backfill/test/`, `FINDINGS.md`) dipakai sebagai **input Step 1** migrasi ini (baseline spec/characterization test sudah ada, tidak perlu ditulis dari nol — lihat `01a_MIGRATION_INTAKE.md` §4 "Baseline Spec" di `migration-tool`, kasus "ADA FUNCTIONAL_SPEC.md lama": baca sebagai draft awal, cross-check ke kode aktual satu per satu).
+
+Nama repo GitHub-nya `inventory_movement_report` (mencerminkan fungsi bisnis modul — laporan pergerakan inventory), sedangkan nama teknis module/folder-nya `product_history_report` — dikonfirmasi dev, bukan kesalahan.
 
 ---
 
 ## Source of Truth & Forbidden Actions (WAJIB DIPATUHI)
 
-**Source of truth:** kode `product_history_report` yang berjalan sekarang adalah kebenaran mutlak.
-Tugasmu mendokumentasikan apa yang SEKARANG terjadi — termasuk quirk/bug kalau ada — bukan
-memperbaikinya.
+**Source of truth:** kode 17.0 yang berjalan (atau `01b_BASELINE_SPEC.md` sebagai dokumentasinya) adalah kebenaran mutlak. Semua business logic, workflow, side effect, dan UX di 18.0 **harus identik** dengan 17.0 — termasuk bug yang sudah ada di sana (jangan diperbaiki, dipertahankan).
 
-**Dilarang mutlak:**
-- Mengubah kode bisnis (`models/`, `controllers/`, `views/`, `security/`) dengan cara apapun.
-- Memperbaiki bug yang ditemukan di kode existing — catat di `doc-dev/backfill/FINDINGS.md` dengan
-  tag `[PERLU-KEPUTUSAN]`, jangan diperbaiki.
-- Mengisi/menjalankan `UAT_CHECKLIST.md` atau apapun yang menyerupai sign-off formal.
+**Dilarang** (kecuali eksplisit disetujui & dicatat sebagai perubahan yang disengaja di intake):
+- Menambah atau menghapus fitur
+- Mengubah business rule, workflow, atau state transition
+- Memperbaiki bug yang sudah ada di 17.0
+- Refactor demi readability/style/performance (KECUALI wajib untuk kompatibilitas 18.0 — itu wajib)
+- Redesign UI/UX demi estetika
+- Rename model/field/XML-ID kecuali wajib untuk kompatibilitas
 
-**Boleh:**
-- Menambah file test baru (`tests/*.py`) — modul belum punya sama sekali.
-- Menjalankan test yang ditulis.
-- Menambah setup/stub ringan di dalam test itu sendiri.
+**Kapan STOP dan eskalasi ke user** (jangan lanjut dengan asumsi):
+- Perubahan mungkin mempengaruhi business logic
+- Fitur deprecated di 18.0 tidak punya padanan jelas
+- Ada beberapa cara migrasi valid dengan efek samping berbeda
+- Dampak perubahan ke behavior tidak pasti
+
+Format eskalasi:
+```
+ESCALATION — Migrasi 18.0
+Step/Fase: {step/fase}
+Modul: product_history_report
+Isu: {deskripsi singkat}
+Opsi: 1) {opsi A} — Risiko: {rendah/sedang/tinggi}  2) {opsi B} — Risiko: ...
+Rekomendasi: {kalau ada}
+Perlu keputusan user sebelum lanjut.
+```
 
 ---
 
-## Provenance Tag (wajib di semua klaim `doc-dev/backfill/spec/`)
+## Mandatory Read Order
 
-| Tag | Arti |
-|---|---|
-| `[HASIL-BACA]` | Murni hasil membaca kode, belum dikonfirmasi manusia — default |
-| `[DIKONFIRMASI]` | Sudah dikonfirmasi pemilik modul sesuai intent |
-| `[PERLU-KEPUTUSAN]` | Kandidat bug/ambigu — WAJIB juga masuk `FINDINGS.md` |
+Sebelum membuat perubahan apapun, baca berurutan:
+
+1. `01_intake/01a_MIGRATION_INTAKE.md` — scope, forbidden actions, definition of done
+2. `migration-tool/knowledge/version-diffs/17-to-18.md` — constraint teknis umum
+3. `01_intake/01b_BASELINE_SPEC.md` (kalau sudah ada) — apa yang modul lakukan (draft awal dari `doc-dev/backfill/spec/`)
+4. `FINDINGS.md` (root `doc/`, kalau sudah ada) — daftar gap/bug/ambiguitas yang masih terbuka lintas step
+5. `03_spec/03_MIGRATION_SPEC.md` (kalau sudah ada) — risiko spesifik modul ini
+6. Step/fase yang sedang berjalan (lihat tabel di bawah) + prompt fase terkait di `migration-tool/templates/06b_PROMPTS_BY_PHASE.md`
 
 ---
 
-## Alur kerja
+## Alur kerja — 11 step
 
-Lihat `doc-dev-backfill/ai-doc/PLAYBOOK.md` §2 untuk detail tiap step.
+Detail lengkap tiap step, alasan desain, dan template dokumen: `ai-doc/OVERVIEW.md` di folder `migration-tool`.
 
-| Step | Output di `doc-dev/backfill/` | Gate? |
-|---|---|---|
-| 01 — Spec (backfill) | `spec/01A_FUNCTIONAL_SPEC.md`, `spec/01B_ACCEPTANCE_CRITERIA.md` | Tidak formal |
-| 03B — Test Plan | `test/03B_TEST_PLAN.md` | Tidak |
-| 04 — Dev Testing | `test/04A_DEV_TESTING.md`, `tests/*.py` (baru, di root modul) | **Ya** |
-| 07 — QA Testing | `test/07_QA_TESTING.md`, `test/07B_QA_AI_BROWSER.md` (kondisional) | **Ya** |
+| # | Step | Output di `doc/` | Gate sebelum lanjut? |
+|---|---|---|---|
+| 1 | Intake & scope | `01_intake/01a_MIGRATION_INTAKE.md` + `01_intake/01b_BASELINE_SPEC.md` | Ya — functional spec/characterization test harus ada |
+| 2 | Diff & compatibility analysis | `02_diff/02_DIFF_ANALYSIS.md` | Tidak |
+| 3 | Migration spec (teknis) | `03_spec/03_MIGRATION_SPEC.md` | Tidak |
+| 4 | Spec completeness review | `04_completeness/04_SPEC_COMPLETENESS_REVIEW.md` | **Ya** — spec harus cover 100% source module |
+| 5 | Acceptance criteria & test plan | `05_acceptance/05a_MIGRATION_ACCEPTANCE_CRITERIA.md` + `05_acceptance/05b_TEST_PLAN_MIGRATION.md` | Tidak |
+| 6 | Code migration | kode di `target-codebase` + `06_implementation/06c_IMPLEMENTATION_LOG.md` | Tidak (disiplin per-fase A→G) |
+| 7 | Data migration scripts | `07_data/07_DATA_MIGRATION_PLAN.md` + script | — (N/A — port kode saja, bukan upgrade instance) |
+| 8 | Code review | `08_review/08_CODE_REVIEW.md` | **Ya** |
+| 9 | Dev testing | `09_devtest/09_DEV_TESTING.md` | **Ya** |
+| 10 | QA testing | `10_qa/10_BUSINESS_FLOW_MIGRATION.md` | **Ya** |
+| 11 | UAT sign-off | `11_uat/11_UAT_CHECKLIST.md` | **Ya** — sign-off final |
 
-Mode eksekusi: **kontinu (CLI)** — Step 01→03B→04→07 dijalankan berturut-turut dalam satu sesi
-tanpa berhenti minta approve tiap step, kecuali Step 04 gagal total atau ada ambiguitas yang
-mengubah arah keseluruhan dokumen.
+Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc/`.
 
-**Tidak ada step 06 (Deploy Staging), 08 (UAT), 09 (Deploy Production)** — di luar scope BACKFILL.
+**Konvensi penamaan:** nama file di `doc-dev/migration_17.0_18.0/doc/<step-folder>/` selalu identik dengan nama file template di `migration-tool/templates/`.
+
+**Aturan paling penting:** `03_MIGRATION_SPEC.md` (step 3) memandu implementasi kode. Dasar acceptance criteria/testing (step 5, 9, 10, 11) adalah `01b_BASELINE_SPEC.md` dan kode 17.0 yang berjalan — BUKAN migration spec.
 
 ---
 
 ## Status saat ini
 
-**Backfill Step 01→07 SELESAI** (mode kontinu CLI, satu sesi, 2026-08-07). 8/8 Integration test
-PASS nyata (`docker compose up`, Odoo 17.0). 9 finding tercatat di `FINDINGS.md` (5
-`[PERLU-KEPUTUSAN]` butuh keputusan pemilik modul — prioritas Tinggi: F-01 race condition SQL view
-global; Sedang: F-02 transfer internal dihitung ganda; Rendah: F-03, F-04, F-09). Branch
-`backfill/17.0` berisi 5 commit (bootstrap, spec, test plan, dev testing, QA testing) — **belum
-di-push**, lihat command serah-terima di bawah.
+Step 1 — Intake & Scope, baru dimulai. Belum ada dokumen `doc-dev/migration_17.0_18.0/doc/` yang ditulis. Bootstrap repo (branch `migration/18.0` dari `backfill/17.0`, source-codebase sibling folder pada branch `migration/17.0_source`, `.claude/settings.json` Mode Git dengan path terisi) sudah selesai.
 
-> AI: update bagian ini sendiri di akhir tiap sesi kerja.
+> AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
 
-| Step | Dokumen | Status | Gate |
+| # | Step | Dokumen | Status | Gate |
+|---|---|---|---|---|
+| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | 🔄 Sedang dikerjakan | ⏳ Menunggu review user |
+| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ⬜ Belum mulai | Tidak ada gate formal |
+| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
+| 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |
+| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ⬜ Belum mulai | — |
+| 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — |
+| 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
+| 8 | Code Review | `08_CODE_REVIEW.md` | ⬜ Belum mulai | — |
+| 9 | Dev Testing | `09_DEV_TESTING.md` | ⬜ Belum mulai | — |
+| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |
+| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
+
+Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.
+
+---
+
+## Folder yang di-connect
+
+| Folder | Path | Peran | Read-only? |
 |---|---|---|---|
-| 01 | `01A_FUNCTIONAL_SPEC.md`, `01B_ACCEPTANCE_CRITERIA.md` | ✅ Selesai ditulis | — |
-| 03B | `03B_TEST_PLAN.md` | ✅ Selesai ditulis | — |
-| 04 | `04A_DEV_TESTING.md`, `tests/*.py` | ✅ Selesai ditulis | ✔️ Lulus (8/8 test real pass) |
-| 07 | `07_QA_TESTING.md`, `07B_QA_AI_BROWSER.md` (kondisional — TIDAK dibuat, lihat 07_QA_TESTING.md §4) | ✅ Selesai ditulis | ✔️ Lulus (findings ter-update, rekap terisi) |
+| `target-codebase` (folder UTAMA) | `D:/Kuncoro/doodex/repo/inventory-movement-report-migration-18` (repo ini, branch `migration/18.0`) | CLAUDE.md + doc/ + kode hasil migrasi | Tidak |
+| `migration-tool` | `D:/Kuncoro/doodex/repo/migration-tool-project/migration-tool` | Template + knowledge + `ai-doc/OVERVIEW.md` | Tulis di `migration-records/` saja |
+| `source-codebase` | `D:/Kuncoro/doodex/repo/inventory-movement-report-migration-18-source` (branch `migration/17.0_source`, dari `backfill/17.0`) | Kode modul 17.0, referensi | Ya |
+| `native-target` (Community 18.0) | `D:/Kuncoro/doodex/repo/odoo18` | Diff API core | Ya |
+| `native-source` (Community 17.0) | `D:/Kuncoro/doodex/repo/odoo17` | Cross-check versi asal | Ya |
 
-### Serah-terima ke dev
+Tidak ada dependency Enterprise/OCA (manifest cuma `depends: ['base', 'stock']`, dikonfirmasi dev) — `native-*-enterprise`/`third-party-*` tidak perlu di-connect.
 
-Branch `backfill/17.0` sudah berisi seluruh dokumen backfill + test baru, siap direview. Push
-manual (BELUM pernah dijalankan otomatis):
-```
-git push -u origin backfill/17.0
-```
-Setelah itu, buka PR/merge ke `17.0` mengikuti proses review repo Anda sendiri — BACKFILL tidak
-pernah menyentuh branch utama.
+---
 
-Legenda: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Selesai ditulis · ✔️ Lulus gate.
+## Knowledge base
+
+Sebelum step 2 mulai analisis, cek dulu `migration-tool/knowledge/INDEX.md` — apakah sudah ada entry untuk pasangan versi 17.0→18.0 atau dependency (`base`, `stock`) yang relevan.
+
+Temuan baru (general Odoo atau dependency-specific) ditulis ke `migration-tool/migration-records/product_history_report_17_18/SUMMARY.md` — bukan langsung ke `knowledge/`. Promosi hanya lewat sesi curation eksplisit (`templates/CURATION_PROMPT.md`).
 
 ---
 
 ## Referensi
 
-- Rasional desain lengkap: `doc-dev-backfill/ai-doc/OVERVIEW.md`
-- Arah lintas-fase: `doc-dev-backfill/ai-doc/ROADMAP.md`
-- Langkah operasional + lesson environment: `doc-dev-backfill/ai-doc/PLAYBOOK.md`
-- Mode Git (branch/commit git untuk repo modul ini): `doc-dev-backfill/ai-doc/PLAYBOOK.md` §"Mode Git"
+- Rujukan lengkap semua keputusan desain: `migration-tool/ai-doc/OVERVIEW.md`
+- Panduan operasional: `migration-tool/ai-doc/USAGE_GUIDE.md`
+- Diagram alur 11 step: `migration-tool/ai-doc/diagrams/migration-workflow.svg`
+- Dokumentasi backfill 17.0 (diarsipkan): `doc-dev/backfill/`

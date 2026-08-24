@@ -1,3 +1,10 @@
 __pycache__/
 *.pyc
+*.pyo
 docker-env/logs/
+
+# Command-log hook Claude Code CLI (migration-tool) — jejak operasional sesi CLI, bukan dokumentasi migrasi.
+.claude/migration-tool-command-log.jsonl
+
+# Config permission personal (auto-generated saat klik "Always allow" di CLI).
+.claude/settings.local.json
