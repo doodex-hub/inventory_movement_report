@@ -6,13 +6,21 @@
 
 > Port kode saja (bukan upgrade instance) — dijalankan lewat install bersih + data demo, bukan clone data produksi (step 7 N/A).
 
-**Mode eksekusi:** Dicoba **AI-interaktif** dulu (Claude Browser pane, instance Odoo 18.0 nyata sudah hidup) — **GAGAL karena limitasi environment, bukan bug modul** (lihat "Catatan Teknis" di bawah). Semua skenario di bawah jadi **Manual** — instance tetap dibiarkan hidup untuk dev/QA klik langsung.
+**Mode eksekusi:** Dicoba **AI-interaktif** dua jalur berbeda — (1) Claude Browser pane (sandbox bawaan Claude Code), (2) Claude in Chrome (Chrome asli dev, `list_connected_browsers` dikonfirmasi 1 browser lokal terhubung) — **KEDUANYA gagal render dengan simptom identik, bukan bug modul** (lihat "Catatan Teknis" di bawah, root cause sudah ditelusuri sampai level `odoo.isReady`). Semua skenario di bawah jadi **Manual** — instance tetap dibiarkan hidup untuk dev/QA klik langsung.
 
-## Catatan Teknis — Kegagalan AI-interaktif
+## Catatan Teknis — Kegagalan AI-interaktif (dicoba 2 jalur, keduanya gagal sama)
 
-Login ke `http://localhost:8091` sukses (request `/odoo/inventory`, `/web/webclient/load_menus`, `/mail/data` semua 200 OK, menu ter-load di level server). Tapi Owl webclient tidak pernah merender apapun ke DOM — `.o_web_client` ada di DOM tapi isinya kosong (24 karakter whitespace), tidak ada error JS yang tertangkap console selain kegagalan registrasi Service Worker (tidak fatal). Kemungkinan root cause: Browser pane sesi ini tidak "displayed"/compositing (dikonfirmasi terpisah lewat error `computer screenshot` — "the Browser pane is not displayed, so the page is not compositing frames"), dan Owl app kemungkinan menunggu tick render yang tidak pernah terpicu tanpa compositing aktif. **Ini limitasi tooling sesi ini, bukan gap pengujian genuinely dibutuhkan** — server-side (yang sebenarnya diuji Step 9 lewat automated test) sudah terbukti benar. Tidak dieksplorasi lebih lanjut supaya tidak menghabiskan waktu di luar scope modul.
+**Jalur 1 (Claude Browser pane):** login sukses, tapi `computer screenshot` menolak capture — "the Browser pane is not displayed, so the page is not compositing frames".
 
-**Instance tetap hidup untuk dev** (lihat langkah serah-terima di akhir dokumen).
+**Jalur 2 (Claude in Chrome, Chrome asli dev, BUKAN sandbox):** login BERHASIL total (form submit, redirect ke `/odoo/discuss` dengan UI ter-render lengkap, screenshot menunjukkan halaman Discuss normal). Navigasi ke `/odoo/inventory` awalnya SEMPAT sukses sekali (chart Receipts/Delivery Orders tampil). Tapi navigasi/reload berikutnya (halaman yang sama maupun tab baru) konsisten macet: `document.body.innerHTML` mentok 24 karakter (cuma whitespace), TIDAK ADA error console apapun (bukan cuma tidak fatal — genuinely nihil, dicek ulang dengan tab baru fresh juga sama). Ditelusuri lebih dalam lewat `javascript_tool`:
+- `odoo.loader.modules.size` = 1030, `odoo.loader.jobs.size` = 0, `odoo.loader.failed` = `{}` — **semua modul JS berhasil dimuat, tidak ada yang gagal/pending.**
+- `odoo.isReady` = **`false`**, tidak pernah berubah jadi `true` — webclient tidak pernah menyelesaikan mount meski semua modul siap.
+- `document.hidden` = `true`, `document.visibilityState` = `"hidden"`, `document.hasFocus()` = `false` — tab otomasi ini TIDAK PERNAH dianggap "visible" oleh browser, konsisten dengan gagalnya jalur 1 (soal compositing).
+- Dicoba dispatch event (`focus`, `visibilitychange`, `pageshow`) dan klik nyata (`computer` left_click) secara manual — tidak mengubah apapun, `isReady` tetap `false`.
+
+**Kesimpulan:** root cause-nya SAMA di kedua jalur — Owl App (`web.assets_web.min.js`) menunggu suatu render-tick (kemungkinan `requestAnimationFrame`, yang di banyak browser ditahan/tidak pernah dipanggil untuk tab yang `hidden`/tidak dikompositing) sebelum menandai `odoo.isReady=true` dan memasang komponen ke DOM. Ini **karakteristik environment otomasi tab (baik sandbox Claude Browser MAUPUN tab yang dikontrol ekstensi Claude in Chrome)**, bukan sesuatu yang bisa diperbaiki dari sisi modul `product_history_report` — server-side (yang genuinely diuji Step 9 lewat automated test Odoo, 8/8 pass) sudah terbukti benar dan tidak terpengaruh sama sekali oleh limitasi rendering front-end ini.
+
+**Instance tetap hidup untuk dev** (lihat langkah serah-terima di akhir dokumen) — klik manual dari browser BUKAN otomasi (browser normal yang di-fokus/visible, tidak seperti tab yang dikontrol tool ini) seharusnya tidak mengalami masalah ini sama sekali, karena kondisi `hidden`/`no compositing` di atas spesifik ke tab yang dikontrol otomasi.
 
 ---
 
