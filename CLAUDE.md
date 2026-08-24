@@ -102,7 +102,7 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 ## Status saat ini
 
-Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716`). Step 5 (AC & Test Plan) selesai, Step 6 (Code Migration) selesai — fix `<tree>`→`<list>` (3 titik) + manifest version + 1 fix baru yang ditemukan lewat eksekusi G1 nyata (`product.template.type='product'` dihapus 18.0, ganti `is_storable`, lihat DIFF-12). Step 8 (Code Review) **lulus gate** (0 issue Critical), Step 9 (Dev Testing) **lulus gate** (8/8 integration test PASS di Odoo 18.0 real container, termasuk verifikasi 3 bug source MF-01..MF-03 tetap identik). Selanjutnya: Step 10 (QA Testing) — perlu dev/QA klik manual di instance 18.0 (tidak bisa dieksekusi AI tanpa instance hidup interaktif), Step 11 (UAT).
+Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716`). Step 5 (AC & Test Plan) selesai, Step 6 (Code Migration) selesai — fix `<tree>`→`<list>` (3 titik) + manifest version + 1 fix baru yang ditemukan lewat eksekusi G1 nyata (`product.template.type='product'` dihapus 18.0, ganti `is_storable`, lihat DIFF-12). Step 8 (Code Review) **lulus gate** (0 issue Critical), Step 9 (Dev Testing) **lulus gate** (8/8 integration test PASS di Odoo 18.0 real container, termasuk verifikasi 3 bug source MF-01..MF-03 tetap identik). Step 10 (QA Testing): draft skenario S-01..S-06 + `human_qa/` sudah ditulis. AI-interaktif via Claude Browser DICOBA tapi gagal render (limitasi environment browser pane, bukan bug modul — lihat catatan teknis di `10_BUSINESS_FLOW_MIGRATION.md`). **Instance Odoo 18.0 QA sudah hidup di `http://localhost:8091` (admin/admin, docker-env/) — menunggu dev klik manual S-01..S-05** (S-06 sudah lulus lewat test otomatis Step 9). Setelah dev konfirmasi, lanjut Step 11 (UAT).
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -119,7 +119,7 @@ Step 1 **lulus gate** (commit `fb720bf`), Step 4 **lulus gate** (commit `6ffd716
 | 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (0 🔴, 1 🟡, 3 🔵 — semua warisan source) |
 | 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (8/8 test PASS, Odoo 18.0 nyata) |
-| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |
+| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | 🔄 Draft ditulis | ⏳ Menunggu dev jalankan S-01..S-05 manual (instance QA hidup di localhost:8091) |
 | 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.

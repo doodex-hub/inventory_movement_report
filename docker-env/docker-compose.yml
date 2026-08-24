@@ -27,12 +27,9 @@ services:
       - D:/Kuncoro/doodex/repo/inventory-movement-report-migration-18/product_history_report:/mnt/extra-addons/product_history_report
       - ./logs:/var/log/odoo
     command: >
-      odoo -d product_history_report_target
+      odoo -d product_history_report_qa
       -i product_history_report
       --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
-      --test-enable
-      --test-tags=/product_history_report
-      --stop-after-init
       --logfile=/var/log/odoo/odoo_target.log
 
 volumes:
