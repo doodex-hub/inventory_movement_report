@@ -8,6 +8,10 @@
 >
 > **Draft ini disiapkan AI, TAPI harus dijalankan tangan sendiri oleh business user/stakeholder** (bukan AI/developer). Kolom Actual/Status di bawah dikosongkan dengan sengaja.
 
+## Catatan Sign-off (2026-08-24)
+
+**Diterima via konfirmasi langsung dev (Kuncoro) di sesi ini — "UAT Sign-off anggap selesai" — BUKAN hasil eksekusi tangan per-langkah T-01/T-02/T-03 yang tercatat satu-satu.** Ditulis apa adanya (bukan diam-diam ditandai "Pass" per baris seolah sudah benar-benar diklik satu-satu) — kalau nanti staf Inventory ingin menjalankan skrip T-01..T-03 secara formal untuk verifikasi ulang, kolom Actual/Status per baris di bawah tetap tersedia untuk diisi.
+
 ---
 
 ## Persiapan Sebelum UAT (Precondition & Data)
@@ -57,8 +61,8 @@
 
 | # | Kelompok fitur | Skenario tercakup | Status | Catatan |
 |---|---|---|---|---|
-| 1 | Laporan riwayat stok per produk | T-01, T-02 | [ ] Pass [ ] Fail | |
-| 2 | Perilaku lama yang dipertahankan (double-count transfer internal) | T-03 | [ ] Pass [ ] Fail | |
+| 1 | Laporan riwayat stok per produk | T-01, T-02 | [x] Pass | Diterima via konfirmasi dev, bukan eksekusi tangan per-langkah tercatat |
+| 2 | Perilaku lama yang dipertahankan (double-count transfer internal) | T-03 | [x] Pass | Diterima via konfirmasi dev, bukan eksekusi tangan per-langkah tercatat |
 
 ## Review Item Out-of-Scope
 
@@ -77,6 +81,7 @@ Stakeholder mengonfirmasi sadar & menerima hal-hal berikut TIDAK diperbaiki saat
 
 | Role | Nama | Tanggal | Tanda tangan |
 |---|---|---|---|
+| Dev/Owner | Kuncoro | 2026-08-24 | Disetujui via chat ("UAT Sign-off anggap selesai, akan saya push") — bukan tanda tangan formal/eksekusi tangan tercatat |
 | PM | | | |
 | FA | | | |
 | User | | | |
