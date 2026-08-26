@@ -110,6 +110,8 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 2026-08-26 (keduanya sama seperti project 17.0→18.0: port kode saja, source dibekukan). **Step 1 (Intake & Scope) draft selesai ditulis** — `01a_MIGRATION_INTAKE.md` + `01b_BASELINE_SPEC.md` + `FINDINGS.md` (root `doc/`), dibangun dari hasil project 17.0→18.0 yang sudah SELESAI+lulus UAT (baseline spec 18.0 dicross-check ulang ke kode aktual, tidak ada drift). Menunggu review user untuk menutup gate Step 1 — 2 open item minor belum dikonfirmasi eksplisit (dependency Enterprise/OCA & dokumen pelengkap lain di luar repo, lihat §Ringkasan `01a_MIGRATION_INTAKE.md`), tidak menghalangi lanjut ke Step 2 kalau dev setuju.
 
+**Step 2 (Diff & Compatibility Analysis) selesai ditulis 2026-08-26** — `02_DIFF_ANALYSIS.md`, dicek langsung terhadap `native-target` (`enterprise19.0`) vs `native-source` (`odoo18`). 2 temuan install/test-blocking BARU (belum ada di knowledge base sebelumnya): **DIFF-01** atribut `expand`/`string` dihapus dari skema RNG tag `<group>` (search view modul ini pakai ini, install-blocking) dan **DIFF-02** `res.users.groups_id`→`group_ids` (kena test fixture modul, test-blocking) — keduanya wajib difix di Step 6. Satu open question (**DIFF-10**) soal xmlid `stock.picking_type_in/_out/_internal`/`stock.stock_location_stock` di test — kemungkinan besar aman tapi belum dibuktikan eksekusi nyata, ditunda ke Step 9 G1 (pola sama seperti `DIFF-12` project 17→18). Temuan dicatat sebagai kandidat di `migration-tool/migration-records/product_history_report_18.0_19.0/SUMMARY.md` (belum di-promote ke `knowledge/`).
+
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
@@ -117,7 +119,7 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 | # | Step | Dokumen | Status | Gate |
 |---|---|---|---|---|
 | 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ✅ Draft/selesai ditulis | ⏳ Menunggu review user (2 open item minor, lihat §Ringkasan di `01a`) |
-| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ⬜ Belum mulai | Tidak ada gate formal |
+| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ✅ Selesai ditulis | Tidak ada gate formal |
 | 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |
 | 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ⬜ Belum mulai | — |
@@ -150,7 +152,7 @@ Belum dikonfirmasi ulang untuk 19.0 apakah modul ini masih tanpa dependency Ente
 
 Sebelum step 2 mulai analisis, cek dulu `migration-tool/knowledge/INDEX.md` — apakah sudah ada entry untuk pasangan versi 18.0→19.0 atau dependency (`base`, `stock`) yang relevan. **Sudah ada 1 project 18→19 selesai sebelumnya** (`advanced_sales_analysis`) — cek `migration-tool/knowledge/version-diffs/18-to-19.md` dan `migration-tool/knowledge/dependency-compat/sale_report/18-to-19.md` untuk temuan yang sudah dipromosikan dari project itu.
 
-Temuan baru (general Odoo atau dependency-specific) ditulis ke `migration-tool/migration-records/product_history_report_18_19/SUMMARY.md` — bukan langsung ke `knowledge/`. Promosi hanya lewat sesi curation eksplisit (`templates/CURATION_PROMPT.md`).
+Temuan baru (general Odoo atau dependency-specific) ditulis ke `migration-tool/migration-records/product_history_report_18.0_19.0/SUMMARY.md` — bukan langsung ke `knowledge/`. Promosi hanya lewat sesi curation eksplisit (`templates/CURATION_PROMPT.md`).
 
 ---
 
