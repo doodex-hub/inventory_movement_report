@@ -20,7 +20,7 @@ Modul punya 1 Tour test (`static/tests/tours/stock_history_tour.js` + `tests/tes
 |---|---|---|---|---|
 | AC-01-01 | Tombol Stock History ada di arch | `test_ac_01_01_button_present_in_form_arch` | ✅ Lengkap | `assertIn` ke `get_view()['arch']` |
 | AC-01-02 | Action window benar | `test_ac_01_02_action_open_stock_history_returns_expected_action` | ✅ Lengkap | 3 assertion (`res_model`, `view_mode`, `domain`) |
-| AC-01-03 | Groupby search panel (DIFF-01) | — | ❌ Tidak ada test otomatis (by design) | Didorong ke Step 10 Manual, sesuai `05b_TEST_PLAN_MIGRATION.md` |
+| AC-01-03 | Groupby search panel (DIFF-01) | `test_stock_history_tour` (2 step baru ditambahkan Step 10, lihat addendum) | ✅ Lengkap | Awalnya didorong ke Step 10 Manual di `05b_TEST_PLAN_MIGRATION.md`, TERNYATA bisa ditutup otomatis via extended Tour — lihat "Addendum" di bawah |
 | AC-02-01 | qty running-sum >13 bulan | `test_ac_02_01_qty_includes_pre_window_balance` | ✅ Lengkap | Setup data nyata (`stock.move` via `button_validate()`), `assertAlmostEqual` |
 | AC-02-02 | Race condition (tidak ditest) | — | ❌ Tidak ada (by design) | Sifat non-deterministik, tidak reliable diuji unit test — konsisten `05b_TEST_PLAN_MIGRATION.md` |
 | AC-03-01 | Customer→internal = income saja | `test_ac_03_01_customer_return_is_income_only` | ✅ Lengkap | `assertGreaterEqual`/`assertEqual` |
@@ -45,7 +45,7 @@ Modul punya 1 Tour test (`static/tests/tours/stock_history_tour.js` + `tests/tes
 |---|---|---|---|---|---|
 | AC-01-01 | — | `test_ac_01_01_button_present_in_form_arch` | Tercakup juga lewat Tour | ✅ Pass | — |
 | AC-01-02 | — | `test_ac_01_02_action_open_stock_history_returns_expected_action` | Tercakup juga lewat Tour | ✅ Pass | Tidak butuh update assertion (token `view_mode` sudah final sejak 18.0) |
-| AC-01-03 | — | — | — | ⏳ Belum (Step 10) | Tidak ada test otomatis by design |
+| AC-01-03 | — | — | `test_stock_history_tour` (extended) | ✅ Pass | Lihat "Addendum — AC-01-03 Ditutup via Extended Tour" di bawah |
 | AC-02-01 | — | `test_ac_02_01_qty_includes_pre_window_balance` | N/A | ✅ Pass | Run #1 ERROR (DIFF-15) → run #2 Pass setelah fix `_make_move()` |
 | AC-02-02 | — | (tidak ditest, by design) | N/A | — | Konsisten baseline 18.0 |
 | AC-03-01 | — | `test_ac_03_01_customer_return_is_income_only` | N/A | ✅ Pass | Run #1 ERROR (DIFF-15) → run #2 Pass |
@@ -57,7 +57,15 @@ Modul punya 1 Tour test (`static/tests/tours/stock_history_tour.js` + `tests/tes
 
 **Hasil eksekusi run #1:** `1 failed, 4 error(s) of 9 tests` — 4 error dari DIFF-15 (`ValueError: Invalid field 'name' in 'stock.move'`), 1 failed dari DIFF-16 (Tour timeout `.o_button_more` tidak ditemukan). DIFF-10 (open question Step 2) terkonfirmasi TIDAK bermasalah — 4 `env.ref()` picking type/lokasi semua resolve normal, error terjadi SETELAH itu di `stock.move.create()`.
 
-**Hasil eksekusi run #2 (final, setelah fix DIFF-15 & DIFF-16):** `0 failed, 0 error(s) of 9 tests` — dikonfirmasi silang jumlah baris log `Starting Test*` = 9 (exact match jumlah method: 8 Integration + 1 Tour), Tour menyelesaikan 10/10 step (satu step lebih sedikit dari project 17→18 yang 11 step — karena step "buka .o_button_more" dihapus, tombol diklik langsung).
+**Hasil eksekusi run #2 (setelah fix DIFF-15 & DIFF-16):** `0 failed, 0 error(s) of 9 tests` — dikonfirmasi silang jumlah baris log `Starting Test*` = 9 (exact match jumlah method: 8 Integration + 1 Tour), Tour menyelesaikan 10/10 step (satu step lebih sedikit dari project 17→18 yang 11 step — karena step "buka .o_button_more" dihapus, tombol diklik langsung).
+
+## Addendum — AC-01-03 Ditutup via Extended Tour (2026-08-26, setelah gate awal, saat Step 10 dimulai)
+
+**Revisi `05b_TEST_PLAN_MIGRATION.md`:** AC-01-03 awalnya didorong ke Step 10 Manual karena dianggap tidak ada jalur otomatis untuk verifikasi UI search panel groupby. Ternyata SALAH — sama seperti pola project 17→18 (Tour test ditemukan sebagai jalur otomatis pengganti AI-interaktif yang gagal), Tour yang SUDAH ADA (`stock_history_tour`) bisa diperpanjang 2 step tanpa infrastruktur baru: buka dropdown search options (`.o_searchview_dropdown_toggler`) → assert filter "By products" (`.o_group_by_menu .o_menu_item:contains("By products")`) masih ada & clickable. Ini "menambah test baru" (diizinkan `03_MIGRATION_SPEC.md` §4), BUKAN mengubah business logic.
+
+**Investigasi teknis yang mendasari:** dibaca langsung source `addons/web/static/src/search/search_bar_menu/search_bar_menu.xml` di `enterprise19.0` — heading "Group By" yang tampil ke user di dropdown TERNYATA di-render oleh komponen JS generik `SearchBarMenu` (`<h5 class="o_dropdown_title">Group By</h5>`, hardcoded di template, BUKAN dari atribut `string=` tag `<group>` arch modul). Ini berarti atribut `string="Group By"`/`expand="0"` yang dihapus dari `<group>` (DIFF-01) kemungkinan besar SUDAH TIDAK punya efek visual apapun di UI modern sejak beberapa versi — cuma legacy attribute yang baru sekarang ditolak skema RNG. Extended Tour ini mengonfirmasi SECARA EMPIRIS (bukan cuma dugaan dari baca source) bahwa filter groupby tetap tampil & berfungsi normal.
+
+**Hasil eksekusi run #3 (final):** `0 failed, 0 error(s) of 9 tests`, Tour menyelesaikan **12/12 step** (10 step lama + 2 step baru), step terakhir `[12/12] ... The 'By products' Group By filter is still present and clickable` sukses, log `tour succeeded`.
 
 ## Kontribusi ke Knowledge Base
 
@@ -65,7 +73,8 @@ Modul punya 1 Tour test (`static/tests/tours/stock_history_tour.js` + `tests/tes
   - **DIFF-15** (`stock.move.name` dihapus 19.0, ganti compute `reference`)
   - **DIFF-16** (button box `ButtonBox` threshold overflow `.o_button_more` berubah di 19.0)
   - Juga konfirmasi **DIFF-10 resolved** (xmlid `stock.picking_type_*`/`stock.stock_location_stock` tetap aman).
+  - Tambahan dari Addendum: **DIFF-01 klarifikasi** — heading "Group By" di UI adalah hardcoded di komponen JS generik `SearchBarMenu`, TIDAK berasal dari atribut `string=` tag `<group>` arch — kemungkinan atribut itu sudah vestigial (tanpa efek visual) sejak beberapa versi sebelum dihapus total dari skema di 19.0.
 
 ## Verdict
 
-- [x] ✅ **Semua AC prioritas Unit/Integration pass** — lanjut ke step 10 (AC-01-03 didorong eksplisit ke Step 10 sebagai satu-satunya item manual yang belum diverifikasi)
+- [x] ✅ **Semua AC pass, termasuk AC-01-03** (ditutup via extended Tour, addendum di atas) — lanjut ke step 10 tanpa item manual yang tertunda
