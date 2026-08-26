@@ -1,7 +1,7 @@
-# Dockerfile.target — product_history_report, Odoo 18.0
+# Dockerfile.target — product_history_report, Odoo 19.0
 # Instansiasi dari migration-tool/templates/Dockerfile.template — dibutuhkan untuk Tour test
 # (static/tests/tours/stock_history_tour.js, HttpCase.start_tour) di Step 9/10.
-FROM odoo:18.0
+FROM odoo:19.0
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends wget gnupg ca-certificates \
     && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \

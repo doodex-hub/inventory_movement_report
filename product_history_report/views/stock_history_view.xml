@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <search string="Stock History">
                 <field name="date"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="By products" name="groupby_product_template_id" domain="[]" context="{'group_by':'product_template_id'}"/>
                     <filter string="Date" name="groupby_date" domain="[]" context="{'group_by':'date'}"/>
                     <filter string="Category" name="groupby_category" domain="[]" context="{'group_by':'categ_id'}"/>

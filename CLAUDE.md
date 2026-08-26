@@ -118,6 +118,8 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 
 **Step 5 (Acceptance Criteria & Test Plan) selesai ditulis 2026-08-26** — `05a_MIGRATION_ACCEPTANCE_CRITERIA.md` (AC-01..AC-05, diwarisi dari project 17→18 + 1 AC baru `AC-01-03` untuk dampak cosmetic DIFF-01) + `05b_TEST_PLAN_MIGRATION.md`. Item kontinjensi DIFF-10 (xmlid picking type) ditandai wajib dicek PERTAMA saat G1 sebelum test lain dijalankan.
 
+**Step 6 (Code Migration) SELESAI 2026-08-26** — 4 fix diterapkan ke kode: DIFF-01 (`<group>` attrs), DIFF-02 (`groups_id`→`group_ids`), plus **DUA temuan BARU yang HANYA ketahuan lewat eksekusi G1 nyata** (Docker, Odoo 19.0 resmi, Mode C — AI jalankan langsung): **DIFF-15** (`stock.move.name` dihapus total, diganti compute `reference`) dan **DIFF-16** (tombol "Stock History" tidak collapse ke `.o_button_more` lagi di 19.0, tour perlu disesuaikan). G1 run #1 gagal (1 failed + 4 error dari 9 test), didokumentasikan dulu ke `02_DIFF_ANALYSIS.md`/`03_MIGRATION_SPEC.md` sebelum fix (prosedur wajib), G1 run #2 setelah fix: **0 failed, 0 error(s) of 9 tests** — install bersih + semua test (8 integration + 1 Tour, 10/10 step) PASS. DIFF-10 (open question Step 2) terkonfirmasi AMAN. Detail lengkap: `06_implementation/06c_IMPLEMENTATION_LOG.md`. Docker containers sudah di-teardown (`docker compose down -v`) setelah verifikasi. **Step 7 N/A** (port kode saja, dikonfirmasi ulang `01a_MIGRATION_INTAKE.md` §3).
+
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
@@ -129,8 +131,8 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 | 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ✅ Selesai ditulis | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (24/24 file cover) |
 | 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ✅ Selesai ditulis | — |
-| 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — |
-| 7 | Data Migration Scripts | — | ⬜ Belum mulai / — (N/A kalau port kode saja) | — |
+| 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ✅ Selesai (4 fix: DIFF-01/02/15/16, 2 ditemukan lewat G1 nyata) | — |
+| 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ⬜ Belum mulai | — |
 | 9 | Dev Testing | `09_DEV_TESTING.md` | ⬜ Belum mulai | — |
 | 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |

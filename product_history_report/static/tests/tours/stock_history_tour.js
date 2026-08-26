@@ -51,13 +51,8 @@ registry.category("web_tour.tours").add("stock_history_tour", {
             run: "click",
         },
         {
-            trigger: ".o_button_more",
-            content: "Open the 'More' stat-button overflow menu (Stock History collapses into it in 18.0)",
-            run: "click",
-        },
-        {
-            trigger: '.o_dropdown_more button:contains("Stock History")',
-            content: "Click the Stock History stat button",
+            trigger: 'button:contains("Stock History")',
+            content: "Click the Stock History stat button (visible directly in the button box in 19.0, no longer collapsed into '.o_button_more' overflow menu like 18.0)",
             run: "click",
         },
         {

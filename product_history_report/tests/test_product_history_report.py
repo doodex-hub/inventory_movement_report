@@ -62,7 +62,6 @@ class TestProductHistoryReport(TransactionCase):
             'company_id': company.id,
         })
         move = self.env['stock.move'].create({
-            'name': 'BACKFILL test move',
             'picking_id': picking.id,
             'product_id': self.product.product_variant_id.id,
             'product_uom_qty': qty,
@@ -186,7 +185,7 @@ class TestProductHistoryReport(TransactionCase):
         plain_user = self.env['res.users'].create({
             'name': 'BACKFILL Plain User',
             'login': 'backfill_plain_user',
-            'groups_id': [(6, 0, [self.env.ref('base.group_user').id])],
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id])],
         })
         # sanity: user ini TIDAK punya grup stock manapun
         self.assertFalse(plain_user.has_group('stock.group_stock_user'))
