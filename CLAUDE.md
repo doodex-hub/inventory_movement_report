@@ -126,6 +126,8 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 
 **Step 10 (QA Testing) lulus gate 2026-08-26** — `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/`. Berdasarkan lesson project 17→18 (AI-interaktif browser automation TERBUKTI GAGAL di environment ini, root cause `document.hidden`/`odoo.isReady` macet) — **tidak diulang lagi**, langsung pakai Tour test + Integration test yang terbukti reliable. S-01..S-07 semua PASS, tidak ada yang genuinely butuh klik manual dev. Docker instance sudah dimatikan.
 
+**Step 11 (UAT Sign-off) — DRAFT selesai ditulis 2026-08-26, MENUNGGU EKSEKUSI DEV.** `11_UAT_CHECKLIST.md` (T-01..T-03, bahasa awam) sudah disiapkan — kolom Actual/Status/Sign-off SENGAJA dikosongkan, ini gate FINAL yang wajib dijalankan tangan sendiri oleh business user/dev (bukan AI). **Semua 10 step sebelumnya (0-10) SELESAI dan lulus gate** — migrasi 18.0→19.0 secara teknis TUNTAS, cuma menunggu sign-off manusia untuk step 11. `git push` tetap 100% manual dev, belum pernah dijalankan dari sesi ini.
+
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
@@ -142,7 +144,7 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (0 🔴, 1 🟡, 3 🔵 — semua warisan source/deprecation opsional) |
 | 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (9/9 test PASS — 8 Integration + 1 Tour, Odoo 19.0 nyata) |
 | 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | ✔️ Disetujui | ✔️ Lulus (S-01..S-07 semua PASS via Tour+Integration, tidak ada yang butuh klik manual) |
-| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
+| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ✅ Draft selesai ditulis | ⏳ Menunggu eksekusi & sign-off dev/business user (T-01..T-03, tangan sendiri) |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.
 
