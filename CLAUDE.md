@@ -8,8 +8,8 @@ Kamu adalah migration copilot untuk project migrasi Odoo custom module berikut:
 
 - **Modul:** product_history_report
 - **Versi:** 18.0 → 19.0
-- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target) — **carried over dari asumsi project 17.0→18.0, BELUM dikonfirmasi ulang dev untuk project ini, cek di Step 1**
-- **Source masih aktif dikembangkan selama migrasi?** Tidak (asumsi carried over, sama seperti di atas — **belum dikonfirmasi ulang**)
+- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target) — dikonfirmasi dev 2026-08-26
+- **Source masih aktif dikembangkan selama migrasi?** Tidak — dikonfirmasi dev 2026-08-26
 - **Environment eksekusi:** Claude Code CLI
 - **Git eksekusi:** Ya. Mode Git aktif (lihat `ai-doc/USAGE_GUIDE.md` "Mode Git" di `migration-tool` untuk prosedur lengkap + pengaman wajib) — AI boleh menjalankan sebagian command git (`fetch`/`checkout`/`clone`/`commit`), TIDAK PERNAH `push`/merge/force-push, dan cuma untuk `target-codebase` (repo ini) + bootstrap `source-codebase` (sudah selesai, lihat di bawah). Konsekuensi: AI WAJIB auto-commit di `target-codebase` tepat setelah tiap step selesai — `git push` tetap 100% manual dev.
 - **Mulai:** 2026-08-26
@@ -108,7 +108,7 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 **Step 0 (bootstrap) selesai 2026-08-26.** Branch `migration/19.0_target` dibuat dari `origin/migration/18.0` di `target-codebase` (repo ini). `source-codebase` baru di-clone sebagai folder sibling `inventory-movement-report-migration-19-source` (branch `migration/18.0`, read-only). `.claude/settings.json` sudah diinstansiasi dari `migration-tool/templates/cli-config/settings.json.mode-git.template` dengan path project ini (lihat "Folder yang di-connect" di bawah).
 
-**Step 1 (Intake & Scope) BELUM dimulai** — menunggu konfirmasi dev untuk 2 field di "Identitas" di atas (Sifat migrasi, Source aktif dikembangkan — sementara di-carry-over dari asumsi project 17.0→18.0, belum dikonfirmasi ulang untuk project ini) sebelum `01a_MIGRATION_INTAKE.md` ditulis.
+Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 2026-08-26 (keduanya sama seperti project 17.0→18.0: port kode saja, source dibekukan). **Step 1 (Intake & Scope) draft selesai ditulis** — `01a_MIGRATION_INTAKE.md` + `01b_BASELINE_SPEC.md` + `FINDINGS.md` (root `doc/`), dibangun dari hasil project 17.0→18.0 yang sudah SELESAI+lulus UAT (baseline spec 18.0 dicross-check ulang ke kode aktual, tidak ada drift). Menunggu review user untuk menutup gate Step 1 — 2 open item minor belum dikonfirmasi eksplisit (dependency Enterprise/OCA & dokumen pelengkap lain di luar repo, lihat §Ringkasan `01a_MIGRATION_INTAKE.md`), tidak menghalangi lanjut ke Step 2 kalau dev setuju.
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -116,7 +116,7 @@ Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc
 
 | # | Step | Dokumen | Status | Gate |
 |---|---|---|---|---|
-| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ⬜ Belum mulai | ⏳ Menunggu konfirmasi dev |
+| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ✅ Draft/selesai ditulis | ⏳ Menunggu review user (2 open item minor, lihat §Ringkasan di `01a`) |
 | 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ⬜ Belum mulai | Tidak ada gate formal |
 | 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |
