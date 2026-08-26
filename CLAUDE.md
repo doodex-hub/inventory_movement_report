@@ -122,6 +122,8 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 
 **Step 8 (Code Review) lulus gate 2026-08-26** — `08_CODE_REVIEW.md`, 0 🔴 Critical, 1 🟡 (SQL f-string warisan MF-01, tidak diubah by design), 3 🔵 Info (dead code/import warisan + `self._cr` deprecated opsional). Gap Analysis vs Migration Spec dan vs Acceptance Criteria semua ✅ Match — satu-satunya item belum diverifikasi adalah AC-01-03 (manual, didorong ke Step 10). Tidak ada tabrakan nama method/field dengan core (dua arah dicek).
 
+**Step 9 (Dev Testing) lulus gate 2026-08-26** — `09_DEV_TESTING.md`, hasil eksekusi G1 Step 6 dipakai langsung sebagai evidence (0 failed, 0 error(s) of 9 tests — 8 Integration + 1 Tour, Odoo 19.0 nyata via Docker). AC-01-03 (satu-satunya AC tanpa test otomatis) didorong eksplisit ke Step 10.
+
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
@@ -136,7 +138,7 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 | 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ✅ Selesai (4 fix: DIFF-01/02/15/16, 2 ditemukan lewat G1 nyata) | — |
 | 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (0 🔴, 1 🟡, 3 🔵 — semua warisan source/deprecation opsional) |
-| 9 | Dev Testing | `09_DEV_TESTING.md` | ⬜ Belum mulai | — |
+| 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (9/9 test PASS — 8 Integration + 1 Tour, Odoo 19.0 nyata) |
 | 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |
 | 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
 
