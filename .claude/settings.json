@@ -1,5 +1,5 @@
 {
-  "_status": "DRAFT — BELUM DIVALIDASI (dibuat 2026-08-21, dikoreksi 2026-08-21 setelah cek dokumentasi resmi Claude Code — code.claude.com/docs/en/permissions). Varian settings.json.template INI KHUSUS untuk project yang mengaktifkan Mode Git (Git eksekusi = Ya di CLAUDE.md) — lihat ai-doc/USAGE_GUIDE.md 'Mode Git'. Kalau Git eksekusi = Tidak (default), pakai settings.json.template biasa. ADA placeholder {{ABS_PATH_...}} di bawah yang WAJIB diisi path absolut nyata sebelum dipakai — lihat README.md 'Koreksi path-matching', kalau tidak diisi rule-nya inert.",
+  "_status": "Project product_history_report (inventory_movement_report) 18.0→19.0 — diinstansiasi dari migration-tool/templates/cli-config/settings.json.mode-git.template pada 2026-08-26, diwarisi dari branch migration/18.0 (project 17.0→18.0 sebelumnya, sudah pakai migration-tool). Mode Git aktif.",
 
   "permissions": {
     "allow": [
@@ -63,9 +63,9 @@
       "Bash(git branch -D:*)",
       "Bash(gh pr create:*)",
 
-      "Edit(//D:/Kuncoro/doodex/repo/inventory-movement-report-migration-18-source/**)",
+      "Edit(//D:/Kuncoro/doodex/repo/inventory-movement-report-migration-19-source/**)",
       "Edit(//D:/Kuncoro/doodex/repo/odoo18/**)",
-      "Edit(//D:/Kuncoro/doodex/repo/odoo17/**)",
+      "Edit(//D:/Kuncoro/doodex/repo/enterprise19.0/**)",
       "Edit(//D:/Kuncoro/doodex/repo/migration-tool-project/migration-tool/knowledge/**)",
       "Edit(//D:/Kuncoro/doodex/repo/migration-tool-project/migration-tool/templates/**)"
     ]
