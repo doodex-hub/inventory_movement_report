@@ -112,6 +112,8 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 
 **Step 2 (Diff & Compatibility Analysis) selesai ditulis 2026-08-26** — `02_DIFF_ANALYSIS.md`, dicek langsung terhadap `native-target` (`enterprise19.0`) vs `native-source` (`odoo18`). 2 temuan install/test-blocking BARU (belum ada di knowledge base sebelumnya): **DIFF-01** atribut `expand`/`string` dihapus dari skema RNG tag `<group>` (search view modul ini pakai ini, install-blocking) dan **DIFF-02** `res.users.groups_id`→`group_ids` (kena test fixture modul, test-blocking) — keduanya wajib difix di Step 6. Satu open question (**DIFF-10**) soal xmlid `stock.picking_type_in/_out/_internal`/`stock.stock_location_stock` di test — kemungkinan besar aman tapi belum dibuktikan eksekusi nyata, ditunda ke Step 9 G1 (pola sama seperti `DIFF-12` project 17→18). Temuan dicatat sebagai kandidat di `migration-tool/migration-records/product_history_report_18.0_19.0/SUMMARY.md` (belum di-promote ke `knowledge/`).
 
+**Step 3 (Migration Spec teknis) selesai ditulis 2026-08-26** — `03_MIGRATION_SPEC.md`. Scope kode wajib: (1) hapus atribut `expand`/`string` di `views/stock_history_view.xml:10`, (2) rename `groups_id`→`group_ids` di `tests/test_product_history_report.py:189`, (3) bump manifest version ke `19.0.1.0.0`. DIFF-10 (xmlid picking type) sengaja TIDAK diubah sekarang — ditunda sampai Step 9 G1 membuktikan gagal/tidak, supaya tidak mengubah kode di luar scope yang genuinely perlu.
+
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
@@ -120,7 +122,7 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 |---|---|---|---|---|
 | 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ✅ Draft/selesai ditulis | ⏳ Menunggu review user (2 open item minor, lihat §Ringkasan di `01a`) |
 | 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ✅ Selesai ditulis | Tidak ada gate formal |
-| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
+| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ✅ Selesai ditulis | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |
 | 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ⬜ Belum mulai | — |
 | 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — |
