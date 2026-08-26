@@ -116,6 +116,8 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 
 **Step 4 (Spec Completeness Review) lulus gate 2026-08-26** — `04_SPEC_COMPLETENESS_REVIEW.md`, 24/24 file source module ter-cover di `03_MIGRATION_SPEC.md` (kriteria objektif/mekanis, AI self-certify konsisten dengan precedent project 17→18 — beda dari Step 1 yang butuh konfirmasi subjektif dev).
 
+**Step 5 (Acceptance Criteria & Test Plan) selesai ditulis 2026-08-26** — `05a_MIGRATION_ACCEPTANCE_CRITERIA.md` (AC-01..AC-05, diwarisi dari project 17→18 + 1 AC baru `AC-01-03` untuk dampak cosmetic DIFF-01) + `05b_TEST_PLAN_MIGRATION.md`. Item kontinjensi DIFF-10 (xmlid picking type) ditandai wajib dicek PERTAMA saat G1 sebelum test lain dijalankan.
+
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
@@ -126,7 +128,7 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 | 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ✅ Selesai ditulis | Tidak ada gate formal |
 | 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ✅ Selesai ditulis | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (24/24 file cover) |
-| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ⬜ Belum mulai | — |
+| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ✅ Selesai ditulis | — |
 | 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — |
 | 7 | Data Migration Scripts | — | ⬜ Belum mulai / — (N/A kalau port kode saja) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ⬜ Belum mulai | — |
