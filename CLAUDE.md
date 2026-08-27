@@ -128,7 +128,7 @@ Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 202
 
 **Step 11 (UAT Sign-off) — draft ditulis 2026-08-26, disetujui dev Kuncoro via chat 2026-08-26** ("UAT dianggap selesai, percaya test oleh AI") — dicatat apa adanya sebagai persetujuan verbal berdasarkan hasil eksekusi otomatis AI (Docker Odoo 19.0 nyata, 9/9 test PASS), BUKAN eksekusi tangan T-01..T-03 tercatat per-baris.
 
-**MIGRASI 18.0→19.0 SELESAI — SEMUA 11 STEP LULUS.** `git push` tetap 100% manual dev, belum pernah dijalankan otomatis dari sesi ini.
+**MIGRASI 18.0→19.0 SELESAI — SEMUA 11 STEP LULUS.** `git push` dijalankan manual oleh dev (dikonfirmasi `git fetch` — `origin/migration/19.0_target` sinkron dengan commit lokal terakhir, `aea668c`), bukan dari sesi AI.
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
