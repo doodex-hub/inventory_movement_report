@@ -8,6 +8,10 @@
 >
 > **Draft ini disiapkan AI, TAPI harus dijalankan tangan sendiri oleh business user/stakeholder** (bukan AI/developer). Kolom Actual/Status di bawah **dikosongkan dengan sengaja** — AI tidak akan mengisinya kecuali diminta eksplisit oleh orang yang bersangkutan setelah benar-benar mencoba sendiri.
 
+## Catatan Sign-off (2026-08-26)
+
+**Diterima via konfirmasi langsung dev (Kuncoro) di sesi ini — "UAT dianggap selesai, percaya test oleh AI" — BUKAN hasil eksekusi tangan per-langkah T-01/T-02/T-03 yang tercatat satu-satu.** Ditulis apa adanya (bukan diam-diam ditandai "Pass" per baris seolah sudah benar-benar diklik satu-satu), pola yang sama seperti sign-off project 17.0→18.0 sebelumnya. Dasar kepercayaan dev: seluruh skenario T-01..T-03 sudah tercermin di eksekusi otomatis AI yang genuinely dijalankan nyata (bukan simulasi) — Docker Odoo 19.0 resmi, 9/9 test PASS (8 Integration + 1 Tour, 12/12 langkah termasuk verifikasi filter Group By T-01 langkah 5) — lihat `09_devtest/09_DEV_TESTING.md` dan `10_qa/10_BUSINESS_FLOW_MIGRATION.md`. Kolom Actual/Status per baris T-01..T-03 di bawah tetap dikosongkan (bukan diisi AI) — kalau nanti staf Inventory ingin menjalankan skrip secara formal untuk verifikasi ulang, kolom itu tetap tersedia untuk diisi.
+
 ---
 
 ## Persiapan Sebelum UAT (Precondition & Data)
@@ -58,8 +62,8 @@
 
 | # | Kelompok fitur | Skenario tercakup | Status | Catatan |
 |---|---|---|---|---|
-| 1 | Laporan riwayat stok per produk (termasuk filter pengelompokan) | T-01, T-02 | [ ] Pass [ ] Fail | |
-| 2 | Perilaku lama yang dipertahankan (double-count transfer internal) | T-03 | [ ] Pass [ ] Fail | |
+| 1 | Laporan riwayat stok per produk (termasuk filter pengelompokan) | T-01, T-02 | [x] Pass | Diterima via konfirmasi dev, bukan eksekusi tangan per-langkah tercatat |
+| 2 | Perilaku lama yang dipertahankan (double-count transfer internal) | T-03 | [x] Pass | Diterima via konfirmasi dev, bukan eksekusi tangan per-langkah tercatat |
 
 ## Review Item Out-of-Scope
 
@@ -78,9 +82,7 @@ Stakeholder mengonfirmasi sadar & menerima hal-hal berikut TIDAK diperbaiki saat
 
 | Role | Nama | Tanggal | Tanda tangan |
 |---|---|---|---|
-| Dev/Owner | | | |
+| Dev/Owner | Kuncoro | 2026-08-26 | Disetujui via chat ("UAT dianggap selesai, percaya test oleh AI") — bukan tanda tangan formal/eksekusi tangan tercatat |
 | PM | | | |
 | FA | | | |
 | User | | | |
-
-> Kosongkan sampai stakeholder benar-benar menjalankan skenario T-01 dst. dengan tangan sendiri (atau eksplisit menyatakan persetujuan verbal, seperti project 17.0→18.0 sebelumnya — dicatat apa adanya, bukan diam-diam ditandai sebagai eksekusi tangan tercatat) dan menyetujui.
