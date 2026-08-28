@@ -68,7 +68,7 @@ Navigate to the Inventory Products to view the Product History Report.
 Once installed, the new smart button will be available in the Inventory Products. Click the smart button to view the Product History Report.
 
 ## Compatibility
-Odoo version: 17.0
+Odoo version: 19.0
 
 ## License
 This module is licensed under [LGPLv3 licensed](./LICENSE)
