@@ -1,145 +1,1555 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product History Report</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-</head>
-<body style="font-family: 'Roboto', sans-serif; margin: 0; padding: 0; box-sizing: border-box; background-color: #fff; color: #333;">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>
+         Product History Report for Odoo 18 &mdash; monthly stock in, out and on hand
+         | Doodex
+      </title>
+      <meta name="description" content="Free Odoo 18 module. Adds a Stock History button to every product form and shows twelve months of stock in, stock out and quantity on hand as a graph, pivot or list. LGPL-3, by Doodex.">
+      </head>
+   <body style="margin: 0">
+      <!-- =========================================================================
+  Product History Report -- Odoo Apps Store listing description
+  Odoo 18.0 * module version 18.0.1.0.0 * Free * LGPL-3 * Doodex
 
-<header class="hero" style="background-color: #ebac55; color: #fff; text-align: center; padding: 100px 20px; position: relative;">
-    <div class="logos" style="margin-bottom: 20px;">
-        <img src="./assets/doodex_odoo.png" alt="Company Logo" style="max-height: 100px;">
-    </div>
-    <h1 style="font-size: 3rem; color: #ffffff; font-weight: 700;">Product History Report</h1>
-    <p style="font-size: 1.25rem; font-weight: 400;">This custom Odoo module provides an insightful report on inventory movement over the last year. It offers a comprehensive view of stock changes, enabling better inventory management and decision-making.</p>
-    <a href="https://www.doodex.net/en/blog/doodex-blog-2/rapport-dhistorique-des-produits-101" class="btn btn-light btn-lg mt-4" style="background-color: #fff; color: #685563; border: none; padding: 10px 20px; text-decoration: none;">Learn More</a>
-</header>
+  PASTE TARGET
+    The "Description" field of the Odoo Apps Store upload for
+    product_history_report 18.0.1.0.0. The same markup is also shipped as
+    product_history_report/static/description/index.html -- see HOWTO.md.
 
-<div class="container" style="padding: 40px 20px;">
-    <section id="features" class="features-section" style="background-color: #ebac55; color: #fff; padding: 40px 20px;">
-        <h2 style="font-weight: 700; text-align: center; color: #ffffff;">Features</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="feature-card" style="background-color: #fff; color: #333; border: none; margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
-                    <h3 style="font-weight: 700;">Stock Input</h3>
-                    <p style="font-weight: 300;">Displays the total quantity and value of products received into inventory. This helps in tracking stock additions and understanding the supply inflow.</p>
-                </div>
+  LAYOUT
+    Archetype C (screenshot-first) from the odoo-store-layouts skill:
+    compact hero (H-4), the screenshot showcase pulled to the top, all-white
+    background rhythm with hairline rules (R-1), icon-row features (F-1),
+    restrained coral accent (A-1). Deliberately unlike the previous Doodex
+    listing (Flow Survey Builder = long-form scroll), per the anti-repetition
+    rule in references/variety-checklist.md.
+
+
+  VERSION 18.0 - DERIVED, NOT HAND-WRITTEN
+    Generated from the 17.0 source with tools/variant.py. Edit the 17.0 source
+    and re-derive; do not patch this file by hand or the versions drift.
+
+    Two things are deliberately not what you might expect:
+
+    * The screenshots and GIFs are recordings of the 17.0 build. The showcase
+      copy and the image alt text therefore do NOT name a version - a caption
+      claiming Odoo 18.0 over an Odoo 17 screen would be a false statement on a
+      store listing. Re-record against a 18.0 database and the version can go
+      back into those sentences.
+    * Cross-sell links point at the version of each module that actually
+      exists, checked against apps.odoo.com: Growth Suite 18.0, Flow Survey
+      Reader 18.0, Flow Survey Builder 18.0.
+
+  RULES BAKED IN
+   * IT SURVIVES odoo.tools.mail.html_sanitize(). What the store really does,
+     measured on a published listing rather than assumed: it deletes every
+     style element from the description (counted: 0 left inside
+     #module-description), it keeps attributes such as details[open] and
+     aria-label, so it runs the DEFAULT flags - and it does NOT load Bootstrap's
+     JavaScript, though it does load Bootstrap's CSS with a 2rem gutter. This
+     file is written to the stricter profile anyway: every colour, size,
+     border, radius and space is an inline style attribute using only
+     whitelisted properties, with no var() left to resolve, so a tightening of
+     the filter cannot break it. Re-check after every edit with
+     tools/check_store_html.py, and re-measure the layout against the original
+     with tools/compare.js before believing a change is safe.
+   * TYPE IS STATED PER ELEMENT, not inherited. The store styles plain tags
+     itself - h1 56px, h2 44px, h3 32px, h4 24px, p and figure margin-bottom
+     16px, code 14px, .lead 20px/300, .small 14px, .badge 12px/500 - and it
+     claims the .btn class for its own buttons. Anything not stated inline
+     inherits THAT. So the typography here was harvested from the original
+     design as a browser computed it and written onto each element.
+   * GUTTERS ARE STATED IN PIXELS, never with Bootstrap's g-* classes: the
+     store's gutter is 2rem where a stock Bootstrap 5 gives 1.5rem, so g-*
+     would render one spacing here and another there. Column WIDTHS still come
+     from col-* classes, which is what keeps the page responsive.
+   * NOTHING IS HIDDEN, anywhere, by anything the sanitiser can remove. The
+     screenshot showcase used to be a CSS :target tab strip whose display:none
+     rules lived in the style block, so on the store all five panels fell open
+     under a pill nav that highlighted nothing. Bootstrap tabs cannot replace
+     it: the store has the CSS that hides an inactive .tab-pane and none of the
+     JavaScript that would bring it back, so marking the panels up as tabs is
+     the one option that actively loses content. All five screens are in the
+     flow, in a column beside the step list, and the step list is a plain jump
+     nav that needs neither CSS nor JavaScript.
+   * Zero script tags, and zero dependency on anyone else's.
+   * NO EXTERNAL RESOURCE IS LOADED FROM THIS FILE. The vendor guidelines allow
+     only resources inside static/description, canonical YouTube links,
+     Microsoft Teams links, mailto: and skype:; every other external link is
+     invalidated. The Google Fonts link tags that used to sit in head bought
+     nothing - the store strips head, and it already serves Inter itself - and
+     left two third-party hosts in a file a reviewer reads.
+   * LINKS. mailto: is the only href that leaves the store. The three
+     cross-sell buttons use root-relative /apps/modules/17.0/... paths, which
+     stay inside apps.odoo.com and so are not external links at all. Every
+     other destination is printed as visible text AND encoded in a QR image.
+     Do not paste an absolute http(s) URL into an href here.
+   * Every claim on this page is sourced from the module itself: __manifest__.py,
+     models/stock_history_view.py, models/product_template.py, views/*.xml,
+     security/ir.model.access.csv and doc-dev/backfill/. No invented figure,
+     no invented comparison column.
+   * The nav strip is NOT sticky and nothing targets html or :root - a pinned
+     bar would float over the store's own header, and this fragment does not
+     own the document root. Everything is scoped under .phr.
+   * No inline SVG. Every icon, mark and QR code is a PNG in ./assets/icons,
+     drawn at three times its display size so it stays sharp on retina
+     screens. Because the intrinsic size is therefore wrong on purpose, each
+     icon carries its display size as an inline width/height, which beats any
+     stylesheet rule including the store's own - it used to be a CSS class,
+     which the sanitiser took away with the style block. Every image also
+     states its own max-width: the store computes img { max-width: none }.
+   * The file is pure ASCII. Punctuation is written as HTML entities so nothing
+     can be mangled by a paste into the store form.
+   * Every screenshot and GIF is a real recording made on fsdemo17.doodex.net
+     against [E-COM09] Large Desk and [FURN_6741] Large Meeting Table. Only
+     banner.png is still a placeholder. See HOWTO.md S3b-3e.
+   * Upload ./assets into the module's static/description folder next to
+     index.html, keeping the folder names. Nothing here loads an image from
+     anywhere else.
+========================================================================== -->
+      <div class="phr" style='background-color: #ffffff; color: rgb(82, 82, 82); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 16px; line-height: 26.4px'>
+         <style>
+/* ---------------------------------------------------------------------------
+   NOTHING LOAD-BEARING LIVES IN THIS BLOCK, on purpose.
+
+   What the Odoo Apps Store actually does to a description, measured on a
+   published listing (apps.odoo.com/apps/modules/17.0/flow_survey) rather than
+   assumed:
+
+     * style elements inside #module-description: 0. The block below is
+       deleted, always - html_sanitize() kills style at every flag level.
+     * details[open], aria-label, role, target and loading all survive, so the
+       store runs the DEFAULT flags, not the strict attribute/style filter.
+       Inline CSS is therefore not filtered today - but this file is written to
+       the strict whitelist anyway, so a tightening cannot break it.
+     * window.bootstrap is undefined: the page loads only
+       web.assets_frontend_minimal, so there is NO Bootstrap JavaScript. Any
+       data-bs-toggle component is inert there.
+     * Bootstrap's CSS *is* loaded, and its gutter is 2rem - .row computes
+       margin -16px where a stock Bootstrap 5 gives -12px. So the column
+       classes are usable but the gutter classes are not: every gap on this
+       page is stated inline in the original design's own pixels instead.
+     * The store styles plain tags itself - h1 56px, h2 44px, h3 32px, h4 24px,
+       p and figure margin-bottom 16px, code 14px, .lead 20px/300, .small 14px,
+       .badge 12px/500 - and it takes the .btn class for its own buttons.
+       Anything this listing does not state inline inherits THAT, not a
+       neutral default. Which is why the type is inlined per element, harvested
+       from the original design as a browser computed it.
+
+   So every colour, size, border, radius and space the design needs is an
+   inline style attribute using whitelisted properties only. What is left here
+   is three things, all of which the page can lose without becoming unreadable:
+
+   1. A Bootstrap 5 fallback for the column classes, so the file also lays out
+      correctly opened straight off disk where no Bootstrap exists at all.
+   2. The properties the whitelist has no room for - box-shadow, ::before and
+      ::after decoration, hover states, cursor, box-sizing. Nothing here hides
+      anything: no display:none rule lives in this block, so no part of the
+      page can become unreachable by losing it.
+   3. Media queries. Everything they override is inlined, so those rules carry
+      !important; the columns themselves stack through col-* breakpoints.
+
+   Check any change with tools/check_store_html.py, and re-measure the layout
+   against the original with tools/compare.js before believing it.
+   --------------------------------------------------------------------------- */
+.phr,
+.phr *,
+.phr *::before,
+.phr *::after {
+    box-sizing: border-box;
+}
+.phr {
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+}
+.phr img {
+    max-width: 100%;
+}
+.phr a {
+    overflow-wrap: anywhere;
+}
+.phr code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.phr .sec[id] {
+    scroll-margin-top: 20px;
+}
+.phr .reason .num {
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Bootstrap 5 fallback: only the classes this page uses ---------------- */
+.phr .row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(-1 * var(--bs-gutter-y));
+    margin-right: calc(-0.5 * var(--bs-gutter-x));
+    margin-left: calc(-0.5 * var(--bs-gutter-x));
+}
+.phr .row > * {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    margin-top: var(--bs-gutter-y);
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+}
+.phr .col-6 {
+    flex: 0 0 auto;
+    width: 50%;
+}
+.phr .col-12 {
+    flex: 0 0 auto;
+    width: 100%;
+}
+.phr .d-flex {
+    display: flex !important;
+}
+.phr .d-inline-flex {
+    display: inline-flex !important;
+}
+.phr .d-inline-block {
+    display: inline-block !important;
+}
+.phr .flex-wrap {
+    flex-wrap: wrap !important;
+}
+.phr .flex-column {
+    flex-direction: column !important;
+}
+.phr .align-items-start {
+    align-items: flex-start !important;
+}
+.phr .align-items-center {
+    align-items: center !important;
+}
+.phr .justify-content-between {
+    justify-content: space-between !important;
+}
+.phr .justify-content-center {
+    justify-content: center !important;
+}
+@media (min-width: 768px) {
+    .phr .col-md {
+        flex: 1 0 0%;
+    }
+    .phr .col-md-auto {
+        flex: 0 0 auto;
+        width: auto;
+    }
+    .phr .col-md-3 {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+    .phr .col-md-4 {
+        flex: 0 0 auto;
+        width: 33.33333333%;
+    }
+    .phr .col-md-6 {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+}
+@media (min-width: 992px) {
+    .phr .col-lg-4 {
+        flex: 0 0 auto;
+        width: 33.33333333%;
+    }
+    .phr .col-lg {
+        flex: 1 0 0%;
+    }
+    .phr .col-lg-auto {
+        flex: 0 0 auto;
+        width: auto;
+    }
+}
+
+/* --- depth and hover: decoration the whitelist has no property for -------- */
+.phr .btn-primary {
+    box-shadow: 0 8px 22px rgba(250, 114, 104, 0.32);
+}
+.phr .heroshot {
+    box-shadow: 0 4px 14px rgba(39, 1, 64, 0.08);
+}
+.phr .uc,
+.phr .xcard,
+.phr .scshot {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.phr .xcard-dark {
+    box-shadow: 0 12px 28px rgba(39, 1, 64, 0.26);
+}
+.phr .jump a:hover {
+    background-color: #ffffff;
+    color: #270140;
+}
+.phr .xcta:hover,
+.phr .qr-btn:hover,
+.phr .btn:hover {
+    text-decoration: none;
+}
+
+/* --- screenshot showcase ---------------------------------------------------
+   Five details/summary rows. It used to be a CSS :target tab strip whose
+   display:none rules lived HERE, so on the store - where this block is deleted
+   - all five panels fell open under a pill nav that highlighted nothing. And
+   Bootstrap tabs could not replace it: the store loads the CSS that hides an
+   inactive .tab-pane and none of the JavaScript that would bring one back, so
+   tab markup is the one option that actively loses content. An accordion needs
+   neither. All that is left here is the scroll offset for the jump links. */
+.phr .scpanel {
+    scroll-margin-top: 80px;
+}
+
+/* --- accordions: the FAQ and the See-it showcase --------------------------
+   Both are details/summary, which is why they work at all: native browser
+   behaviour needs no stylesheet and no script, and the store keeps
+   details[open]. The marker is suppressed here AND by an inline display:flex
+   on every summary - the store computes summary { display: list-item;
+   list-style-type: disclosure-closed } and would otherwise draw its own
+   triangle next to our chevron. Only the chevron's spin lives here; losing it
+   costs nothing. */
+.phr summary {
+    cursor: pointer;
+    list-style: none;
+}
+.phr summary::-webkit-details-marker {
+    display: none;
+}
+.phr summary::marker {
+    content: "";
+}
+.phr .phr-chev {
+    transition: transform 0.18s ease;
+}
+.phr details[open] > summary .phr-chev {
+    transform: rotate(90deg);
+}
+.phr .sc-summary:hover .t,
+.phr .faq summary:hover {
+    color: #3a1a5a;
+}
+@media (prefers-reduced-motion: reduce) {
+    .phr .phr-chev {
+        transition: none;
+    }
+}
+
+/* --- release timeline dot ------------------------------------------------- */
+.phr .relitem {
+    position: relative;
+}
+.phr .relitem::before {
+    content: "";
+    position: absolute;
+    left: -29px;
+    top: 7px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #fa7268;
+    box-shadow: 0 0 0 3px #ffffff;
+}
+
+/* --- responsive: every value below is inlined, hence !important ----------- */
+@media (max-width: 620px) {
+    .phr .hero h1 {
+        font-size: 29px !important;
+    }
+    .phr .hero .hook {
+        font-size: 16.5px !important;
+    }
+    .phr .h2 {
+        font-size: 22px !important;
+    }
+    .phr .qrcta {
+        padding: 26px 20px 22px !important;
+    }
+    .phr .limits {
+        padding: 24px 20px !important;
+    }
+    /* the stat row is col-6 col-md-3, so on a phone it is two per line and the
+       vertical rule between four cells becomes a horizontal one between rows */
+    .phr .statrow .st {
+        border-left-width: 0 !important;
+        border-top: 1px solid #ece4f3 !important;
+    }
+    .phr .statrow .col-6:first-child .st,
+    .phr .statrow .col-6:nth-child(2) .st {
+        border-top-width: 0 !important;
+    }
+    .phr .reason .num {
+        font-size: 28px !important;
+        padding-right: 0 !important;
+        width: auto !important;
+    }
+}
+
+</style>
+
+         <!-- -- Top strip: identity + jump menu (not sticky, on purpose) ----------- -->
+         <div class="strip" style="border-bottom: 1px solid #ece4f3; background-color: #faf7fc">
+            <div class="strip-in d-flex flex-wrap align-items-center justify-content-between" style="max-width: 1080px; margin: 0 auto; padding: 12px 24px; display: flex; margin-bottom: -10px">
+               <div class="brand d-inline-flex align-items-center" style="display: inline-flex; font-size: 14px; font-weight: 800; color: rgb(39, 1, 64); letter-spacing: -0.14px; line-height: 23.1px; margin-bottom: 10px">
+                  <img class="brandmark" src="./assets/icons/logo-phr.png" alt="Product History Report" style="max-width: none; width: 26px; height: 26px; display: block; color: rgb(39, 1, 64); font-size: 14px; font-style: normal; font-weight: 800; letter-spacing: -0.14px; line-height: 23.1px; text-align: start; text-transform: none; white-space: normal; margin-right: 10px; min-width: 26px">Product History Report
+               </div>
+               <div class="jump" style="display: block; margin-bottom: 10px">
+                  <a href="#phr-see" style="color: rgb(82, 82, 82); font-size: 13px; font-weight: 600; text-decoration: none; padding: 5px 11px; border-radius: 9999px; font-style: normal; letter-spacing: normal; line-height: 21.45px; text-align: start; text-transform: none; white-space: nowrap; display: inline-block; margin: 0 4px 0 0">See it</a>
+                  <a href="#phr-features" style="color: rgb(82, 82, 82); font-size: 13px; font-weight: 600; text-decoration: none; padding: 5px 11px; border-radius: 9999px; font-style: normal; letter-spacing: normal; line-height: 21.45px; text-align: start; text-transform: none; white-space: nowrap; display: inline-block; margin: 0 4px 0 0">Features</a>
+                  <a href="#phr-why" style="color: rgb(82, 82, 82); font-size: 13px; font-weight: 600; text-decoration: none; padding: 5px 11px; border-radius: 9999px; font-style: normal; letter-spacing: normal; line-height: 21.45px; text-align: start; text-transform: none; white-space: nowrap; display: inline-block; margin: 0 4px 0 0">Why install it</a>
+                  <a href="#phr-needs" style="color: rgb(82, 82, 82); font-size: 13px; font-weight: 600; text-decoration: none; padding: 5px 11px; border-radius: 9999px; font-style: normal; letter-spacing: normal; line-height: 21.45px; text-align: start; text-transform: none; white-space: nowrap; display: inline-block; margin: 0 4px 0 0">Requirements</a>
+                  <a href="#phr-faq" style="color: rgb(82, 82, 82); font-size: 13px; font-weight: 600; text-decoration: none; padding: 5px 11px; border-radius: 9999px; font-style: normal; letter-spacing: normal; line-height: 21.45px; text-align: start; text-transform: none; white-space: nowrap; display: inline-block; margin: 0 4px 0 0">FAQ</a>
+                  <a href="#phr-releases" style="color: rgb(82, 82, 82); font-size: 13px; font-weight: 600; text-decoration: none; padding: 5px 11px; border-radius: 9999px; font-style: normal; letter-spacing: normal; line-height: 21.45px; text-align: start; text-transform: none; white-space: nowrap; display: inline-block; margin: 0 4px 0 0">Releases</a>
+               </div>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card" style="background-color: #fff; color: #333; border: none; margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
-                    <h3 style="font-weight: 700;">Stock Output</h3>
-                    <p style="font-weight: 300;">Shows the total quantity and value of products dispatched from inventory. This is useful for monitoring stock depletion and managing demand fulfillment.</p>
-                </div>
+         </div>
+
+         <!-- -- Trust bar: facts only, before any sales text ----------------------- -->
+         <div class="sec-tight" style="padding: 32px 0">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="chips" style="display: block; text-align: center; margin-bottom: -8px">
+                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Odoo Official Partner</span>
+                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Odoo 18.0 &mdash; Community &amp; Enterprise</span>
+                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Free &middot; LGPL-3 &middot; no key, no limit</span>
+                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Reads your data, never writes to it</span>
+                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">8 automated tests, shipped inside</span>
+               </div>
             </div>
-            <div class="col-md-4">
-                <div class="feature-card" style="background-color: #fff; color: #333; border: none; margin: 20px 0; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
-                    <h3 style="font-weight: 700;">Stock Quantity</h3>
-                    <p style="font-weight: 300;">Provides the current quantity and value of products in inventory. This assists in maintaining optimal stock levels and avoiding stockouts or overstocking.</p>
-                </div>
+         </div>
+
+         <!-- -- Hero (H-4 compact): pain -> promise, then straight to the visual ---- -->
+         <div class="hero" style="padding: 44px 0 28px; text-align: center">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: center; white-space: normal">
+                  Product History Report &middot; Odoo 18 &middot; Inventory &middot; Free
+               </p>
+               <h1 style="color: rgb(39, 1, 64); letter-spacing: -1.05px; margin: 0 auto 18px; font-size: 42px; font-weight: 800; line-height: 46.2px; max-width: 880px; font-style: normal; text-align: center; text-transform: none; white-space: normal">
+                  A year of stock movement for any Odoo product &mdash; one
+                  click from the product page.
+               </h1>
+               <p class="hook" style="margin: 0 auto 10px; max-width: 720px; font-size: 18px; line-height: 27.9px; color: rgb(23, 23, 23); font-weight: 600; font-style: normal; letter-spacing: normal; text-align: center; text-transform: none; white-space: normal">
+                  Answering &ldquo;how did this product actually move last
+                  year?&rdquo; in Odoo means scrolling through stock moves line
+                  by line.
+               </p>
+               <p class="sub" style="margin: 0 auto 24px; max-width: 720px; font-size: 16px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">
+                  <b style="color: rgb(115, 115, 115); font-size: 16px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">Product History Report</b> is a free Odoo 18 module that
+                  adds a <b style="color: rgb(115, 115, 115); font-size: 16px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">Stock History</b> button to every product form. One
+                  click gives you twelve months of stock in, stock out and
+                  quantity on hand &mdash; as a chart, a pivot or a list, built
+                  from the stock moves already sitting in your database. No
+                  setup, no new data to maintain, no subscription.
+               </p>
+               <div class="btnrow" style="display: block; margin-bottom: -10px; text-align: center">
+                  <a class="btn btn-primary d-inline-flex align-items-center justify-content-center" href="mailto:odoo@doodex.net?subject=Product%20History%20Report" style="display: inline-flex; font-weight: 700; font-size: 14.5px; text-decoration: none; padding: 10.5px 20.5px; border-radius: 10px; color: rgb(255, 255, 255); background-color: #fa7268; font-style: normal; letter-spacing: normal; line-height: 23.925px; text-align: center; text-transform: none; white-space: normal; margin: 0 10px 10px 0; border: 1.5px solid #fa7268">Ask us anything about it</a>
+                  <a class="btn btn-ghost d-inline-flex align-items-center justify-content-center" href="#phr-see" style="display: inline-flex; font-weight: 700; font-size: 14.5px; text-decoration: none; padding: 10.5px 20.5px; border-radius: 10px; color: rgb(39, 1, 64); background-color: #fff; font-style: normal; letter-spacing: normal; line-height: 23.925px; text-align: center; text-transform: none; white-space: normal; margin: 0 10px 10px 0; border: 1.5px solid #270140">See the five screens</a>
+               </div>
+
+               <figure class="heroshot" style="margin: 30px auto 0; max-width: 960px; border-radius: 20px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal; border: 1px solid #e9dff1; margin-bottom: 0">
+                  <img src="./assets/gifs/hero-full-journey.gif" alt="Opening a product in Odoo, clicking the Stock History button and landing on a twelve-month stock chart" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal; border-radius: 19px">
+               </figure>
+               <p class="shotcap" style="margin: 10px 0 0; font-size: 12.5px; color: rgb(115, 115, 115); text-align: center; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 20.625px; text-transform: none; white-space: normal">
+                  Product form &rarr; Stock History &rarr; twelve months of
+                  movement. No menu to find, no filter to build.
+               </p>
             </div>
-        </div>
-    </section>
+         </div>
 
-    <section id="screenshots" style="padding: 40px 20px;">
-        <h2 style="font-weight: 700; padding-bottom: 20px;">Screenshots</h2>
-
-        <div class="image-section" style="text-align: center; margin-bottom: 40px;">
-            <img src="./assets/image_inventory_move.png" alt="Descriptive Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        </div>
-
-        <div class="image-section" style="text-align: center; margin-bottom: 40px;">
-            <img src="./assets/image_inventory_move2.png" alt="Descriptive Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        </div>
-
-        <div class="image-section" style="text-align: center;">
-            <img src="./assets/image_inventory_move3.png" alt="Descriptive Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-        </div>
-    </section>
-
-    <section id="benefits" class="my-5">
-        <h2 style="font-weight: 700;">Benefits</h2>
-        <ul>
-            <li><strong>Enhanced Inventory Visibility:</strong> Gain deeper insights into the movement and status of inventory items, leading to better stock control and management.</li>
-            <li><strong>Improved Demand Forecasting:</strong> Analyze movement trends to predict future inventory needs, ensuring timely replenishment and reducing the risk of stockouts.</li>
-            <li><strong>Efficient Inventory Management:</strong> Track inbound, outbound, and adjusted stock quantities to maintain accurate records and streamline inventory operations.</li>
-            <li><strong>Better Decision-Making:</strong> Access detailed inventory movement data to make informed decisions regarding purchasing, stocking, and sales strategies.</li>
-        </ul>
-    </section>
-
-    <section id="installation" class="my-5">
-        <h2 style="font-weight: 700;">Installation</h2>
-        <ol>
-            <li>Download the module from this repository.</li>
-            <li>Install the module in your Odoo instance.</li>
-            <li>Navigate to the Inventory Products to view the Product History Report.</li>
-        </ol>
-    </section>
-
-    <section id="usage" class="my-5">
-        <h2 style="font-weight: 700;">Usage</h2>
-        <p>Once installed, the new smart button will be available in the Inventory Products. Click the smart button to view the Product History Report.</p>
-    </section>
-
-    <section id="compatibility" class="my-5">
-        <h2 style="font-weight: 700;">Compatibility</h2>
-        <p>Odoo version: 17.0</p>
-    </section>
-
-    <section id="license" class="my-5">
-        <h2 style="font-weight: 700;">License</h2>
-        <p>This module is licensed under LGPLv3 licensed.</p>
-    </section>
-
-    <div class="separator" style="border-top: 1px solid #ddd; margin: 40px 0;"></div>
-
-    <section id="about" class="my-5">
-        <h2 style="font-weight: 700;"></h2>
-        <p>Welcome to Doodex: Your Partner in Tailor-Made Odoo Solutions</p>
-        <p>At Doodex, we believe that every business is unique, with its own set of challenges and opportunities. That’s why we specialize in delivering customized Odoo solutions tailored to meet the specific needs of your organization. Our expertise in Python development and deep understanding of the Odoo platform enable us to provide unparalleled services that drive efficiency, enhance productivity, and support your business growth.</p>
-        <h3 style="font-weight: 700;">About Doodex</h3>
-        <p>Doodex is a leading provider of business management solutions built on the Odoo framework. With a focus on customization and flexibility, we offer a wide range of services designed to optimize your business processes. Our team of experienced developers and consultants work closely with you to understand your requirements and deliver solutions that are perfectly aligned with your business goals.</p>
-        <h3 style="font-weight: 700;">Our Services</h3>
-        <ul>
-            <li><strong>Odoo Customization:</strong> Our customization services ensure that the Odoo platform is tailored to fit your unique business needs. From modifying existing modules to developing new functionalities, we provide solutions that enhance the efficiency of your operations.</li>
-            <li><strong>Tailor-Made Solutions:</strong> At Doodex, we understand that one size does not fit all. Our tailor-made solutions are designed to address the specific challenges faced by your business. We offer bespoke development services that create a perfect match between Odoo’s capabilities and your business requirements.</li>
-            <li><strong>Python Development:</strong> Our team of skilled Python developers brings extensive experience in developing robust and scalable applications. Whether you need a custom module, a complex integration, or a standalone application, we leverage the power of Python to deliver high-quality solutions.</li>
-            <li><strong>Integration Services:</strong> We help you integrate Odoo with other systems and applications to ensure seamless data flow and unified operations. Our integration services cover a wide range of systems including CRM, ERP, eCommerce platforms, and more.</li>
-            <li><strong>Odoo Implementation:</strong> We offer end-to-end Odoo implementation services, guiding you through the entire process from initial consultation to final deployment. Our structured approach ensures a smooth transition and rapid adoption of the new system.</li>
-            <li><strong>Support and Maintenance:</strong> Our commitment to your success doesn’t end with implementation. We provide ongoing support and maintenance services to ensure that your Odoo system runs smoothly and efficiently, allowing you to focus on your core business activities.</li>
-        </ul>
-        <h3 style="font-weight: 700;">Why Choose Doodex?</h3>
-        <ul>
-            <li><strong>Expertise in Odoo:</strong> Our team has a deep understanding of the Odoo platform and its various modules, enabling us to deliver solutions that are both effective and efficient.</li>
-            <li><strong>Customized Solutions:</strong> We believe in providing solutions that are tailored to your specific needs, ensuring maximum ROI.</li>
-            <li><strong>Proven Track Record:</strong> We have successfully implemented Odoo solutions for a wide range of businesses across different industries.</li>
-            <li><strong>Commitment to Quality:</strong> Our focus on quality ensures that every solution we deliver meets the highest standards of excellence.</li>
-            <li><strong>Comprehensive Support:</strong> We offer continuous support and maintenance services to keep your system up-to-date and running smoothly.</li>
-        </ul>
-        <h3 style="font-weight: 700;">Get in Touch</h3>
-        <p>If you are looking for a partner who can provide customized Odoo solutions tailored to your business needs, look no further than Doodex. Visit our website at <a href="https://www.doodex.net/" style="color: #ebac55;">www.doodex.net</a> to learn more about our services and how we can help you achieve your business objectives.</p>
-        <p>Get a free audit <a href="https://www.doodex.net/en/contactus" style="color: #ebac55;">here</a>.</p>
-    </section>
-
-    <section id="contact" class="contact-section" style="background-color: #f4f4f4; padding: 40px 20px; text-align: center;">
-        <h2 style="font-weight: 700;">Contact Us</h2>
-        <p>If you have any questions or need further information, feel free to reach out to us.</p>
-        <a href="mailto:nisrinamirandaa@doodex.net" class="btn btn-primary" style="background-color: #ebac55; color: #fff; border: none; padding: 10px 20px; text-decoration: none;">Email Us</a>
-    </section>
+         <!-- -- Stat row: four numbers, all checkable in the module --------------- -->
+         <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+            <div class="statrow row" style="text-align: center; border-top: 1px solid #ece4f3; border-bottom: 1px solid #ece4f3; margin-left: 0; margin-right: 0; margin-top: 0px">
+               <div class="col-6 col-md-3" style="padding-left: 0px; padding-right: 0px"><div class="st" style="padding: 22px 12px; border-left-width: 0; border-left-style: none; height: 100%">
+                  <div class="n" style="font-size: 36px; font-weight: 800; color: rgb(39, 1, 64); letter-spacing: -1.08px; line-height: 36px">12</div>
+                  <div class="l" style="font-size: 12.5px; color: rgb(115, 115, 115); margin-top: 8px; line-height: 20.625px">months of history, per product</div>
+               </div>
+               </div>
+<div class="col-6 col-md-3" style="padding-left: 0px; padding-right: 0px"><div class="st" style="padding: 22px 12px; border-left-width: 1px; border-left-style: solid; border-left-color: #ece4f3; height: 100%">
+                  <div class="n" style="font-size: 36px; font-weight: 800; color: rgb(39, 1, 64); letter-spacing: -1.08px; line-height: 36px">3</div>
+                  <div class="l" style="font-size: 12.5px; color: rgb(115, 115, 115); margin-top: 8px; line-height: 20.625px">views: graph, pivot, list</div>
+               </div>
+               </div>
+<div class="col-6 col-md-3" style="padding-left: 0px; padding-right: 0px"><div class="st" style="padding: 22px 12px; border-left-width: 1px; border-left-style: solid; border-left-color: #ece4f3; height: 100%">
+                  <div class="n" style="font-size: 36px; font-weight: 800; color: rgb(39, 1, 64); letter-spacing: -1.08px; line-height: 36px">4</div>
+                  <div class="l" style="font-size: 12.5px; color: rgb(115, 115, 115); margin-top: 8px; line-height: 20.625px">
+                     ways to group: product, month, category, unit
+                  </div>
+               </div>
+               </div>
+<div class="col-6 col-md-3" style="padding-left: 0px; padding-right: 0px"><div class="st" style="padding: 22px 12px; border-left-width: 1px; border-left-style: solid; border-left-color: #ece4f3; height: 100%">
+                  <div class="n" style="font-size: 36px; font-weight: 800; color: rgb(39, 1, 64); letter-spacing: -1.08px; line-height: 36px">0</div>
+                  <div class="l" style="font-size: 12.5px; color: rgb(115, 115, 115); margin-top: 8px; line-height: 20.625px">settings to configure</div>
+               </div>
+            </div>
 </div>
+         </div>
 
-<footer style="background-color: #ebac55; color: #fff; text-align: center; padding: 20px;">
-    <div class="logos" style="margin-bottom: 10px;">
-        <img src="./assets/doodex_odoo.png" alt="Company Logo" style="max-height: 80px;">
-    </div>
-    <p style="margin: 0;">&copy; 2024 Doodex. All rights reserved.</p>
-</footer>
+         <!-- -- Showcase: archetype C puts the product on screen first ------------ -->
+         <div class="sec" id="phr-see" style="padding: 56px 0">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">See it</p>
+               <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 8px">
+                  One button, and then the whole year
+               </h2>
+               <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; max-width: 760px; margin-bottom: 28px">
+                  Five screens of the stock history report, exactly as
+                  it installs. No theme, no custom view, nothing else to buy.
+               </p>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+               <div class="scase" style="display: block">
+                  <details class="scpanel" id="phr-sc-1" open="open" style="border-top: 1px solid #ece4f3; padding: 2px 0"><summary class="sc-summary d-flex align-items-center justify-content-between" style="display: flex; padding: 15px 0"><span style="display: block"><span class="k" style="display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #737373; margin-right: 12px; white-space: nowrap">Step 1</span><span class="t" style="font-size: 15.5px; font-weight: 700; color: #270140; line-height: 25.575px">The button</span></span><img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 0 6px 0 16px; max-width: none; min-width: 16px"></summary><div style="padding: 4px 0 20px"><div class="scshot" style="border-radius: 14px; border: 1px solid #efe7f4">
+                           <img src="./assets/screens/sc-01-smart-button.png" alt="The Stock History button on a product form" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px">
+                        </div>
+                        <p class="sccap" style="margin: 12px 2px 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           <b style="color: rgb(39, 1, 64); font-size: 13.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">It lives where you already are.</b> The button
+                           sits in the product's own button bar, right after
+                           Odoo's stock buttons. Open a product, press it &mdash; that
+                           is the entire workflow.
+                        </p>
+                     </div></details><details class="scpanel" id="phr-sc-2" style="border-top: 1px solid #ece4f3; padding: 2px 0"><summary class="sc-summary d-flex align-items-center justify-content-between" style="display: flex; padding: 15px 0"><span style="display: block"><span class="k" style="display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #737373; margin-right: 12px; white-space: nowrap">Step 2</span><span class="t" style="font-size: 15.5px; font-weight: 700; color: #270140; line-height: 25.575px">The chart</span></span><img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 0 6px 0 16px; max-width: none; min-width: 16px"></summary><div style="padding: 4px 0 20px"><div class="scshot" style="border-radius: 14px; border: 1px solid #efe7f4">
+                           <img src="./assets/screens/sc-02-graph.png" alt="Twelve monthly bars showing stock quantity for one Odoo product" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px">
+                        </div>
+                        <p class="sccap" style="margin: 12px 2px 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           <b style="color: rgb(39, 1, 64); font-size: 13.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">The report opens on the chart.</b> One bar per
+                           month across the last year, showing the quantity on
+                           hand at each month's close &mdash; hover a bar and it gives
+                           you the exact figure. A seasonal pattern you would
+                           never spot in a list of stock moves is obvious here
+                           in a couple of seconds.
+                        </p>
+                     </div></details><details class="scpanel" id="phr-sc-3" style="border-top: 1px solid #ece4f3; padding: 2px 0"><summary class="sc-summary d-flex align-items-center justify-content-between" style="display: flex; padding: 15px 0"><span style="display: block"><span class="k" style="display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #737373; margin-right: 12px; white-space: nowrap">Step 3</span><span class="t" style="font-size: 15.5px; font-weight: 700; color: #270140; line-height: 25.575px">The pivot</span></span><img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 0 6px 0 16px; max-width: none; min-width: 16px"></summary><div style="padding: 4px 0 20px"><div class="scshot" style="border-radius: 14px; border: 1px solid #efe7f4">
+                           <img src="./assets/screens/sc-03-pivot.png" alt="Odoo pivot view with input, output and stock quantity by month" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px">
+                        </div>
+                        <p class="sccap" style="margin: 12px 2px 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           <b style="color: rgb(39, 1, 64); font-size: 13.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">Switch to the pivot when you want the numbers.</b>
+                           Every month a row, stock in, stock out and quantity
+                           on hand as columns, and a total line across the whole
+                           year. Odoo's own download button sends the table
+                           straight to a spreadsheet.
+                        </p>
+                     </div></details><details class="scpanel" id="phr-sc-4" style="border-top: 1px solid #ece4f3; padding: 2px 0"><summary class="sc-summary d-flex align-items-center justify-content-between" style="display: flex; padding: 15px 0"><span style="display: block"><span class="k" style="display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #737373; margin-right: 12px; white-space: nowrap">Step 4</span><span class="t" style="font-size: 15.5px; font-weight: 700; color: #270140; line-height: 25.575px">The list</span></span><img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 0 6px 0 16px; max-width: none; min-width: 16px"></summary><div style="padding: 4px 0 20px"><div class="scshot" style="border-radius: 14px; border: 1px solid #efe7f4">
+                           <img src="./assets/screens/sc-04-list.png" alt="List view of monthly stock history rows in Odoo" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px">
+                        </div>
+                        <p class="sccap" style="margin: 12px 2px 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           <b style="color: rgb(39, 1, 64); font-size: 13.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">Or read it as plain rows.</b> Date, product,
+                           category, unit of measure, input, output, quantity &mdash;
+                           one row per month, ready to copy into a report or an
+                           e-mail.
+                        </p>
+                     </div></details><details class="scpanel" id="phr-sc-5" style="border-top: 1px solid #ece4f3; padding: 2px 0; border-bottom: 1px solid #ece4f3"><summary class="sc-summary d-flex align-items-center justify-content-between" style="display: flex; padding: 15px 0"><span style="display: block"><span class="k" style="display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #737373; margin-right: 12px; white-space: nowrap">Step 5</span><span class="t" style="font-size: 15.5px; font-weight: 700; color: #270140; line-height: 25.575px">Group and filter</span></span><img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 0 6px 0 16px; max-width: none; min-width: 16px"></summary><div style="padding: 4px 0 20px"><div class="scshot" style="border-radius: 14px; border: 1px solid #efe7f4">
+                           <img src="./assets/screens/sc-05-groupby.png" alt="Grouping the Odoo stock history report by product, date, category or unit of measure" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px">
+                        </div>
+                        <p class="sccap" style="margin: 12px 2px 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           <b style="color: rgb(39, 1, 64); font-size: 13.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">Regroup it without leaving the screen.</b> Group
+                           by product, by date, by product category or by unit
+                           of measure, and filter on the date field &mdash; all
+                           through Odoo's standard search panel.
+                        </p>
+                     </div></details></div>
+            </div>
+         </div>
 
-</body>
+         <!-- -- Features: icon rows, not cards ------------------------------------- -->
+         <div class="sec rule" id="phr-features" style="padding: 56px 0; border-top: 1px solid #ece4f3">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">What is in it</p>
+               <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 8px">
+                  Fourteen things it does, stated plainly
+               </h2>
+               <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; max-width: 760px; margin-bottom: 22px">
+                  Every line below is a behaviour of the module as shipped in
+                  18.0.1.0.0. Nothing here is planned, optional or on a roadmap.
+               </p>
+
+               <div class="featgrid row" style="margin-left: -24px; margin-right: -24px; margin-top: 0px">
+                  <div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-cursor-click.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">A Stock History button on every product</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Added to the product form next to Odoo's own stock
+                           buttons. One click, no menu to hunt for.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-calendar.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Twelve months, month by month</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           One row per month, dated on the month's last day,
+                           from twelve months before the current month up to
+                           today.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-arrow-in.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Stock in, per month</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           The quantity that arrived into one of your internal
+                           locations that month, summed for you.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-arrow-out.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Stock out, per month</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           The quantity that left an internal location that
+                           month &mdash; deliveries, consumption, scrap, transfers
+                           out.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-chart-line.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Quantity on hand, carried forward</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Each month closes with a running total, so the line
+                           shows the level of stock over time rather than a set
+                           of unrelated bars.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-sigma.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">A correct starting point</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Everything older than the window is folded into a
+                           single opening figure, so the quantity line starts
+                           from your real stock level, not from zero.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-chart-bar.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Graph view</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           A monthly bar chart, opened by default, using Odoo's
+                           standard graph widget.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-table-pivot.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Pivot view with three measures</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Input, Output and Stock Quantity as measures with
+                           months in columns &mdash; and Odoo's spreadsheet export on
+                           top.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-list-rows.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">List view</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           The same months as rows, with date, product,
+                           category, unit of measure, input, output and
+                           quantity.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-filter.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Group and filter as usual</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Group by product, date, product category or unit of
+                           measure; filter on the date field. Standard Odoo
+                           search panel, nothing new to learn.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-shield-check.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Completed moves only</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Draft, waiting and cancelled transfers are ignored,
+                           so the history matches what really happened.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-building.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Multi-company aware</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Only the companies switched on in your session are
+                           counted. Change the company selector, reopen the
+                           report, the figures follow.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-layers.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Category and unit on every row</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           The product's category and unit of measure travel
+                           with the data, so grouped totals stay meaningful.
+                        </p>
+                     </div>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 24px; padding-right: 24px"><div class="feat d-flex" style="display: flex; padding: 16px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 13px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-plug.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(23, 23, 23); margin: 0 0 3px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Nothing to configure</h4>
+                        <p style="margin: 0; font-size: 13px; color: rgb(115, 115, 115); line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           No settings page, no menu to build, no scheduled job,
+                           no third-party library. Install it and the button is
+                           there.
+                        </p>
+                     </div>
+                  </div>
+               </div>
+</div>
+            </div>
+         </div>
+
+         <!-- -- Mid-page contact block (QR + naked links, no external hrefs) ------- -->
+         <div class="sec-tight" style="padding: 32px 0">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="qrcta" style="background-color: #270140; border-radius: 20px; padding: 30px 30px 24px">
+                  <div class="qr-head" style="max-width: 660px">
+                     <p class="qr-eyebrow" style="margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.88px; text-transform: uppercase; color: rgb(250, 114, 104); font-style: normal; line-height: 18.15px; text-align: start; white-space: normal">
+                        Free module, real people behind it
+                     </p>
+                     <h2 class="qr-title" style="color: rgb(255, 255, 255); letter-spacing: -0.5px; margin: 0 0 8px; font-size: 25px; font-weight: 800; line-height: 31.25px; font-style: normal; text-align: start; text-transform: none; white-space: normal">
+                        Not sure it fits your Odoo? Ask before you install.
+                     </h2>
+                     <p class="qr-sub" style="margin: 0; color: rgba(255, 255, 255, 0.74); font-size: 14.5px; line-height: 22.475px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                        Tell us your version, how you use Inventory, and what
+                        you are trying to see. We will tell you plainly whether
+                        this module answers it &mdash; and if it does not, what would.
+                     </p>
+                  </div>
+                  <div class="qr-grid row" style="margin: 24px 0 0; margin-left: -7px; margin-right: -7px; margin-top: 10px">
+                     <div class="col-12 col-md-4" style="padding-left: 7px; padding-right: 7px; margin-top: 14px"><div class="qr-card qr-lead d-flex flex-column" style="min-width: 0; background-color: #fff; border-radius: 14px; padding: 14px; display: flex; height: 100%; border: 2px solid #fa7268">
+                        <div class="qr-top d-flex align-items-center justify-content-between" style="display: flex; margin-bottom: 9px">
+                           <span class="qr-ico d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 9px; background-color: #270140; display: inline-flex; min-width: 30px"><img class="phrico-18" src="./assets/icons/ic-calendar-check-w.png" alt="" style="max-width: none; width: 18px; height: 18px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 18px"></span>
+                           <span class="qr-tag qr-tag-hot" style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; padding: 4px 9px; border-radius: 9999px; background-color: #fa7268; color: rgb(255, 255, 255); line-height: 16.5px">30 minutes</span>
+                        </div>
+                        <h3 class="qr-h" style="letter-spacing: -0.2325px; color: rgb(39, 1, 64); margin: 1px 0 0; font-size: 15.5px; font-style: normal; font-weight: 700; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">Book a walkthrough</h3>
+                        <p class="qr-p" style="margin: 0; font-size: 12.5px; line-height: 18.75px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">
+                           We open the report on a real Odoo and answer as we
+                           go.
+                        </p>
+                        <span class="qr-code" style="display: block; background-color: #faf7fc; border-radius: 10px; padding: 10px; margin-top: auto; text-decoration: none; margin-bottom: 9px"><img src="./assets/icons/qr-meeting.png" alt="QR code for hub.doodex.net/r/meeting" width="98" height="98" style="max-width: 100%; display: block; width: 98px; height: auto; margin: 0 auto; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal"></span>
+                        <span class="btn btn-primary qr-btn d-inline-flex align-items-center justify-content-center" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; background-color: #fa7268; color: rgb(255, 255, 255); font-size: 12.5px; padding: 7.5px 8.5px; line-height: 20.625px; border: 1.5px solid #fa7268">hub.doodex.net<wbr></wbr>/r/meeting</span>
+                     </div>
+                     </div>
+<div class="col-12 col-md-4" style="padding-left: 7px; padding-right: 7px; margin-top: 14px"><div class="qr-card d-flex flex-column" style="min-width: 0; background-color: #fff; border-radius: 14px; padding: 16px; display: flex; height: 100%">
+                        <div class="qr-top d-flex align-items-center justify-content-between" style="display: flex; margin-bottom: 9px">
+                           <span class="qr-ico d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 9px; background-color: #270140; display: inline-flex; min-width: 30px"><img class="phrico-18" src="./assets/icons/ic-mail-w.png" alt="" style="max-width: none; width: 18px; height: 18px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 18px"></span>
+                           <span class="qr-tag" style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 4px 9px; border-radius: 9999px; line-height: 16.5px">Written reply</span>
+                        </div>
+                        <h3 class="qr-h" style="letter-spacing: -0.2325px; color: rgb(39, 1, 64); margin: 1px 0 0; font-size: 15.5px; font-style: normal; font-weight: 700; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">Send a question</h3>
+                        <p class="qr-p" style="margin: 0; font-size: 12.5px; line-height: 18.75px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">
+                           Put it in writing and we answer by e-mail.
+                        </p>
+                        <a class="qr-code" href="mailto:odoo@doodex.net?subject=Product%20History%20Report" aria-label="E-mail odoo@doodex.net" style="color: rgb(232, 92, 82); display: block; background-color: #faf7fc; border-radius: 10px; padding: 10px; margin-top: auto; text-decoration: none; font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px"><img src="./assets/icons/ic-qr-mail.png" alt="QR code for odoo@doodex.net" width="98" height="98" style="max-width: 100%; display: block; width: 98px; height: auto; margin: 0 auto; color: rgb(232, 92, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal"></a>
+                        <a class="btn btn-ghost qr-btn d-inline-flex align-items-center justify-content-center" href="mailto:odoo@doodex.net?subject=Product%20History%20Report" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; color: rgb(39, 1, 64); background-color: #fff; font-size: 12.5px; padding: 7.5px 8.5px; font-style: normal; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; border: 1.5px solid #270140">odoo@doodex.net</a>
+                     </div>
+                     </div>
+<div class="col-12 col-md-4" style="padding-left: 7px; padding-right: 7px; margin-top: 14px"><div class="qr-card d-flex flex-column" style="min-width: 0; background-color: #fff; border-radius: 14px; padding: 16px; display: flex; height: 100%">
+                        <div class="qr-top d-flex align-items-center justify-content-between" style="display: flex; margin-bottom: 9px">
+                           <span class="qr-ico d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 9px; background-color: #270140; display: inline-flex; min-width: 30px"><img class="phrico-18" src="./assets/icons/ic-chat-w.png" alt="" style="max-width: none; width: 18px; height: 18px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 18px"></span>
+                           <span class="qr-tag" style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 4px 9px; border-radius: 9999px; line-height: 16.5px">Fastest reply</span>
+                        </div>
+                        <h3 class="qr-h" style="letter-spacing: -0.2325px; color: rgb(39, 1, 64); margin: 1px 0 0; font-size: 15.5px; font-style: normal; font-weight: 700; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">Message us on WhatsApp</h3>
+                        <p class="qr-p" style="margin: 0; font-size: 12.5px; line-height: 18.75px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">
+                           Reach the team directly on +62 821-3120-5030.
+                        </p>
+                        <span class="qr-code" style="display: block; background-color: #faf7fc; border-radius: 10px; padding: 10px; margin-top: auto; text-decoration: none; margin-bottom: 9px"><img src="./assets/icons/qr-whatsapp.png" alt="QR code for hub.doodex.net/r/whatsapp" width="98" height="98" style="max-width: 100%; display: block; width: 98px; height: auto; margin: 0 auto; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal"></span>
+                        <span class="btn btn-ghost qr-btn d-inline-flex align-items-center justify-content-center" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; background-color: #fff; color: rgb(39, 1, 64); font-size: 12.5px; padding: 7.5px 8.5px; line-height: 20.625px; border: 1.5px solid #270140">hub.doodex.net<wbr></wbr>/r/whatsapp</span>
+                     </div>
+                  </div>
+</div>
+                  <p class="qr-foot" style="margin: 16px 0 0; color: rgba(255, 255, 255, 0.5); font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 19.8px; text-align: start; text-transform: none; white-space: normal">
+                     Scan a code with your phone, or type the address printed
+                     under it &mdash; both reach the same place.
+                  </p>
+               </div>
+            </div>
+         </div>
+
+         <!-- -- Use cases: four situations, one visual each ------------------------ -->
+         <div class="sec" style="padding: 56px 0">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">Where it earns its place</p>
+               <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 8px">
+                  Four questions this answers in seconds
+               </h2>
+               <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; max-width: 760px; margin-bottom: 26px">
+                  None of these need a new report, a spreadsheet export or a
+                  developer. They need one button on the product you are already
+                  looking at.
+               </p>
+
+               <div class="ucgrid row" style="margin-left: -11px; margin-right: -11px; margin-top: -22px">
+                  <div class="col-12 col-md-6" style="padding-left: 11px; padding-right: 11px; margin-top: 22px"><div class="uc" style="border-radius: 14px; background-color: #fff; border: 1px solid #efe7f4; height: 100%">
+                     <img src="./assets/gifs/uc-01-slow-mover.gif" alt="A product with almost no outgoing movement across twelve months" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px 13px 0 0">
+                     <div class="body" style="padding: 17px 19px 19px">
+                        <h4 style="color: rgb(39, 1, 64); letter-spacing: -0.24px; margin: 0 0 6px; font-size: 16px; font-weight: 800; font-style: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">&ldquo;Is this product still moving?&rdquo;</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           A flat output line across twelve months is a slow
+                           mover you are paying to store. Check it before the
+                           next purchase order goes out, not after the
+                           stocktake.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 11px; padding-right: 11px; margin-top: 22px"><div class="uc" style="border-radius: 14px; background-color: #fff; border: 1px solid #efe7f4; height: 100%">
+                     <img src="./assets/gifs/uc-02-season.gif" alt="Monthly stock movement showing a seasonal peak and trough" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px 13px 0 0">
+                     <div class="body" style="padding: 17px 19px 19px">
+                        <h4 style="color: rgb(39, 1, 64); letter-spacing: -0.24px; margin: 0 0 6px; font-size: 16px; font-weight: 800; font-style: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">&ldquo;When does demand peak?&rdquo;</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           Twelve months side by side make the season obvious.
+                           Order ahead of the peak instead of reacting to it,
+                           and stop tying up cash in the quiet months.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 11px; padding-right: 11px; margin-top: 22px"><div class="uc" style="border-radius: 14px; background-color: #fff; border: 1px solid #efe7f4; height: 100%">
+                     <img src="./assets/gifs/uc-03-stock-check.gif" alt="Cumulative quantity line compared with the product's on-hand figure" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px 13px 0 0">
+                     <div class="body" style="padding: 17px 19px 19px">
+                        <h4 style="color: rgb(39, 1, 64); letter-spacing: -0.24px; margin: 0 0 6px; font-size: 16px; font-weight: 800; font-style: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                           &ldquo;Does this on-hand figure make sense?&rdquo;
+                        </h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           When a quantity looks wrong, the running line shows
+                           you the month it went wrong &mdash; so you go straight to
+                           that period's moves instead of scrolling through a
+                           year of them.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6" style="padding-left: 11px; padding-right: 11px; margin-top: 22px"><div class="uc" style="border-radius: 14px; background-color: #fff; border: 1px solid #efe7f4; height: 100%">
+                     <img src="./assets/gifs/uc-04-multicompany.gif" alt="The report following the active company selection" style="max-width: 100%; display: block; width: 100%; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; border-radius: 13px 13px 0 0">
+                     <div class="body" style="padding: 17px 19px 19px">
+                        <h4 style="color: rgb(39, 1, 64); letter-spacing: -0.24px; margin: 0 0 6px; font-size: 16px; font-weight: 800; font-style: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">&ldquo;Whose numbers am I looking at?&rdquo;</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           On a multi-company database the report follows the
+                           companies switched on in your session, so a group
+                           controller and a single-site manager both see figures
+                           that belong to them.
+                        </p>
+                     </div>
+                  </div>
+               </div>
+</div>
+            </div>
+         </div>
+
+         <!-- -- Interlude: one honest claim, no adjectives ------------------------- -->
+         <div class="sec-tight" style="padding: 32px 0">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="interlude" style="background-color: #270140; border-radius: 20px; padding: 40px 36px; text-align: center">
+                  <p class="big" style="margin: 0 auto; font-size: 30px; font-weight: 800; color: rgb(255, 255, 255); letter-spacing: -0.6px; line-height: 37.5px; max-width: 760px; font-style: normal; text-align: center; text-transform: none; white-space: normal; margin-bottom: 0">
+                     Odoo already stores every move you need. It just never
+                     <em style="font-style: normal; color: rgb(250, 114, 104); font-size: 30px; font-weight: 800; letter-spacing: -0.6px; line-height: 37.5px; text-align: center; text-transform: none; white-space: normal">adds them up per month, per product, on one screen</em>.
+                  </p>
+                  <p class="s" style="margin: 12px auto 0; color: rgba(255, 255, 255, 0.72); font-size: 14.5px; max-width: 640px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: center; text-transform: none; white-space: normal">
+                     That is the whole gap this module closes &mdash; and why it is
+                     free.
+                  </p>
+               </div>
+            </div>
+         </div>
+
+         <!-- -- Why install it: native vs module, stated fairly -------------------- -->
+         <!-- -- Why install it: three arguments, not a comparison --------------- -->
+         <div class="sec rule" id="phr-why" style="padding: 56px 0; border-top: 1px solid #ece4f3">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="narrow" style="max-width: 820px; margin: 0 auto">
+                  <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">Why install it</p>
+                  <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 8px">
+                     Three reasons it is worth the two minutes
+                  </h2>
+                  <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 26px">
+                     The module costs nothing, so the only real question is
+                     whether an Odoo stock history report earns a place on your
+                     database. Here is the honest case.
+                  </p>
+
+                  <div class="reasons" style="border-top: 1px solid #ece4f3">
+                     <div class="reason row align-items-start" style="padding: 24px 0; border-bottom: 1px solid #ece4f3; margin-left: 0; margin-right: 0">
+                        <div class="num col-12 col-md-auto" style="font-size: 38px; font-weight: 800; line-height: 36.1px; color: rgb(39, 1, 64); letter-spacing: -1.52px; width: 94px; padding-right: 18px; padding-left: 0">01</div>
+                        <div class="col-12 col-md" style="padding-left: 0; padding-right: 0">
+                           <h3 style="color: rgb(39, 1, 64); letter-spacing: -0.216px; margin: 0 0 6px; font-size: 18px; font-weight: 800; font-style: normal; line-height: 29.7px; text-align: start; text-transform: none; white-space: normal">It answers the question where you ask it</h3>
+                           <p style="margin: 0; font-size: 14.5px; color: rgb(82, 82, 82); line-height: 23.49px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                              Stock questions start on a product, not in a
+                              reporting menu. The <b style="color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 23.49px; text-align: start; text-transform: none; white-space: normal">Stock History</b> button
+                              sits on the product form, so the year is one click
+                              from where you already are &mdash; no report to
+                              build, no filter to set, nothing to remember next
+                              time.
+                           </p>
+                        </div>
+                     </div>
+                     <div class="reason row align-items-start" style="padding: 24px 0; border-bottom: 1px solid #ece4f3; margin-left: 0; margin-right: 0">
+                        <div class="num col-12 col-md-auto" style="font-size: 38px; font-weight: 800; line-height: 36.1px; color: rgb(39, 1, 64); letter-spacing: -1.52px; width: 94px; padding-right: 18px; padding-left: 0">02</div>
+                        <div class="col-12 col-md" style="padding-left: 0; padding-right: 0">
+                           <h3 style="color: rgb(39, 1, 64); letter-spacing: -0.216px; margin: 0 0 6px; font-size: 18px; font-weight: 800; font-style: normal; line-height: 29.7px; text-align: start; text-transform: none; white-space: normal">The figures are yours, read live</h3>
+                           <p style="margin: 0; font-size: 14.5px; color: rgb(82, 82, 82); line-height: 23.49px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                              Nothing is copied into a new table, cached, or
+                              synced overnight. Every month is summed from the
+                              completed stock moves in your own Odoo database at
+                              the moment you press the button, so the report
+                              cannot drift out of step with your warehouse.
+                           </p>
+                        </div>
+                     </div>
+                     <div class="reason row align-items-start" style="padding: 24px 0; border-bottom: 1px solid #ece4f3; margin-left: 0; margin-right: 0">
+                        <div class="num col-12 col-md-auto" style="font-size: 38px; font-weight: 800; line-height: 36.1px; color: rgb(39, 1, 64); letter-spacing: -1.52px; width: 94px; padding-right: 18px; padding-left: 0">03</div>
+                        <div class="col-12 col-md" style="padding-left: 0; padding-right: 0">
+                           <h3 style="color: rgb(39, 1, 64); letter-spacing: -0.216px; margin: 0 0 6px; font-size: 18px; font-weight: 800; font-style: normal; line-height: 29.7px; text-align: start; text-transform: none; white-space: normal">
+                              Nothing to lose if it turns out not to suit you
+                           </h3>
+                           <p style="margin: 0; font-size: 14.5px; color: rgb(82, 82, 82); line-height: 23.49px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                              It reads and never writes: no settings to
+                              configure, no fields added to your records, no
+                              third-party service called. Uninstall it and the
+                              button disappears, leaving your stock moves
+                              exactly as they were. Eight automated tests ship
+                              with the source, under LGPL-3.
+                           </p>
+                        </div>
+                     </div>
+                  </div>
+
+                  <p class="closer" style="margin: 26px 0 0; font-size: 15.5px; line-height: 24.8px; color: rgb(39, 1, 64); font-weight: 600; font-style: normal; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                     Install it, open a product, press the button. If the answer
+                     is not useful within ten seconds, uninstall it &mdash; you
+                     are out two minutes and nothing else.
+                  </p>
+               </div>
+            </div>
+         </div>
+
+         <!-- -- Honest limits: the objections a buyer will find anyway ------------- -->
+         <div class="sec" style="padding: 56px 0">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="narrow" style="max-width: 820px; margin: 0 auto">
+                  <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">Before you install</p>
+                  <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 8px">
+                     What it does not do
+                  </h2>
+                  <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 22px">
+                     We would rather you read this now than discover it later.
+                     Nothing below is a fault to be fixed &mdash; it is the shape of
+                     the module.
+                  </p>
+                  <div class="limits" style="background-color: #faf7fc; border-radius: 20px; padding: 30px 32px">
+                     <div class="lim" style="padding: 14px 0; border-top: none; padding-top: 4px">
+                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">It reports one product at a time</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           The report opens from a product form and covers that
+                           product. There is no menu that lines every product up
+                           side by side.
+                        </p>
+                     </div>
+                     <div class="lim" style="padding: 14px 0; border-top: 1px solid #ece4f3">
+                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Internal transfers count on both sides</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           A move between two of your own internal locations is
+                           recorded as an input and an output on the same date.
+                           The Stock Quantity line is unaffected &mdash; the two
+                           cancel out &mdash; but if you shuffle a lot of stock
+                           between your own locations, read Input and Output as
+                           total warehouse activity rather than as pure receipts
+                           and deliveries.
+                        </p>
+                     </div>
+                     <div class="lim" style="padding: 14px 0; border-top: 1px solid #ece4f3">
+                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Quantities, not values</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           Everything is expressed in the product's unit of
+                           measure. There is no cost, margin or valuation
+                           column; Odoo's Inventory Valuation already does that
+                           job.
+                        </p>
+                     </div>
+                     <div class="lim" style="padding: 14px 0; border-top: 1px solid #ece4f3">
+                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Built fresh on each click</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           The report is generated from your stock moves the
+                           moment you press the button, for the product you
+                           pressed it on. It is designed for looking at one
+                           product at a time rather than for many people
+                           generating it in the same second.
+                        </p>
+                     </div>
+                     <div class="lim" style="padding: 14px 0; border-top: 1px solid #ece4f3">
+                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Odoo 18.0</h4>
+                        <p style="margin: 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           This listing is the 18.0 build. If you need it on
+                           another version, write to us and we will tell you
+                           honestly what it takes.
+                        </p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- -- Requirements ------------------------------------------------------- -->
+         <div class="sec rule" id="phr-needs" style="padding: 56px 0; border-top: 1px solid #ece4f3">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">Requirements</p>
+               <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 22px">
+                  What it needs, and what it touches
+               </h2>
+               <div class="reqgrid row" style="margin-left: -20px; margin-right: -20px; margin-top: 0px">
+                  <div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-gauge.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Odoo version</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">18.0 &mdash; Community or Enterprise</p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-boxes.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Depends on</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.15px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 18.225px; text-align: start; text-transform: none; white-space: normal">base</code> and <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.15px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 18.225px; text-align: start; text-transform: none; white-space: normal">stock</code> (Inventory).
+                           Nothing else.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-plug.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Third-party libraries</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           None. No pip install, no API key, no account.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-download.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Install</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Copy to your addons folder, update the apps list,
+                           install. Then open any product.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-server.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Hosting</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Odoo.sh and self-hosted. Odoo Online (SaaS) does not
+                           accept Apps Store modules.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-sliders.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Configuration</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           None. There is no settings screen and no menu item to
+                           create.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-lock.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Who can see it</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Any internal user who can open a product form.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-shield-check.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Your data</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Read-only. Nothing is sent anywhere, no external
+                           service is called.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-trash.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Uninstall</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Removes the button and the report. Your stock moves
+                           are untouched.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-globe.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Language</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           English. Labels follow Odoo's own Inventory
+                           vocabulary.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-mobile.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Mobile</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           Uses Odoo's standard graph, pivot and list views, so
+                           it behaves as they do.
+                        </p>
+                     </div>
+                  </div>
+                  </div>
+<div class="col-12 col-md-6 col-lg-4" style="padding-left: 20px; padding-right: 20px"><div class="req d-flex" style="display: flex; padding: 15px 0; border-top: 1px solid #ece4f3">
+                     <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-book.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
+                     <div>
+                        <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Licence</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                           LGPL-3. Source included, yours to read and adapt.
+                        </p>
+                     </div>
+                  </div>
+               </div>
+</div>
+            </div>
+         </div>
+
+         <!-- -- FAQ ---------------------------------------------------------------- -->
+         <div class="sec rule" id="phr-faq" style="padding: 56px 0; border-top: 1px solid #ece4f3">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="center" style="text-align: center"><p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: center; white-space: normal">FAQ</p></div>
+               <h2 class="h2 center" style="color: rgb(39, 1, 64); margin: 0; text-align: center; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-transform: none; white-space: normal; margin-bottom: 8px">
+                  Fourteen questions buyers actually ask
+               </h2>
+               <p class="lead muted center" style="margin: 0 auto 26px; text-align: center; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-transform: none; white-space: normal; max-width: 700px">
+                  Written from the questions we get by e-mail. Where the honest
+                  answer is &ldquo;no&rdquo;, it says no.
+               </p>
+               <div class="faq" style="max-width: 820px; margin: 0 auto">
+                  <details open style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Is it really free?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Yes. It is published under LGPL-3 at no cost. There
+                           is no paid edition, no licence key, no record limit
+                           and no trial that expires. The source ships with the
+                           module.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">
+                        Where do I find the report once it is installed?
+                     <img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Inventory &rarr; Products &rarr; open any product.
+                           The <b style="color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">Stock History</b> button is in the row of
+                           buttons at the top right of the product form, beside
+                           Odoo's own stock buttons. There is no new menu,
+                           because the report only makes sense for a product you
+                           have chosen.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Which Odoo versions does it work with?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           This is the 18.0 build, and it works on both
+                           Community and Enterprise. It depends only on
+                           <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.05px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 21.5325px; text-align: start; text-transform: none; white-space: normal">base</code> and <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.05px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 21.5325px; text-align: start; text-transform: none; white-space: normal">stock</code>, so nothing
+                           else has to be installed first.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Can I use it on Odoo Online?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           No &mdash; Odoo Online (the SaaS offering) does not allow
+                           modules from the Apps Store. Odoo.sh and any
+                           self-hosted installation are fine.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">
+                        Do I have to configure anything after installing?
+                     <img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           No. There is no settings page, no menu to create, no
+                           access group to assign and no scheduled job to
+                           enable. Install it, open a product, press the button.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">How far back does the history go?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Twelve months, counted from the first day of the
+                           current month. Anything older than that window is
+                           folded into a single opening figure so the running
+                           quantity starts from your real stock level rather
+                           than from zero.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Where do the numbers come from?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           From the completed stock moves already in your
+                           database. Nothing is duplicated into a new table and
+                           nothing is recalculated overnight &mdash; the report is
+                           read from your existing data at the moment you open
+                           it, so it can never drift out of date.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">
+                        Why is Input higher than my actual receipts?
+                     <img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Because a transfer between two of your own internal
+                           locations counts as an input <i style="color: rgb(82, 82, 82); font-size: 14.5px; font-style: italic; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">and</i> an output on
+                           the same date. The Stock Quantity line is not
+                           affected, since the two cancel each other out. If
+                           internal transfers are a big part of your operation,
+                           read Input and Output as total warehouse activity
+                           rather than as pure receipts and deliveries.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Does it show stock value or cost?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           No. It reports quantities in the product's unit of
+                           measure. For values, margins and costing, Odoo's own
+                           Inventory Valuation is the right tool &mdash; this module
+                           is deliberately about movement, not money.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Does it respect multi-company?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Yes. Only the companies switched on in your session
+                           are counted. Change the company selector and reopen
+                           the report, and the figures follow your selection.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Can I export the figures?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Yes. The pivot view carries Odoo's standard
+                           spreadsheet download, and the list view supports
+                           Odoo's normal export. The module adds no export of
+                           its own because it does not need to.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Will it change or slow down my database?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           It only reads. It creates no new stock data, modifies
+                           no move and adds no field to your existing records.
+                           Uninstalling removes the button and the report and
+                           leaves your stock moves exactly as they were.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Has it been tested?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Yes. The module ships with automated integration
+                           tests that ship with the source &mdash;
+                           eight of them, covering the monthly grouping, the
+                           opening balance, the input and output rules and the
+                           multi-company scoping. They live in the module's
+                           <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.05px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 21.5325px; text-align: start; text-transform: none; white-space: normal">tests</code> folder, so you can run them
+                           yourself.
+                        </p>
+                     </div>
+                  </details>
+
+                  <details style="border-top: 1px solid #ece4f3; padding: 2px 0; border-bottom: 1px solid #ece4f3; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal">
+                     <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">
+                        I need it on another Odoo version, or with extra
+                        columns. Can you do that?
+                     <img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
+                     <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
+                        <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
+                           Very likely. Doodex builds and maintains custom Odoo
+                           modules &mdash; that is our day job, and this one came out
+                           of it. Tell us the version and what you need to see,
+                           and you will get a straight answer about whether it
+                           is a small change or a real project. Write to
+                           <a href="mailto:odoo@doodex.net?subject=Product%20History%20Report" style="color: rgb(232, 92, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal; text-decoration: underline">odoo@doodex.net</a>.
+                        </p>
+                     </div>
+                  </details>
+               </div>
+            </div>
+         </div>
+
+         <!-- -- Cross-sell: other Doodex modules ---------------------------------- -->
+         <div class="sec xsec" style="padding: 56px 0; background-color: #faf7fc; border-top: 1px solid #ece4f3; border-bottom: 1px solid #ece4f3">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="center" style="text-align: center"><p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: center; white-space: normal">Works great with</p></div>
+               <h2 class="h2 center" style="color: rgb(39, 1, 64); margin: 0; text-align: center; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-transform: none; white-space: normal; margin-bottom: 10px">
+                  Other Doodex modules, built the same way
+               </h2>
+               <p class="lead muted center" style="margin: 0 auto; text-align: center; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-transform: none; white-space: normal; max-width: 700px">
+                  Different problems, same approach: narrow scope, a one-time
+                  price and the limits stated up front. Each one installs on its
+                  own.
+               </p>
+
+               <div class="xchips" style="display: block; margin: 20px 0 -10px; text-align: center">
+                  <span class="xchip d-inline-block" style="background-color: #fff; color: rgb(39, 1, 64); font-size: 13px; font-weight: 600; padding: 8px 17px; border-radius: 9999px; line-height: 21.45px; border: 1px solid #f2ecf6; margin: 0 5px 10px; white-space: nowrap">Narrow scope</span>
+                  <span class="xchip d-inline-block" style="background-color: #fff; color: rgb(39, 1, 64); font-size: 13px; font-weight: 600; padding: 8px 17px; border-radius: 9999px; line-height: 21.45px; border: 1px solid #f2ecf6; margin: 0 5px 10px; white-space: nowrap">One-time price</span>
+                  <span class="xchip d-inline-block" style="background-color: #fff; color: rgb(39, 1, 64); font-size: 13px; font-weight: 600; padding: 8px 17px; border-radius: 9999px; line-height: 21.45px; border: 1px solid #f2ecf6; margin: 0 5px 10px; white-space: nowrap">Limits stated up front</span>
+               </div>
+
+               <div class="xgrid row" style="margin-top: 14px; margin-left: -10px; margin-right: -10px">
+                  <div class="col-12 col-md-4" style="padding-left: 10px; padding-right: 10px; margin-top: 20px"><div class="xcard xcard-dark d-flex flex-column" style="border-radius: 14px; padding: 23px; display: flex; background-color: #270140; border: 1px solid #270140; height: 100%">
+                     <div class="xtop d-flex align-items-start justify-content-between" style="display: flex; margin-bottom: 18px">
+                        <img class="xico" src="./assets/icons/ic-app-growth.png" alt="Doodex Growth Suite" style="max-width: none; width: 34px; height: 34px; display: block; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; margin-right: 12px; min-width: 34px">
+                        <span class="xbadge" style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.735px; text-transform: uppercase; padding: 5px 11px; border-radius: 9999px; white-space: nowrap; background-color: rgba(255, 255, 255, 0.13); color: rgb(255, 255, 255); line-height: 17.325px">$349 once</span>
+                     </div>
+                     <h4 style="letter-spacing: -0.17px; margin: 0 0 8px; font-size: 17px; font-weight: 800; color: rgb(255, 255, 255); font-style: normal; line-height: 28.05px; text-align: start; text-transform: none; white-space: normal">Doodex Growth Suite</h4>
+                     <p style="margin: 0 0 20px; font-size: 13.5px; line-height: 21.6px; color: rgba(255, 255, 255, 0.78); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                        Five CRM and marketing modules that <i style="color: rgba(255, 255, 255, 0.78); font-size: 13.5px; font-style: italic; font-weight: 400; letter-spacing: normal; line-height: 21.6px; text-align: start; text-transform: none; white-space: normal">do</i> share one
+                        another's data: BizScan AI, Campaign Manager, Smart
+                        Dashboards, User Roles and Email Sync+. Sold as one
+                        suite.
+                     </p>
+                     <a class="btn btn-primary xcta d-inline-flex align-items-center justify-content-center" href="/apps/modules/18.0/marketing_crm_automation_dashboard_campaign_doodex" aria-label="Open Doodex Growth Suite on the Odoo Apps Store" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; color: rgb(255, 255, 255); background-color: #fa7268; font-size: 13.5px; padding: 9.5px 14.5px; margin-top: auto; font-style: normal; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal; border: 1.5px solid #fa7268">Open on the Apps Store &rarr;</a>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-4" style="padding-left: 10px; padding-right: 10px; margin-top: 20px"><div class="xcard d-flex flex-column" style="background-color: #fff; border-radius: 14px; padding: 23px; display: flex; border: 1px solid #efe7f4; height: 100%">
+                     <div class="xtop d-flex align-items-start justify-content-between" style="display: flex; margin-bottom: 18px">
+                        <img class="xico" src="./assets/icons/ic-app-reader.png" alt="Flow Survey Reader" style="max-width: none; width: 34px; height: 34px; display: block; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; margin-right: 12px; min-width: 34px">
+                        <span class="xbadge" style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.735px; text-transform: uppercase; padding: 5px 11px; border-radius: 9999px; white-space: nowrap; background-color: #f4eef8; color: rgb(39, 1, 64); line-height: 17.325px">Free</span>
+                     </div>
+                     <h4 style="color: rgb(39, 1, 64); letter-spacing: -0.17px; margin: 0 0 8px; font-size: 17px; font-weight: 800; font-style: normal; line-height: 28.05px; text-align: start; text-transform: none; white-space: normal">Flow Survey Reader</h4>
+                     <p style="margin: 0 0 20px; font-size: 13.5px; line-height: 21.6px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                        Publish conditional surveys and forms straight from Odoo
+                        and keep every answer in your own database.
+                     </p>
+                     <a class="btn btn-ghost xcta d-inline-flex align-items-center justify-content-center" href="/apps/modules/18.0/flow_survey_reader" aria-label="Open Flow Survey Reader on the Odoo Apps Store" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; color: rgb(39, 1, 64); background-color: #fff; font-size: 13.5px; padding: 9.5px 14.5px; margin-top: auto; font-style: normal; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal; border: 1.5px solid #270140">Open on the Apps Store &rarr;</a>
+                  </div>
+
+                  </div>
+<div class="col-12 col-md-4" style="padding-left: 10px; padding-right: 10px; margin-top: 20px"><div class="xcard d-flex flex-column" style="background-color: #fff; border-radius: 14px; padding: 23px; display: flex; border: 1px solid #efe7f4; height: 100%">
+                     <div class="xtop d-flex align-items-start justify-content-between" style="display: flex; margin-bottom: 18px">
+                        <img class="xico" src="./assets/icons/ic-app-builder.png" alt="Flow Survey Builder" style="max-width: none; width: 34px; height: 34px; display: block; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; margin-right: 12px; min-width: 34px">
+                        <span class="xbadge" style="font-size: 10.5px; font-weight: 800; letter-spacing: 0.735px; text-transform: uppercase; padding: 5px 11px; border-radius: 9999px; white-space: nowrap; background-color: #f4eef8; color: rgb(39, 1, 64); line-height: 17.325px">$199 once</span>
+                     </div>
+                     <h4 style="color: rgb(39, 1, 64); letter-spacing: -0.17px; margin: 0 0 8px; font-size: 17px; font-weight: 800; font-style: normal; line-height: 28.05px; text-align: start; text-transform: none; white-space: normal">Flow Survey Builder</h4>
+                     <p style="margin: 0 0 20px; font-size: 13.5px; line-height: 21.6px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">
+                        The drag-and-drop editor for those surveys: 25 question
+                        types, slide branching and full theming.
+                     </p>
+                     <a class="btn btn-ghost xcta d-inline-flex align-items-center justify-content-center" href="/apps/modules/18.0/flow_survey" aria-label="Open Flow Survey Builder on the Odoo Apps Store" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; color: rgb(39, 1, 64); background-color: #fff; font-size: 13.5px; padding: 9.5px 14.5px; margin-top: auto; font-style: normal; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal; border: 1.5px solid #270140">Open on the Apps Store &rarr;</a>
+                  </div>
+               </div>
+</div>
+            </div>
+         </div>
+
+         <!-- -- Public release history --------------------------------------------- -->
+         <div class="sec rule" id="phr-releases" style="padding: 56px 0; border-top: 1px solid #ece4f3">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="narrow" style="max-width: 820px; margin: 0 auto">
+                  <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: start; white-space: normal">Releases</p>
+                  <h2 class="h2" style="color: rgb(39, 1, 64); margin: 0; letter-spacing: -0.52px; font-size: 26px; font-weight: 800; line-height: 32.5px; font-style: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 8px">
+                     Public release history
+                  </h2>
+                  <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 24px">
+                     Every version we publish is listed here, newest first, with
+                     what changed. If a line is not on this list, it did not
+                     ship.
+                  </p>
+                  <div class="rel" style="border-left-width: 2px; border-left-style: solid; border-left-color: #ece4f3; padding-left: 22px; margin-left: 6px">
+                     <div class="relitem" style="padding-bottom: 22px">
+                        <span class="v" style="font-size: 15px; font-weight: 800; color: rgb(39, 1, 64); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; line-height: 24.75px">18.0.1.0.0</span><span class="badge" style="display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.7px; padding: 3px 8px; border-radius: 6px; background-color: #f4eef8; color: rgb(39, 1, 64); margin-left: 8px; vertical-align: 2px; line-height: 16.5px">NEW</span>
+                        <p style="margin: 6px 0 0; font-size: 13.5px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
+                           First public release. Adds the Stock History button
+                           to the product form; monthly report of stock in,
+                           stock out and running quantity over the last twelve
+                           months; graph, pivot and list views; grouping by
+                           product, date, product category and unit of measure;
+                           opening-balance aggregation for periods older than
+                           the window; multi-company scoping to the companies
+                           active in the session. Ships with eight automated
+                           integration tests.
+                        </p>
+                     </div>
+                  </div>
+                  <p class="small muted" style="margin: 0 0 14px; color: rgb(115, 115, 115); font-size: 13px; line-height: 20.15px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-top: 6px">
+                     Found something that looks wrong, or need a change? Write
+                     to
+                     <a href="mailto:odoo@doodex.net?subject=Product%20History%20Report" style="color: rgb(232, 92, 82); font-size: 13px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 20.15px; text-align: start; text-transform: none; white-space: normal; text-decoration: underline">odoo@doodex.net</a>
+                     &mdash; reported issues get an answer, and fixes appear on this
+                     list.
+                  </p>
+               </div>
+            </div>
+         </div>
+
+         <!-- -- Closing CTA -------------------------------------------------------- -->
+         <div class="sec sec-last" style="padding: 56px 0; padding-bottom: 72px">
+            <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
+               <div class="qrcta qrcta-end" style="background-color: #270140; border-radius: 20px; padding: 38px 30px 28px">
+                  <div class="qr-head" style="max-width: 660px; margin: 0 auto; text-align: center">
+                     <p class="qr-eyebrow" style="margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.88px; text-transform: uppercase; color: rgb(250, 114, 104); font-style: normal; line-height: 18.15px; text-align: center; white-space: normal">
+                        It is free &mdash; the only cost is a minute of your time
+                     </p>
+                     <h2 class="qr-title" style="color: rgb(255, 255, 255); letter-spacing: -0.58px; margin: 0 0 8px; font-weight: 800; line-height: 36.25px; font-size: 29px; font-style: normal; text-align: center; text-transform: none; white-space: normal">
+                        Install it, open a product, and see the year.
+                     </h2>
+                     <p class="qr-sub" style="margin: 0; color: rgba(255, 255, 255, 0.74); font-size: 14.5px; line-height: 22.475px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: center; text-transform: none; white-space: normal">
+                        Download it from this page and press the Stock History
+                        button on any product. If anything is unclear, or you
+                        want it shown on your own Odoo first, all three doors
+                        below reach the same team.
+                     </p>
+                  </div>
+                  <div class="qr-grid row" style="margin: 24px 0 0; margin-left: -7px; margin-right: -7px; margin-top: 10px">
+                     <div class="col-12 col-md-4" style="padding-left: 7px; padding-right: 7px; margin-top: 14px"><div class="qr-card qr-lead d-flex flex-column" style="min-width: 0; background-color: #fff; border-radius: 14px; padding: 14px; display: flex; height: 100%; border: 2px solid #fa7268">
+                        <div class="qr-top d-flex align-items-center justify-content-between" style="display: flex; margin-bottom: 9px">
+                           <span class="qr-ico d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 9px; background-color: #270140; display: inline-flex; min-width: 30px"><img class="phrico-18" src="./assets/icons/ic-calendar-check-w.png" alt="" style="max-width: none; width: 18px; height: 18px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 18px"></span>
+                           <span class="qr-tag qr-tag-hot" style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; padding: 4px 9px; border-radius: 9999px; background-color: #fa7268; color: rgb(255, 255, 255); line-height: 16.5px">30 minutes</span>
+                        </div>
+                        <h3 class="qr-h" style="letter-spacing: -0.2325px; color: rgb(39, 1, 64); margin: 1px 0 0; font-size: 15.5px; font-style: normal; font-weight: 700; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">Book a walkthrough</h3>
+                        <p class="qr-p" style="margin: 0; font-size: 12.5px; line-height: 18.75px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">
+                           We open the report on a live Odoo and answer as we
+                           go.
+                        </p>
+                        <span class="qr-code" style="display: block; background-color: #faf7fc; border-radius: 10px; padding: 10px; margin-top: auto; text-decoration: none; margin-bottom: 9px"><img src="./assets/icons/qr-meeting.png" alt="QR code for hub.doodex.net/r/meeting" width="98" height="98" style="max-width: 100%; display: block; width: 98px; height: auto; margin: 0 auto; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal"></span>
+                        <span class="btn btn-primary qr-btn d-inline-flex align-items-center justify-content-center" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; background-color: #fa7268; color: rgb(255, 255, 255); font-size: 12.5px; padding: 7.5px 8.5px; line-height: 20.625px; border: 1.5px solid #fa7268">hub.doodex.net<wbr></wbr>/r/meeting</span>
+                     </div>
+                     </div>
+<div class="col-12 col-md-4" style="padding-left: 7px; padding-right: 7px; margin-top: 14px"><div class="qr-card d-flex flex-column" style="min-width: 0; background-color: #fff; border-radius: 14px; padding: 16px; display: flex; height: 100%">
+                        <div class="qr-top d-flex align-items-center justify-content-between" style="display: flex; margin-bottom: 9px">
+                           <span class="qr-ico d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 9px; background-color: #270140; display: inline-flex; min-width: 30px"><img class="phrico-18" src="./assets/icons/ic-mail-w.png" alt="" style="max-width: none; width: 18px; height: 18px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 18px"></span>
+                           <span class="qr-tag" style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 4px 9px; border-radius: 9999px; line-height: 16.5px">Written reply</span>
+                        </div>
+                        <h3 class="qr-h" style="letter-spacing: -0.2325px; color: rgb(39, 1, 64); margin: 1px 0 0; font-size: 15.5px; font-style: normal; font-weight: 700; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">E-mail the team</h3>
+                        <p class="qr-p" style="margin: 0; font-size: 12.5px; line-height: 18.75px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">
+                           Questions, bug reports and version requests all land
+                           here.
+                        </p>
+                        <a class="qr-code" href="mailto:odoo@doodex.net?subject=Product%20History%20Report" aria-label="E-mail odoo@doodex.net" style="color: rgb(232, 92, 82); display: block; background-color: #faf7fc; border-radius: 10px; padding: 10px; margin-top: auto; text-decoration: none; font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px"><img src="./assets/icons/ic-qr-mail.png" alt="QR code for odoo@doodex.net" width="98" height="98" style="max-width: 100%; display: block; width: 98px; height: auto; margin: 0 auto; color: rgb(232, 92, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal"></a>
+                        <a class="btn btn-ghost qr-btn d-inline-flex align-items-center justify-content-center" href="mailto:odoo@doodex.net?subject=Product%20History%20Report" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; color: rgb(39, 1, 64); background-color: #fff; font-size: 12.5px; padding: 7.5px 8.5px; font-style: normal; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; border: 1.5px solid #270140">odoo@doodex.net</a>
+                     </div>
+                     </div>
+<div class="col-12 col-md-4" style="padding-left: 7px; padding-right: 7px; margin-top: 14px"><div class="qr-card d-flex flex-column" style="min-width: 0; background-color: #fff; border-radius: 14px; padding: 16px; display: flex; height: 100%">
+                        <div class="qr-top d-flex align-items-center justify-content-between" style="display: flex; margin-bottom: 9px">
+                           <span class="qr-ico d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; border-radius: 9px; background-color: #270140; display: inline-flex; min-width: 30px"><img class="phrico-18" src="./assets/icons/ic-chat-w.png" alt="" style="max-width: none; width: 18px; height: 18px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 18px"></span>
+                           <span class="qr-tag" style="font-size: 10px; font-weight: 800; letter-spacing: 0.7px; text-transform: uppercase; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 4px 9px; border-radius: 9999px; line-height: 16.5px">Fastest reply</span>
+                        </div>
+                        <h3 class="qr-h" style="letter-spacing: -0.2325px; color: rgb(39, 1, 64); margin: 1px 0 0; font-size: 15.5px; font-style: normal; font-weight: 700; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">WhatsApp us</h3>
+                        <p class="qr-p" style="margin: 0; font-size: 12.5px; line-height: 18.75px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; margin-bottom: 9px">
+                           Reach the team directly on +62 821-3120-5030.
+                        </p>
+                        <span class="qr-code" style="display: block; background-color: #faf7fc; border-radius: 10px; padding: 10px; margin-top: auto; text-decoration: none; margin-bottom: 9px"><img src="./assets/icons/qr-whatsapp.png" alt="QR code for hub.doodex.net/r/whatsapp" width="98" height="98" style="max-width: 100%; display: block; width: 98px; height: auto; margin: 0 auto; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal"></span>
+                        <span class="btn btn-ghost qr-btn d-inline-flex align-items-center justify-content-center" style="display: flex; font-weight: 700; text-decoration: none; border-radius: 10px; background-color: #fff; color: rgb(39, 1, 64); font-size: 12.5px; padding: 7.5px 8.5px; line-height: 20.625px; border: 1.5px solid #270140">hub.doodex.net<wbr></wbr>/r/whatsapp</span>
+                     </div>
+                  </div>
+</div>
+                  <p class="qr-foot" style="margin: 16px 0 0; color: rgba(255, 255, 255, 0.5); font-size: 12px; text-align: center; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 19.8px; text-transform: none; white-space: normal">
+                     Scan a code with your phone, or type the address printed
+                     under it &mdash; both reach the same place.
+                  </p>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>
