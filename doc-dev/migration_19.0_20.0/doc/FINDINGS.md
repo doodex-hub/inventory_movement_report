@@ -17,6 +17,7 @@
 | MF-05 | Ikon stat button `fa-signal` tidak dirender di 20.0 (Font Awesome → Material Symbols) | 1 | `[GAP-MIGRASI]` | Sedang | ✅ Diputuskan AI (low-risk, preseden native): `android_cell_5_bar` — lihat detail |
 | MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
+| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI masih "17.0" | 3 | `[PERLU-KEPUTUSAN]` | Rendah | 🔓 Terbuka — tugas dev (re-derive via `tools/variant.py`), tidak diedit AI |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -98,6 +99,18 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 **Deskripsi:** manifest hanya `base`, `stock`; dev menjawab "enterprise kemungkinan depend".
 **Tindakan:** Step 2 analisis `enterprise20` untuk modul yang menyentuh form `product.template`/tabel stock (kandidat awal `quality_control`); Step 9 run tambahan dengan addons Enterprise terpasang.
 **Keputusan pemilik modul:** ✅ jawaban dev di atas (2026-09-24). Kalau ternyata ada modul Enterprise spesifik yang dimaksud, dev bisa menyebutkannya kapan saja.
+
+---
+
+### MF-08 — Konten store & README masih menyebut versi lama
+**Ditemukan di:** Step 3 (2026-09-24)
+**Tag:** `[PERLU-KEPUTUSAN]`
+**Ref:** `SCOPE-01`, `03_MIGRATION_SPEC.md` §4
+**Lokasi:** `product_history_report/static/description/index.html` (port dari branch `19.0`, baris 7, 10, 15, 429, 441, 1027: "Odoo 19"/"Odoo 19.0"/"module version 19.0.1.0.0"); `README.md:71`, `LISEZMOI.md:69`, `product_history_report/README.md:71`, `product_history_report/LISEZMOI.md:69` ("17.0" — basi sejak migrasi 17→18).
+**Deskripsi:** header komentar `index.html` sendiri menyatakan file itu "DERIVED, NOT HAND-WRITTEN — Generated from the 17.0 source with tools/variant.py. Edit the 17.0 source and re-derive; do not patch this file by hand". Karena itu AI port apa adanya (sesuai persetujuan dev "port aset store") dan TIDAK mengedit manual. README/LISEZMOI di luar scope yang disetujui.
+**Dampak:** non-fungsional — listing App Store 20.0 akan menampilkan "Odoo 19" sampai varian 20.0 di-derive.
+**Rekomendasi:** dev menjalankan `tools/variant.py` (di luar repo ini) untuk varian 20.0 dan mengganti `index.html`; sekaligus perbarui baris "Odoo version" di README/LISEZMOI kalau diinginkan.
+**Keputusan pemilik modul:** *(kosong)*
 
 ---
 
