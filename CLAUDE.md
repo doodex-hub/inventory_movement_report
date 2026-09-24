@@ -1,4 +1,9 @@
-# CLAUDE.md — product_history_report migration (18.0 → 19.0)
+# CLAUDE.md — product_history_report migration (19.0 → 20.0)
+
+> Diinstansiasi ulang untuk migrasi 19.0→20.0 pada 2026-09-24 dari `CLAUDE_TEMPLATE.md`, menggantikan CLAUDE.md lama bertema 18.0→19.0 (SELESAI 2026-08-26). Root CLAUDE.md sebelumnya sudah digantikan file ini.
+> File ini ditaruh di **ROOT `target-codebase`** dan otomatis dibaca Claude Code sebagai instruksi utama project ini.
+> Semua path `doc/...` yang disebut di file ini relatif terhadap `doc-dev/migration_19.0_20.0/doc/` — bukan relatif ke root `target-codebase` langsung.
+> CLAUDE.md lama (18.0→19.0) masih utuh di git: `git show migration/19.0:CLAUDE.md`.
 
 ---
 
@@ -6,55 +11,47 @@
 
 Kamu adalah migration copilot untuk project migrasi Odoo custom module berikut:
 
-- **Modul:** product_history_report
-- **Versi:** 18.0 → 19.0
-- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target) — dikonfirmasi dev 2026-08-26
-- **Source masih aktif dikembangkan selama migrasi?** Tidak — dikonfirmasi dev 2026-08-26
+- **Modul:** product_history_report (kode di subfolder `product_history_report/`; `depends: base, stock` — Community-only). Nama repo GitHub-nya `inventory_movement_report` (fungsi bisnis — laporan pergerakan inventory), nama teknis module/folder-nya `product_history_report` — dikonfirmasi dev, bukan kesalahan.
+- **Versi:** 19.0 → 20.0
+- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target). Diwarisi dari project 17.0→18.0 dan 18.0→19.0 (dikonfirmasi dev 2026-08-26) — **konfirmasi ulang eksplisit di Step 1 intake**. Step 7 N/A kecuali dev mengoreksi.
+- **Source masih aktif dikembangkan selama migrasi?** Tidak (asumsi — branch `migration/19.0` adalah hasil akhir migrasi 18→19 yang sudah SELESAI). Konfirmasi di Step 1; kalau Ya, ikuti `SYNC_POLICY.md`.
 - **Environment eksekusi:** Claude Code CLI
-- **Git eksekusi:** Ya. Mode Git aktif (lihat `ai-doc/USAGE_GUIDE.md` "Mode Git" di `migration-tool` untuk prosedur lengkap + pengaman wajib) — AI boleh menjalankan sebagian command git (`fetch`/`checkout`/`clone`/`commit`), TIDAK PERNAH `push`/merge/force-push, dan cuma untuk `target-codebase` (repo ini) + bootstrap `source-codebase` (sudah selesai, lihat di bawah). Konsekuensi: AI WAJIB auto-commit di `target-codebase` tepat setelah tiap step selesai — `git push` tetap 100% manual dev.
-- **Mulai:** 2026-08-26
+- **Git eksekusi:** Ya — Mode Git aktif, dideteksi dari `.claude/settings.json` (varian `settings.json.mode-git.template`, bootstrap 2026-08-26, path referensi diperbarui untuk 19.0→20.0 pada 2026-09-24). AI boleh `fetch`/`checkout`/`commit`/`diff`/`log`/`show` di `target-codebase` (repo ini) sesuai `migration-tool/ai-doc/USAGE_GUIDE.md` "Mode Git", TIDAK PERNAH `push`/merge/force-push. AI WAJIB auto-commit di `target-codebase` tepat setelah tiap step selesai — `git push` 100% manual dev.
+- **Mulai:** 2026-09-24 (conditioning; Step 1 belum mulai)
 
 Begitu sesi ini dibuka, langsung kenalkan diri sebagai migration copilot dan lanjutkan dari "Status saat ini" di bawah — jangan tunggu user menjelaskan project dari nol.
 
-> **Larangan mutlak (default): JANGAN jalankan command `git` apapun di REPO MANAPUN yang terhubung ke project ini** — `migration-tool`, `source-codebase`, `native-source`/`native-target` — KECUALI di `target-codebase` (repo ini) sesuai batas Mode Git di atas. Command non-git (`ls`/`find`/`grep`/`diff`/`cat`) tetap aman dipakai kapan saja. Larangan `push`/merge/force-push/PR otomatis tetap mutlak walau Mode Git aktif.
+> **Larangan mutlak (default): JANGAN jalankan command `git` apapun di repo lain yang terhubung ke project ini** — `migration-tool`, `native-source`/`native-target` (+Enterprise), `third-party-*`. Git hanya boleh di `target-codebase` (repo ini) sesuai scope Mode Git di atas. Command non-git (`ls`/`find`/`grep`/`diff`/`cat`) tetap aman dipakai kapan saja. `push`/merge/force-push/PR otomatis TETAP TERLARANG MUTLAK.
 
 > **Setiap kali menyerahkan aksi ke dev (git push, jalankan docker, install test, dst) — beri langkah bernomor konkret SAAT ITU JUGA, bukan cuma "sudah disiapkan, tinggal kamu jalankan".**
 
----
-
-## Catatan penting — modul ini punya riwayat 2 project sebelumnya
-
-Repo ini sebelumnya dipakai untuk:
-1. **doc-dev-backfill** — dokumentasi retroaktif product_history_report 17.0 (Step 01-07 selesai), diarsipkan di `doc-dev/backfill/`.
-2. **Migrasi 17.0→18.0** (lewat `migration-tool`) — **SELESAI, semua 11 step lulus gate** (commit terakhir `978a384`, "MIGRASI 17.0->18.0 SELESAI"), diarsipkan di `doc-dev/migration_17.0_18.0/doc/`.
-
-Kedua arsip ini dipakai sebagai **input Step 1** project 18.0→19.0 ini: `01b_BASELINE_SPEC.md` dari project 17→18 (`doc-dev/migration_17.0_18.0/doc/01_intake/01b_BASELINE_SPEC.md`) mendokumentasikan behavior modul di 18.0 (versi SOURCE project ini sekarang) — baca sebagai draft awal baseline spec 18.0, cross-check ke kode aktual `product_history_report/` satu per satu (kode di repo ini SUDAH di versi 18.0, bukan lagi 17.0).
-
-Nama repo GitHub-nya `inventory_movement_report` (mencerminkan fungsi bisnis modul — laporan pergerakan inventory), sedangkan nama teknis module/folder-nya `product_history_report` — dikonfirmasi dev, bukan kesalahan.
+> **Di CLI: JALAN TERUS dari step ke step, jangan berhenti proaktif tanya "mau lanjut atau dicek dulu?" tanpa alasan kuat.** Setelah Step 1 intake selesai, lanjut sampai Step 11 tanpa henti KECUALI kena salah satu dari 4 kondisi valid di `migration-tool/ai-doc/USAGE_GUIDE.md` "Prinsip: Eksekusi Berkelanjutan di CLI".
 
 ---
 
 ## Source of Truth & Forbidden Actions (WAJIB DIPATUHI)
 
-**Source of truth:** kode 18.0 yang berjalan (kode di repo ini saat ini, atau baseline spec project 17→18 sebagai dokumentasi awalnya) adalah kebenaran mutlak. Semua business logic, workflow, side effect, dan UX di 19.0 **harus identik** dengan 18.0 — termasuk bug yang sudah ada di sana (jangan diperbaiki, dipertahankan).
+**Source of truth:** kode 19.0 yang berjalan — branch `migration/19.0` di repo ini (hasil migrasi 18→19 yang sudah SELESAI), dibaca via `git show migration/19.0:<path>` / `git diff migration/19.0 migration/20.0 -- <path>` — atau `01b_BASELINE_SPEC.md` sebagai dokumentasinya. Semua business logic, workflow, side effect, dan UX di 20.0 **harus identik** dengan 19.0 — termasuk bug yang sudah ada di sana (jangan diperbaiki, dipertahankan).
+
+**Catatan dari migrasi sebelumnya:** baca `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` sebelum mulai Step 1 baseline spec — termasuk MF-01 (SQL f-string warisan, sengaja tidak diubah by design) dan temuan yang dibawa dari 17→18. Jangan dianggap "baru" atau tidak sengaja "diperbaiki" di migrasi 19→20 ini.
 
 **Dilarang** (kecuali eksplisit disetujui & dicatat sebagai perubahan yang disengaja di intake):
 - Menambah atau menghapus fitur
 - Mengubah business rule, workflow, atau state transition
-- Memperbaiki bug yang sudah ada di 18.0
-- Refactor demi readability/style/performance (KECUALI wajib untuk kompatibilitas 19.0 — itu wajib)
+- Memperbaiki bug yang sudah ada di 19.0
+- Refactor demi readability/style/performance (KECUALI wajib untuk kompatibilitas 20.0 — itu wajib)
 - Redesign UI/UX demi estetika
 - Rename model/field/XML-ID kecuali wajib untuk kompatibilitas
 
 **Kapan STOP dan eskalasi ke user** (jangan lanjut dengan asumsi):
 - Perubahan mungkin mempengaruhi business logic
-- Fitur deprecated di 19.0 tidak punya padanan jelas
+- Fitur deprecated di 20.0 tidak punya padanan jelas
 - Ada beberapa cara migrasi valid dengan efek samping berbeda
 - Dampak perubahan ke behavior tidak pasti
 
 Format eskalasi:
 ```
-ESCALATION — Migrasi 19.0
+ESCALATION — Migrasi 20.0
 Step/Fase: {step/fase}
 Modul: product_history_report
 Isu: {deskripsi singkat}
@@ -67,20 +64,23 @@ Perlu keputusan user sebelum lanjut.
 
 ## Mandatory Read Order
 
+> **Catatan notasi versi:** file knowledge base pakai notasi singkat — `knowledge/version-diffs/19-to-20.md`, bukan `19.0-to-20.0.md`.
+
 Sebelum membuat perubahan apapun, baca berurutan:
 
 1. `01_intake/01a_MIGRATION_INTAKE.md` — scope, forbidden actions, definition of done
-2. `migration-tool/knowledge/version-diffs/18-to-19.md` — constraint teknis umum
-3. `doc-dev/migration_17.0_18.0/doc/01_intake/01b_BASELINE_SPEC.md` — baseline behavior modul (versi 18.0, source project ini) — dipakai sebagai draft awal `01_intake/01b_BASELINE_SPEC.md` project ini
-4. `FINDINGS.md` (root `doc/`, kalau sudah ada) — daftar gap/bug/ambiguitas yang masih terbuka lintas step
-5. `03_spec/03_MIGRATION_SPEC.md` (kalau sudah ada) — risiko spesifik modul ini
-6. Step/fase yang sedang berjalan (lihat tabel di bawah) + prompt fase terkait di `migration-tool/templates/06b_PROMPTS_BY_PHASE.md`
+2. `migration-tool/knowledge/version-diffs/19-to-20.md` — constraint teknis umum
+3. `01_intake/01b_BASELINE_SPEC.md` (kalau sudah ada) — apa yang modul lakukan di 19.0 (basis awal: `doc-dev/migration_18.0_19.0/doc/01_intake/01b_BASELINE_SPEC.md`, cross-check ulang ke kode 19.0 aktual `product_history_report/`)
+4. `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` — referensi gap migrasi sebelumnya (18→19) yang WAJIB dibaca sebelum mulai baseline spec 19→20
+5. `FINDINGS.md` (root `doc/`, kalau sudah ada) — gap/bug/ambiguitas migrasi 19→20 yang masih terbuka (lihat `templates/FINDINGS.md`)
+6. `03_spec/03_MIGRATION_SPEC.md` (kalau sudah ada) — risiko spesifik modul ini
+7. Step/fase yang sedang berjalan (lihat tabel di bawah) + prompt fase terkait di `migration-tool/templates/06b_PROMPTS_BY_PHASE.md`
 
 ---
 
 ## Alur kerja — 11 step
 
-Detail lengkap tiap step, alasan desain, dan template dokumen: `ai-doc/OVERVIEW.md` di folder `migration-tool`.
+Detail lengkap tiap step, alasan desain, dan template dokumen: `migration-tool/ai-doc/OVERVIEW.md`.
 
 | # | Step | Output di `doc/` | Gate sebelum lanjut? |
 |---|---|---|---|
@@ -89,64 +89,61 @@ Detail lengkap tiap step, alasan desain, dan template dokumen: `ai-doc/OVERVIEW.
 | 3 | Migration spec (teknis) | `03_spec/03_MIGRATION_SPEC.md` | Tidak |
 | 4 | Spec completeness review | `04_completeness/04_SPEC_COMPLETENESS_REVIEW.md` | **Ya** — spec harus cover 100% source module |
 | 5 | Acceptance criteria & test plan | `05_acceptance/05a_MIGRATION_ACCEPTANCE_CRITERIA.md` + `05_acceptance/05b_TEST_PLAN_MIGRATION.md` | Tidak |
-| 6 | Code migration | kode di `target-codebase` + `06_implementation/06c_IMPLEMENTATION_LOG.md` | Tidak (disiplin per-fase A→G) |
-| 7 | Data migration scripts | `07_data/07_DATA_MIGRATION_PLAN.md` + script | — (N/A kalau port kode saja — cek ulang di Step 1) |
-| 8 | Code review | `08_review/08_CODE_REVIEW.md` | **Ya** |
+| 6 | Code migration | kode di `product_history_report/` + `06_implementation/06c_IMPLEMENTATION_LOG.md` (ref `06a_CODE_MIGRATION_PHASES.md` + `06b_PROMPTS_BY_PHASE.md`) | Tidak (tapi per-fase A→G disiplin) |
+| 7 | Data migration scripts | `07_data/07_DATA_MIGRATION_PLAN.md` + script — **kondisional**, cuma kalau sifat migrasi = upgrade instance | — |
+| 8 | Code review | `08_review/08_CODE_REVIEW.md` | **Ya** — cek vs migration spec DAN acceptance criteria |
 | 9 | Dev testing | `09_devtest/09_DEV_TESTING.md` | **Ya** |
 | 10 | QA testing | `10_qa/10_BUSINESS_FLOW_MIGRATION.md` | **Ya** |
 | 11 | UAT sign-off | `11_uat/11_UAT_CHECKLIST.md` | **Ya** — sign-off final |
 
-Cross-cutting (direkomendasikan): `PROMPT_LOG.md` dan `FINDINGS.md` di root `doc/`.
+Cross-cutting (kondisional): `SYNC_POLICY.md` + `SYNC_LOG.md` di root `doc/` — kalau intake §4b menjawab "Ya" (source masih aktif dikembangkan).
 
-**Konvensi penamaan:** nama file di `doc-dev/migration_18.0_19.0/doc/<step-folder>/` selalu identik dengan nama file template di `migration-tool/templates/`.
+Cross-cutting (direkomendasikan): `PROMPT_LOG.md` di root `doc/` — **AI wajib update tabelnya di akhir tiap giliran/sesi** (Normal/Tool-fix per step).
 
-**Aturan paling penting:** `03_MIGRATION_SPEC.md` (step 3) memandu implementasi kode. Dasar acceptance criteria/testing (step 5, 9, 10, 11) adalah `01b_BASELINE_SPEC.md` dan kode 18.0 yang berjalan — BUKAN migration spec.
+Cross-cutting (direkomendasikan): `FINDINGS.md` di root `doc/` — **AI wajib update begitu step manapun menemukan gap/bug/ambiguitas yang butuh keputusan manusia**. Step 4 dan Step 8 WAJIB baca file ini sebagai bagian gate.
+
+Cross-cutting, LATEN: `HOTFIX_REVIEW.md` + `HOTFIX_LOG.md` di root `doc/` — dipicu hanya kalau `doc/MIGRATION_CLOSED.md` sudah ada (ditulis di akhir Step 11) DAN ada commit baru di branch target setelah SHA di file itu (lihat `templates/HOTFIX_REVIEW.md`).
+
+**Cross-Version-Compare (Step 9/10, on-demand):** kalau butuh menjalankan versi 19.0 LIVE berdampingan dengan 20.0 di Docker, buat worktree fisik saat itu juga (`git worktree add <path> migration/19.0`) — lihat `templates/CROSS_VERSION_COMPARE.md`. Tidak dibuat saat conditioning.
+
+**Konvensi penamaan:** nama file di `doc-dev/migration_19.0_20.0/doc/<step-folder>/` **selalu identik** dengan nama file template di `migration-tool/templates/` (termasuk prefix angka/huruf).
+
+**Aturan paling penting — jangan lupa:** `03_MIGRATION_SPEC.md` (step 3) memandu implementasi kode. Dasar acceptance criteria/testing (step 5, 9, 10, 11) adalah **`01b_BASELINE_SPEC.md`** dan kode 19.0 yang berjalan — BUKAN migration spec. Kalau ragu kenapa, baca §6 `ai-doc/OVERVIEW.md`.
+
+**Phase discipline (step 6):** eksekusi HANYA scope fase yang sedang berjalan (lihat `06a_CODE_MIGRATION_PHASES.md`). Applicability Check wajib jalan dulu sebelum Fase A. Urutan A1→A2→A3→A4→A5→B1→B2→C1→C2→D1→D2→E→F→G2. Checkpoint G1 (install test) **wajib diulang di tengah Fase A** (setelah A2, setelah A3) — di project 18→19 dua breaking change (DIFF-15/16) HANYA ketahuan lewat G1 nyata. **E (JavaScript) wajib selesai penuh sebelum F (Template).**
+
+**Catatan QA (lesson 17→18 dan 18→19):** AI-interaktif browser automation TERBUKTI GAGAL di environment ini (`document.hidden`/`odoo.isReady` macet) — Step 10 langsung pakai Tour test + Integration test yang terbukti reliable, jangan diulang dari nol tanpa alasan baru.
 
 ---
 
 ## Status saat ini
 
-**Step 0 (bootstrap) selesai 2026-08-26.** Branch `migration/19.0_target` dibuat dari `origin/migration/18.0` di `target-codebase` (repo ini). `source-codebase` baru di-clone sebagai folder sibling `inventory-movement-report-migration-19-source` (branch `migration/18.0`, read-only). `.claude/settings.json` sudah diinstansiasi dari `migration-tool/templates/cli-config/settings.json.mode-git.template` dengan path project ini (lihat "Folder yang di-connect" di bawah).
+**Step 0 — Conditioning selesai (2026-09-24).** Branch `migration/20.0` dibuat dari `migration/19.0` (HEAD `f57dee4`, setelah "Step 11 gate passed … MIGRASI 18.0->19.0 SELESAI" `aea668c`). `.claude/settings.json` diperbarui (deny list native 19/20, `git show` diizinkan), CLAUDE.md ini ditulis ulang, skeleton `doc-dev/migration_19.0_20.0/doc/` dibuat (folder kosong + `.gitkeep`). **Step 1 Intake belum mulai** — sesi eksekusi berikutnya mulai dari Step 1.
 
-Field "Sifat migrasi" dan "Source aktif dikembangkan" sudah dikonfirmasi dev 2026-08-26 (keduanya sama seperti project 17.0→18.0: port kode saja, source dibekukan). **Step 1 (Intake & Scope) draft selesai ditulis** — `01a_MIGRATION_INTAKE.md` + `01b_BASELINE_SPEC.md` + `FINDINGS.md` (root `doc/`), dibangun dari hasil project 17.0→18.0 yang sudah SELESAI+lulus UAT (baseline spec 18.0 dicross-check ulang ke kode aktual, tidak ada drift). Menunggu review user untuk menutup gate Step 1 — 2 open item minor belum dikonfirmasi eksplisit (dependency Enterprise/OCA & dokumen pelengkap lain di luar repo, lihat §Ringkasan `01a_MIGRATION_INTAKE.md`), tidak menghalangi lanjut ke Step 2 kalau dev setuju.
-
-**Step 2 (Diff & Compatibility Analysis) selesai ditulis 2026-08-26** — `02_DIFF_ANALYSIS.md`, dicek langsung terhadap `native-target` (`enterprise19.0`) vs `native-source` (`odoo18`). 2 temuan install/test-blocking BARU (belum ada di knowledge base sebelumnya): **DIFF-01** atribut `expand`/`string` dihapus dari skema RNG tag `<group>` (search view modul ini pakai ini, install-blocking) dan **DIFF-02** `res.users.groups_id`→`group_ids` (kena test fixture modul, test-blocking) — keduanya wajib difix di Step 6. Satu open question (**DIFF-10**) soal xmlid `stock.picking_type_in/_out/_internal`/`stock.stock_location_stock` di test — kemungkinan besar aman tapi belum dibuktikan eksekusi nyata, ditunda ke Step 9 G1 (pola sama seperti `DIFF-12` project 17→18). Temuan dicatat sebagai kandidat di `migration-tool/migration-records/product_history_report_18.0_19.0/SUMMARY.md` (belum di-promote ke `knowledge/`).
-
-**Step 3 (Migration Spec teknis) selesai ditulis 2026-08-26** — `03_MIGRATION_SPEC.md`. Scope kode wajib: (1) hapus atribut `expand`/`string` di `views/stock_history_view.xml:10`, (2) rename `groups_id`→`group_ids` di `tests/test_product_history_report.py:189`, (3) bump manifest version ke `19.0.1.0.0`. DIFF-10 (xmlid picking type) sengaja TIDAK diubah sekarang — ditunda sampai Step 9 G1 membuktikan gagal/tidak, supaya tidak mengubah kode di luar scope yang genuinely perlu.
-
-**Step 4 (Spec Completeness Review) lulus gate 2026-08-26** — `04_SPEC_COMPLETENESS_REVIEW.md`, 24/24 file source module ter-cover di `03_MIGRATION_SPEC.md` (kriteria objektif/mekanis, AI self-certify konsisten dengan precedent project 17→18 — beda dari Step 1 yang butuh konfirmasi subjektif dev).
-
-**Step 5 (Acceptance Criteria & Test Plan) selesai ditulis 2026-08-26** — `05a_MIGRATION_ACCEPTANCE_CRITERIA.md` (AC-01..AC-05, diwarisi dari project 17→18 + 1 AC baru `AC-01-03` untuk dampak cosmetic DIFF-01) + `05b_TEST_PLAN_MIGRATION.md`. Item kontinjensi DIFF-10 (xmlid picking type) ditandai wajib dicek PERTAMA saat G1 sebelum test lain dijalankan.
-
-**Step 6 (Code Migration) SELESAI 2026-08-26** — 4 fix diterapkan ke kode: DIFF-01 (`<group>` attrs), DIFF-02 (`groups_id`→`group_ids`), plus **DUA temuan BARU yang HANYA ketahuan lewat eksekusi G1 nyata** (Docker, Odoo 19.0 resmi, Mode C — AI jalankan langsung): **DIFF-15** (`stock.move.name` dihapus total, diganti compute `reference`) dan **DIFF-16** (tombol "Stock History" tidak collapse ke `.o_button_more` lagi di 19.0, tour perlu disesuaikan). G1 run #1 gagal (1 failed + 4 error dari 9 test), didokumentasikan dulu ke `02_DIFF_ANALYSIS.md`/`03_MIGRATION_SPEC.md` sebelum fix (prosedur wajib), G1 run #2 setelah fix: **0 failed, 0 error(s) of 9 tests** — install bersih + semua test (8 integration + 1 Tour, 10/10 step) PASS. DIFF-10 (open question Step 2) terkonfirmasi AMAN. Detail lengkap: `06_implementation/06c_IMPLEMENTATION_LOG.md`. Docker containers sudah di-teardown (`docker compose down -v`) setelah verifikasi. **Step 7 N/A** (port kode saja, dikonfirmasi ulang `01a_MIGRATION_INTAKE.md` §3).
-
-**Step 8 (Code Review) lulus gate 2026-08-26** — `08_CODE_REVIEW.md`, 0 🔴 Critical, 1 🟡 (SQL f-string warisan MF-01, tidak diubah by design), 3 🔵 Info (dead code/import warisan + `self._cr` deprecated opsional). Gap Analysis vs Migration Spec dan vs Acceptance Criteria semua ✅ Match — satu-satunya item belum diverifikasi adalah AC-01-03 (manual, didorong ke Step 10). Tidak ada tabrakan nama method/field dengan core (dua arah dicek).
-
-**Step 9 (Dev Testing) lulus gate 2026-08-26** — `09_DEV_TESTING.md`, hasil eksekusi G1 Step 6 dipakai langsung sebagai evidence (0 failed, 0 error(s) of 9 tests — 8 Integration + 1 Tour, Odoo 19.0 nyata via Docker). Addendum: Tour diperpanjang 2 step untuk menutup AC-01-03 (filter groupby tetap berfungsi pasca DIFF-01) — 12/12 step PASS, tidak ada item manual tersisa.
-
-**Step 10 (QA Testing) lulus gate 2026-08-26** — `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/`. Berdasarkan lesson project 17→18 (AI-interaktif browser automation TERBUKTI GAGAL di environment ini, root cause `document.hidden`/`odoo.isReady` macet) — **tidak diulang lagi**, langsung pakai Tour test + Integration test yang terbukti reliable. S-01..S-07 semua PASS, tidak ada yang genuinely butuh klik manual dev. Docker instance sudah dimatikan.
-
-**Step 11 (UAT Sign-off) — draft ditulis 2026-08-26, disetujui dev Kuncoro via chat 2026-08-26** ("UAT dianggap selesai, percaya test oleh AI") — dicatat apa adanya sebagai persetujuan verbal berdasarkan hasil eksekusi otomatis AI (Docker Odoo 19.0 nyata, 9/9 test PASS), BUKAN eksekusi tangan T-01..T-03 tercatat per-baris.
-
-**MIGRASI 18.0→19.0 SELESAI — SEMUA 11 STEP LULUS.** `git push` dijalankan manual oleh dev (dikonfirmasi `git fetch` — `origin/migration/19.0_target` sinkron dengan commit lokal terakhir, `aea668c`), bukan dari sesi AI.
+Open item untuk Step 1 intake (dicatat saat conditioning, belum diputuskan):
+- CLAUDE.md lama menyebut branch hasil migrasi `migration/19.0_target`, tapi nama aktual branch-nya `migration/19.0` (lokal = `origin/migration/19.0`). Semua rujukan di file ini sudah pakai nama aktual.
+- Inkonsistensi dokumen lama 18→19: tabel "Status per Step" di CLAUDE.md lama dan header `doc-dev/migration_18.0_19.0/doc/01_intake/01a_MIGRATION_INTAKE.md` masih menulis Step 1 "⏳ Menunggu review user", padahal commit `fb720bf` "Step 1 gate passed: Intake & Baseline Spec disetujui" ada di riwayat — gate sebenarnya sudah lulus, dokumennya saja yang basi. 2 open item minor di 01a (dependency Enterprise/OCA tak terlihat dari manifest; dokumen pelengkap di luar repo) tidak pernah dijawab eksplisit — tanyakan di Step 1 project ini.
+- Branch rilis `19.0`/`staging/19.0` berisi 5 commit pasca-migrasi yang TIDAK ada di `migration/19.0` (commit "cleaning" + aset store: `banner.gif`, `icon.png`, folder `assets`, `index.html`, fix key `images` di manifest). Putuskan di intake apakah aset store perlu di-port ke 20.0.
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
 ### Status per Step
 
+Ringkasan cepat — detail lengkap tiap step ada di field `Status:` di header masing-masing file `doc/<step>/`. Tabel ini WAJIB di-update AI setiap kali satu step/dokumen berubah status.
+
 | # | Step | Dokumen | Status | Gate |
 |---|---|---|---|---|
-| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ✅ Draft/selesai ditulis | ⏳ Menunggu review user (2 open item minor, lihat §Ringkasan di `01a`) |
-| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ✅ Selesai ditulis | Tidak ada gate formal |
-| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ✅ Selesai ditulis | — |
-| 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (24/24 file cover) |
-| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ✅ Selesai ditulis | — |
-| 6 | Code Migration | kode `target-codebase` + `06c_IMPLEMENTATION_LOG.md` | ✅ Selesai (4 fix: DIFF-01/02/15/16, 2 ditemukan lewat G1 nyata) | — |
-| 7 | Data Migration Scripts | — | — (N/A, port kode saja) | — |
-| 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Disetujui | ✔️ Lulus (0 🔴, 1 🟡, 3 🔵 — semua warisan source/deprecation opsional) |
-| 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Disetujui | ✔️ Lulus (9/9 test PASS — 8 Integration + 1 Tour, Odoo 19.0 nyata) |
-| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | ✔️ Disetujui | ✔️ Lulus (S-01..S-07 semua PASS via Tour+Integration, tidak ada yang butuh klik manual) |
-| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ✔️ Disetujui | ✔️ Lulus (konfirmasi dev Kuncoro via chat, 2026-08-26 — bukan eksekusi tangan T-01..T-03 tercatat per-baris) |
+| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ⬜ Belum mulai | ⏳ Menunggu review user |
+| 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ⬜ Belum mulai | Tidak ada gate formal |
+| 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
+| 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |
+| 5 | Acceptance Criteria & Test Plan | `05a_MIGRATION_ACCEPTANCE_CRITERIA.md`, `05b_TEST_PLAN_MIGRATION.md` | ⬜ Belum mulai | — |
+| 6 | Code Migration | kode `product_history_report/` + `06c_IMPLEMENTATION_LOG.md` | ⬜ Belum mulai | — (disiplin per-fase A1→G2) |
+| 7 | Data Migration Scripts | `07_DATA_MIGRATION_PLAN.md` + script — cuma kalau upgrade instance | ⬜ Belum mulai / — (n/a kalau port kode saja) | — |
+| 8 | Code Review | `08_CODE_REVIEW.md` | ⬜ Belum mulai | — |
+| 9 | Dev Testing | `09_DEV_TESTING.md` | ⬜ Belum mulai | — |
+| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |
+| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.
 
@@ -154,23 +151,39 @@ Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai d
 
 ## Folder yang di-connect
 
+> Semua folder referensi sudah diketahui path-nya sejak conditioning. Di akhir Step 1, tetap konfirmasi ulang ke dev (checklist `01a_MIGRATION_INTAKE.md` §0).
+
 | Folder | Path | Peran | Read-only? |
 |---|---|---|---|
-| `target-codebase` (folder UTAMA) | `D:/Kuncoro/doodex/repo/inventory-movement-report-migration-19` (repo ini, branch `migration/19.0_target`) | CLAUDE.md + doc/ + kode hasil migrasi | Tidak |
-| `migration-tool` | `D:/Kuncoro/doodex/repo/migration-tool-project/migration-tool` | Template + knowledge + `ai-doc/OVERVIEW.md` | Tulis di `migration-records/` saja |
-| `source-codebase` | `D:/Kuncoro/doodex/repo/inventory-movement-report-migration-19-source` (branch `migration/18.0`) | Kode modul 18.0, referensi | Ya |
-| `native-target` (19.0) | `D:/Kuncoro/doodex/repo/enterprise19.0` — **BUKAN addons-only, ini folder Odoo 19.0 penuh (Community+Enterprise tergabung dalam `odoo/addons/` yang sama)**, lihat lesson `advanced_sales_analysis` 18.0→19.0. Juga BUKAN git repo (hasil extract). Path ini dipakai untuk `ABS_PATH_NATIVE_TARGET` DAN `ABS_PATH_NATIVE_TARGET_ENTERPRISE` sekaligus. | Diff API core 19.0 | Ya |
-| `native-source` (18.0) | `D:/Kuncoro/doodex/repo/odoo18` | Cross-check versi asal | Ya |
+| `target-codebase` (folder UTAMA) | `D:\Kuncoro\doodex\repo\inventory-movement-report-migration-20` (branch `migration/20.0`) | CLAUDE.md + `doc-dev/` di root, kode migrasi di `product_history_report/` | Tidak |
+| `migration-tool` | `D:\Kuncoro\doodex\repo\migration-tool-project\migration-tool` | Template + knowledge + `ai-doc/OVERVIEW.md`; tulis ke `migration-records/product_history_report_19.0_20.0/` | Tulis di `migration-records/` saja |
+| `native-source` (Community 19.0) | `D:\Kuncoro\doodex\repo\odoo19` (git, branch `19.0`) | Cross-check API core 19.0 (`stock`) | Ya |
+| `native-source-enterprise` (Enterprise 19.0) | `D:\Kuncoro\doodex\repo\enterprise19` (git, branch `19.0`, addons-only) | Jaga-jaga — modul tidak depend Enterprise | Ya |
+| `native-target` (Community 20.0) | `D:\Kuncoro\doodex\repo\odoo20` (git, branch `20.0`) | Diff API core 20.0 (step 2) | Ya |
+| `native-target-enterprise` (Enterprise 20.0) | `D:\Kuncoro\doodex\repo\enterprise20` (git, branch `20.0`, addons-only) | Jaga-jaga — tidak wajib dianalisis kecuali ditemukan dependency Enterprise | Ya |
+| `third-party-*` | — | Tidak ada indikasi dari manifest (`depends: ['base', 'stock']`) — belum pernah dikonfirmasi eksplisit dev, tanyakan di Step 1 | — |
 
-Belum dikonfirmasi ulang untuk 19.0 apakah modul ini masih tanpa dependency Enterprise/OCA (di 17→18 confirmed `depends: ['base', 'stock']` saja, tidak ada Enterprise/OCA) — cek ulang di Step 2 (§0b `ai-doc/USAGE_GUIDE.md`, jangan diasumsikan otomatis sama).
+> **Tidak ada `source-codebase` folder terpisah.** Kode versi 19.0 direferensikan via `git diff`/`git show` ke branch `migration/19.0` di repo yang sama, tanpa folder terpisah. Worktree fisik hanya dibuat on-demand untuk Cross-Version-Compare (lihat §Alur kerja).
+
+> **Struktur native (dicek 2026-09-24):** model dua-clone standar — `odoo19`/`odoo20` repo Community penuh, `enterprise19`/`enterprise20` addons-only terpisah. BUKAN folder gabungan seperti `enterprise19.0` yang dipakai project 18→19 (folder itu sudah tidak ada).
 
 ---
 
 ## Knowledge base
 
-Sebelum step 2 mulai analisis, cek dulu `migration-tool/knowledge/INDEX.md` — apakah sudah ada entry untuk pasangan versi 18.0→19.0 atau dependency (`base`, `stock`) yang relevan. **Sudah ada 1 project 18→19 selesai sebelumnya** (`advanced_sales_analysis`) — cek `migration-tool/knowledge/version-diffs/18-to-19.md` dan `migration-tool/knowledge/dependency-compat/sale_report/18-to-19.md` untuk temuan yang sudah dipromosikan dari project itu.
+Sebelum step 2 mulai analisis, cek `migration-tool/knowledge/INDEX.md` — `version-diffs/19-to-20.md` sudah ada (dari `optional_field_save` dan `pos-margin-sale`), plus `dependency-compat/stock/18-to-19.md` (`stock.move.name` dihapus, diganti `reference`) sebagai konteks pasangan versi sebelumnya.
 
-Temuan baru (general Odoo atau dependency-specific) ditulis ke `migration-tool/migration-records/product_history_report_18.0_19.0/SUMMARY.md` — bukan langsung ke `knowledge/`. Promosi hanya lewat sesi curation eksplisit (`templates/CURATION_PROMPT.md`).
+Temuan baru (general Odoo atau dependency-specific) ditulis ke `migration-tool/migration-records/product_history_report_19.0_20.0/SUMMARY.md` saat itu juga — **BUKAN** langsung ke `migration-tool/knowledge/`. Promosi hanya lewat sesi curation eksplisit (`templates/CURATION_PROMPT.md`).
+
+---
+
+## Riwayat migrasi sebelumnya (referensi historis — JANGAN dihapus)
+
+| Project | Dokumen | Status | Catatan |
+|---|---|---|---|
+| Backfill 17.0 | `doc-dev/backfill/` (termasuk `FINDINGS.md`) | Selesai (Step 01-07) | Dokumentasi retroaktif product_history_report 17.0 |
+| Migrasi 17.0→18.0 | `doc-dev/migration_17.0_18.0/doc/` (`01_intake/01b_BASELINE_SPEC.md`, `FINDINGS.md`) | SELESAI (commit `978a384`) | Branch `migration/18.0`. Migration record: `migration-tool/migration-records/product_history_report_17.0_18.0/` |
+| Migrasi 18.0→19.0 | `doc-dev/migration_18.0_19.0/doc/` — **baseline behavior:** `01_intake/01b_BASELINE_SPEC.md`; **gap yang sengaja dipertahankan:** `FINDINGS.md` | SELESAI 2026-08-26 (UAT disetujui dev Kuncoro via chat berdasarkan eksekusi otomatis AI) | Branch `migration/19.0` (di dokumen lama tertulis `migration/19.0_target`). Perubahan kode: DIFF-01 (atribut `expand`/`string` `<group>` dihapus), DIFF-02 (`groups_id`→`group_ids` di test), DIFF-15 (`stock.move.name` dihapus → `reference`), DIFF-16 (tour: tombol "Stock History" tidak collapse ke `.o_button_more`). 9/9 test pass (8 Integration + 1 Tour 12/12 step), code review 0🔴 1🟡 3🔵, QA S-01..S-07 PASS. Migration record: `migration-tool/migration-records/product_history_report_18.0_19.0/` |
 
 ---
 
@@ -179,5 +192,4 @@ Temuan baru (general Odoo atau dependency-specific) ditulis ke `migration-tool/m
 - Rujukan lengkap semua keputusan desain: `migration-tool/ai-doc/OVERVIEW.md`
 - Panduan operasional: `migration-tool/ai-doc/USAGE_GUIDE.md`
 - Diagram alur 11 step: `migration-tool/ai-doc/diagrams/migration-workflow.svg`
-- Dokumentasi backfill 17.0 (diarsipkan): `doc-dev/backfill/`
-- Dokumentasi migrasi 17.0→18.0 (diarsipkan, SELESAI): `doc-dev/migration_17.0_18.0/`
+- Diagram dua jalur dokumen (functional vs teknis): `migration-tool/ai-doc/diagrams/spec-vs-test-tracks.svg`
