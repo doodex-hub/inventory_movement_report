@@ -13,11 +13,11 @@ Kamu adalah migration copilot untuk project migrasi Odoo custom module berikut:
 
 - **Modul:** product_history_report (kode di subfolder `product_history_report/`; `depends: base, stock` — Community-only). Nama repo GitHub-nya `inventory_movement_report` (fungsi bisnis — laporan pergerakan inventory), nama teknis module/folder-nya `product_history_report` — dikonfirmasi dev, bukan kesalahan.
 - **Versi:** 19.0 → 20.0
-- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target). Diwarisi dari project 17.0→18.0 dan 18.0→19.0 (dikonfirmasi dev 2026-08-26) — **konfirmasi ulang eksplisit di Step 1 intake**. Step 7 N/A kecuali dev mengoreksi.
-- **Source masih aktif dikembangkan selama migrasi?** Tidak (asumsi — branch `migration/19.0` adalah hasil akhir migrasi 18→19 yang sudah SELESAI). Konfirmasi di Step 1; kalau Ya, ikuti `SYNC_POLICY.md`.
+- **Sifat migrasi:** port kode saja (belum ada data produksi — instalasi baru di versi target). **Dikonfirmasi ulang dev 2026-09-24 (Step 1 intake).** Step 7 N/A.
+- **Source masih aktif dikembangkan selama migrasi?** Tidak — dikonfirmasi dev 2026-09-24 (Step 1).
 - **Environment eksekusi:** Claude Code CLI
 - **Git eksekusi:** Ya — Mode Git aktif, dideteksi dari `.claude/settings.json` (varian `settings.json.mode-git.template`, bootstrap 2026-08-26, path referensi diperbarui untuk 19.0→20.0 pada 2026-09-24). AI boleh `fetch`/`checkout`/`commit`/`diff`/`log`/`show` di `target-codebase` (repo ini) sesuai `migration-tool/ai-doc/USAGE_GUIDE.md` "Mode Git", TIDAK PERNAH `push`/merge/force-push. AI WAJIB auto-commit di `target-codebase` tepat setelah tiap step selesai — `git push` 100% manual dev.
-- **Mulai:** 2026-09-24 (conditioning; Step 1 belum mulai)
+- **Mulai:** 2026-09-24 (conditioning + Step 1 intake di hari yang sama)
 
 Begitu sesi ini dibuka, langsung kenalkan diri sebagai migration copilot dan lanjutkan dari "Status saat ini" di bawah — jangan tunggu user menjelaskan project dari nol.
 
@@ -133,7 +133,7 @@ Ringkasan cepat — detail lengkap tiap step ada di field `Status:` di header ma
 
 | # | Step | Dokumen | Status | Gate |
 |---|---|---|---|---|
-| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ⬜ Belum mulai | ⏳ Menunggu review user |
+| 1 | Intake & Scope | `01a_MIGRATION_INTAKE.md`, `01b_BASELINE_SPEC.md` | ✔️ Disetujui | ✔️ Lulus 2026-09-24 (jawaban intake dev via chat) |
 | 2 | Diff & Compatibility Analysis | `02_DIFF_ANALYSIS.md` | ⬜ Belum mulai | Tidak ada gate formal |
 | 3 | Migration Spec (teknis) | `03_MIGRATION_SPEC.md` | ⬜ Belum mulai | — |
 | 4 | Spec Completeness Review | `04_SPEC_COMPLETENESS_REVIEW.md` | ⬜ Belum mulai | — |

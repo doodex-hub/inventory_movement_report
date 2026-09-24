@@ -1,0 +1,106 @@
+# Findings — product_history_report (migrasi 19.0 → 20.0)
+
+**Modul:** product_history_report
+**Migrasi:** 19.0 → 20.0
+**Terakhir update:** 2026-09-24
+
+---
+
+## Ringkasan
+
+| ID | Judul | Ditemukan di Step | Tag | Prioritas | Status |
+|---|---|---|---|---|---|
+| MF-01 | SQL view global `stock_history_view` di-drop+recreate per klik, race condition antar user | 1 | `[DIWARISI-SOURCE]` | Tinggi | 🔓 Terbuka — pertahankan identik |
+| MF-02 | Transfer internal→internal dihitung ganda di income DAN outcome | 1 | `[DIWARISI-SOURCE]` | Sedang | 🔓 Terbuka — pertahankan identik |
+| MF-03 | ACL `stock.history.view` tanpa grup — terbuka untuk semua user | 1 | `[DIWARISI-SOURCE]` + `[GAP-MIGRASI]` | Rendah | 🔓 Terbuka — pertahankan identik; bentuk ACL wajib dikonversi ke `ir.access` (DIFF-01) |
+| MF-04 | ORM cache stale kalau `recreate_view()` dipanggil >1x dalam environment sama | 1 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik |
+| MF-05 | Ikon stat button `fa-signal` tidak dirender di 20.0 (Font Awesome → Material Symbols) | 1 | `[GAP-MIGRASI]` | Sedang | ✅ Diputuskan AI (low-risk, preseden native): `android_cell_5_bar` — lihat detail |
+| MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
+| MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
+
+MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
+
+> Catatan konsistensi: `CLAUDE.md` project ini menyebut "MF-01 (SQL f-string warisan, sengaja tidak diubah by design)". MF-01 di dokumen 18→19 sebenarnya berjudul race condition SQL view global — f-string SQL adalah bagian dari mekanisme yang sama (`recreate_view()` menyusun SQL lewat f-string), jadi keduanya merujuk hal yang sama. Tidak ada MF terpisah untuk f-string.
+
+---
+
+## Detail
+
+### MF-01 — SQL view global di-drop+recreate per klik, race condition antar user
+**Ditemukan di:** Step 1 (2026-09-24), diwarisi dari MF-01 18→19 / 17→18, aslinya `F-01` backfill
+**Tag:** `[DIWARISI-SOURCE]`
+**Ref:** `BSL-002`
+**Lokasi:** `product_history_report/models/stock_history_view.py:24-110` (`recreate_view`), dipanggil dari `models/product_template.py:19`
+**Deskripsi:** DROP+CREATE VIEW global `stock_history_view` tanpa locking, di-scope ke satu produk+company lewat f-string SQL. Nilai yang disisipkan (`product_template_id` = `self.id` integer, `companies` = join dari `env.companies.ids` integer) bukan input user bebas, jadi f-string ini tidak dianggap injection vector di alur normal — tetap dipertahankan apa adanya.
+**Dampak di 20.0:** identik dengan 19.0 — dipertahankan.
+**Rekomendasi:** tidak ada tindakan saat migrasi.
+**Keputusan pemilik modul:** *(kosong — belum pernah diputuskan sejak F-01 2026-08-07)*
+
+---
+
+### MF-02 — Transfer internal→internal dihitung ganda di income DAN outcome
+**Ditemukan di:** Step 1 (2026-09-24), diwarisi (`F-02` backfill)
+**Tag:** `[DIWARISI-SOURCE]`
+**Ref:** `BSL-004`
+**Lokasi:** `product_history_report/models/stock_history_view.py:32-33`
+**Deskripsi:** income/outcome dievaluasi independen per move; internal→internal masuk keduanya.
+**Dampak di 20.0:** identik — dipertahankan.
+**Keputusan pemilik modul:** *(kosong)*
+
+---
+
+### MF-03 — ACL `stock.history.view` tanpa grup, terbuka untuk semua user
+**Ditemukan di:** Step 1 (2026-09-24), diwarisi (`F-04` backfill)
+**Tag:** `[DIWARISI-SOURCE]` + `[GAP-MIGRASI]` (bentuk teknisnya wajib berubah di 20.0)
+**Ref:** `BSL-007`, `DIFF-01` (`02_DIFF_ANALYSIS.md`)
+**Lokasi:** `product_history_report/security/ir.model.access.csv:2`
+**Deskripsi:** `access_stock_history_view` 1,1,1,1 tanpa `group_id` — di 19.0 berlaku semua user.
+**Dampak di 20.0:** model `ir.model.access` DIHAPUS di 20.0 (diganti `ir.access`). Di `ir.access`, baris TANPA grup adalah *restriction* (di-AND, tidak memberi akses apapun) — port mentah akan membuat model ini tidak bisa diakses siapapun kecuali superuser (regresi total). Padanan behavior-preserving: baris `ir.access` dengan grup `base.group_everyone` (grup "Role / Everyone", di-imply oleh `base.group_user`, `base.group_portal`, `base.group_public`) dan `operation=crud`. Ini persis konversi resmi Odoo (`odoo20/odoo/upgrade_code/19.4-00-ir-access.py` baris 517-519: "ir.model.access without group, base.group_everyone instead").
+**Rekomendasi:** konversi ke `security/ir.access.csv` dengan `base.group_everyone` — mempertahankan keterbukaan akses identik 19.0 (bukan diperketat).
+**Keputusan pemilik modul:** *(kosong — soal apakah akses perlu dibatasi ke grup Inventory tetap keputusan terpisah dari migrasi)*
+
+---
+
+### MF-04 — ORM cache stale kalau `recreate_view()` dipanggil >1x dalam environment sama
+**Ditemukan di:** Step 1 (2026-09-24), diwarisi (`F-09` backfill)
+**Tag:** `[DIWARISI-SOURCE]`
+**Ref:** `BSL-009`
+**Lokasi:** `product_history_report/models/stock_history_view.py:24-110`
+**Dampak di 20.0:** identik — dipertahankan.
+**Keputusan pemilik modul:** *(kosong)*
+
+---
+
+### MF-05 — Ikon stat button `fa-signal` tidak dirender di 20.0
+**Ditemukan di:** Step 1 (2026-09-24, analisis awal `native-target`)
+**Tag:** `[GAP-MIGRASI]`
+**Ref:** `BSL-013`, `DIFF-02`
+**Lokasi:** `product_history_report/views/views.xml` (atribut `icon="fa-signal"`)
+**Deskripsi:** Di 20.0 `ViewButton` (`addons/web/static/src/views/view_button/view_button.js` `iconFromString`) merender atribut `icon` sebagai `<i class="o_button_icon oi" data-icon="...">` yang digambar lewat ligature font Material Symbols (`addons/web/static/src/webclient/icons.scss`, `content: attr(data-icon)`). String `fa-signal` bukan nama ikon Material → tombol tampil tanpa ikon yang benar. Semua stat button native di view yang sama sudah dikonversi (`fa-exchange`→`sync_alt`, `fa-refresh`→`cached`, dst). Font yang dimuat adalah SUBSET (`addons/web/tooling/icons/icons_wishlist.txt`, 479 nama) — pengganti wajib ada di subset.
+**Keputusan (AI, prinsip "jalan terus" USAGE_GUIDE — satu opsi jelas paling aman):** `android_cell_5_bar`. Alasan: Odoo sendiri memetakan `fa-signal` → `android_cell_5_bar` untuk stat button produk di modul `sale` (commit native `5d739f24054` "[IMP] mrp,*: icon update"), dan nama itu ada di subset font. Ini mempertahankan UX (ikon bar sinyal) — bukan redesign.
+**Keputusan pemilik modul:** *(opsional — dev boleh koreksi nama ikon kalau mau yang lain)*
+
+---
+
+### MF-06 — Aset App Store branch rilis `19.0` tidak ada di `migration/19.0`
+**Ditemukan di:** Conditioning (2026-09-24), diputuskan Step 1
+**Tag:** `[PERLU-KEPUTUSAN]`
+**Ref:** `01a_MIGRATION_INTAKE.md` §5, `BSL-015`
+**Deskripsi:** branch `19.0`/`staging/19.0` punya 5 commit pasca-migrasi (banner.gif, icon.png, `assets/`, `index.html`, key `images`).
+**Keputusan pemilik modul:** ✅ Dev 2026-09-24 (AskUserQuestion): **port aset store ke 20.0**. Hanya `static/description/**` + key `images` yang dibawa; hasil `cleaning` lain (hapus tests/doc-dev) tidak dibawa.
+
+---
+
+### MF-07 — Dependency Enterprise "kemungkinan"
+**Ditemukan di:** Step 1 (2026-09-24)
+**Tag:** `[PERLU-KEPUTUSAN]`
+**Ref:** `01a_MIGRATION_INTAKE.md` §0
+**Deskripsi:** manifest hanya `base`, `stock`; dev menjawab "enterprise kemungkinan depend".
+**Tindakan:** Step 2 analisis `enterprise20` untuk modul yang menyentuh form `product.template`/tabel stock (kandidat awal `quality_control`); Step 9 run tambahan dengan addons Enterprise terpasang.
+**Keputusan pemilik modul:** ✅ jawaban dev di atas (2026-09-24). Kalau ternyata ada modul Enterprise spesifik yang dimaksud, dev bisa menyebutkannya kapan saja.
+
+---
+
+## Cara Pakai
+
+Lihat `migration-tool/templates/FINDINGS.md` §Cara Pakai.
