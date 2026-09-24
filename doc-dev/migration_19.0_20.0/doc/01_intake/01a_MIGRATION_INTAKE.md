@@ -96,6 +96,9 @@ Dependency opsional yang dicek runtime (`'x' in self.env`): tidak ada — dikonf
 - Yang harus tetap identik pasca migrasi: seluruh `BSL-001`..`BSL-015` (`01b_BASELINE_SPEC.md`), termasuk 4 bug/quirk warisan `MF-01`..`MF-04`.
 - **Yang sengaja diubah (disetujui dev 2026-09-24):** port aset App Store dari branch rilis `19.0` — `static/description/**` (banner.gif, icon.png, `assets/{gifs,icons,screens}`, `index.html`) + key `images` manifest → `['static/description/banner.gif', 'static/description/icon.png']`. Non-fungsional, tidak menyentuh business logic.
 - Perubahan wajib kompatibilitas (bukan perubahan scope): ACL → `ir.access.csv`, ikon Material Symbols, rename field test — detail Step 2/3.
+- **Yang sengaja diubah — tambahan pasca Step 9 (disetujui dev 2026-09-24 via chat):**
+  - **SCOPE-02 — fix keamanan MF-10** ("ok kerjakan dan nanti catat baru di fixing di 20, versi sebelumnya belum"): `stock.history.view.recreate_view()` diberi `@api.private` + argumen dipaksa integer. Hanya di 20.0 — branch 17.0/18.0/19.0 tidak diperbaiki. Hasil laporan untuk input sah identik 19.0; yang berubah: method tidak lagi bisa dipanggil lewat RPC, dan argumen non-integer ditolak (`ValueError`).
+  - **SCOPE-03 — konten store** ("sesuaikan", MF-08): penanda versi di `static/description/index.html` → 20.0, README/LISEZMOI root → "20.0".
 
 ## 6. Constraint
 

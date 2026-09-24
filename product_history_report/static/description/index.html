@@ -4,19 +4,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>
-         Product History Report for Odoo 19 &mdash; monthly stock in, out and on hand
+         Product History Report for Odoo 20 &mdash; monthly stock in, out and on hand
          | Doodex
       </title>
-      <meta name="description" content="Free Odoo 19 module. Adds a Stock History button to every product form and shows twelve months of stock in, stock out and quantity on hand as a graph, pivot or list. LGPL-3, by Doodex.">
+      <meta name="description" content="Free Odoo 20 module. Adds a Stock History button to every product form and shows twelve months of stock in, stock out and quantity on hand as a graph, pivot or list. LGPL-3, by Doodex.">
       </head>
    <body style="margin: 0">
       <!-- =========================================================================
   Product History Report -- Odoo Apps Store listing description
-  Odoo 19.0 * module version 19.0.1.0.0 * Free * LGPL-3 * Doodex
+  Odoo 20.0 * module version 20.0.1.0.0 * Free * LGPL-3 * Doodex
 
   PASTE TARGET
     The "Description" field of the Odoo Apps Store upload for
-    product_history_report 19.0.1.0.0. The same markup is also shipped as
+    product_history_report 20.0.1.0.0. The same markup is also shipped as
     product_history_report/static/description/index.html -- see HOWTO.md.
 
   LAYOUT
@@ -28,7 +28,9 @@
     rule in references/variety-checklist.md.
 
 
-  VERSION 19.0 - DERIVED, NOT HAND-WRITTEN
+  VERSION 20.0 - ADJUSTED BY HAND FROM THE 19.0 VARIANT (dev request 2026-09-24,
+    migration 19.0->20.0: version strings + release entry only). Port the same edits into
+    the 17.0 source / tools/variant.py before the next re-derive, or they will be lost.
     Generated from the 17.0 source with tools/variant.py. Edit the 17.0 source
     and re-derive; do not patch this file by hand or the versions drift.
 
@@ -36,8 +38,8 @@
 
     * The screenshots and GIFs are recordings of the 17.0 build. The showcase
       copy and the image alt text therefore do NOT name a version - a caption
-      claiming Odoo 19.0 over an Odoo 17 screen would be a false statement on a
-      store listing. Re-record against a 19.0 database and the version can go
+      claiming Odoo 20.0 over an Odoo 17 screen would be a false statement on a
+      store listing. Re-record against a 20.0 database and the version can go
       back into those sentences.
     * Cross-sell links point at the version of each module that actually
       exists, checked against apps.odoo.com: Growth Suite 18.0, Flow Survey
@@ -414,7 +416,7 @@
             <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
                <div class="chips" style="display: block; text-align: center; margin-bottom: -8px">
                   <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Odoo Official Partner</span>
-                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Odoo 19.0 &mdash; Community &amp; Enterprise</span>
+                  <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Odoo 20.0 &mdash; Community &amp; Enterprise</span>
                   <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Free &middot; LGPL-3 &middot; no key, no limit</span>
                   <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">Reads your data, never writes to it</span>
                   <span class="chip d-inline-flex align-items-center" style="display: inline-flex; font-size: 12.5px; font-weight: 600; color: rgb(39, 1, 64); background-color: #f4eef8; padding: 6px 13px; border-radius: 9999px; line-height: 20.625px; margin: 0 4px 8px; vertical-align: top; white-space: nowrap"><img class="phrico-16" src="./assets/icons/ic-check-v.png" alt="" style="max-width: none; width: 16px; height: 16px; display: inline-block; vertical-align: -3px; color: rgb(39, 1, 64); font-size: 12.5px; font-style: normal; font-weight: 600; letter-spacing: normal; line-height: 20.625px; text-align: start; text-transform: none; white-space: normal; margin-right: 7px; min-width: 16px">8 automated tests, shipped inside</span>
@@ -426,7 +428,7 @@
          <div class="hero" style="padding: 44px 0 28px; text-align: center">
             <div class="wrap" style="max-width: 1080px; margin: 0 auto; padding: 0 24px">
                <p class="eyebrow" style="margin: 0 0 14px; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.96px; text-transform: uppercase; color: rgb(232, 92, 82); font-style: normal; line-height: 19.8px; text-align: center; white-space: normal">
-                  Product History Report &middot; Odoo 19 &middot; Inventory &middot; Free
+                  Product History Report &middot; Odoo 20 &middot; Inventory &middot; Free
                </p>
                <h1 style="color: rgb(39, 1, 64); letter-spacing: -1.05px; margin: 0 auto 18px; font-size: 42px; font-weight: 800; line-height: 46.2px; max-width: 880px; font-style: normal; text-align: center; text-transform: none; white-space: normal">
                   A year of stock movement for any Odoo product &mdash; one
@@ -438,7 +440,7 @@
                   by line.
                </p>
                <p class="sub" style="margin: 0 auto 24px; max-width: 720px; font-size: 16px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">
-                  <b style="color: rgb(115, 115, 115); font-size: 16px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">Product History Report</b> is a free Odoo 19 module that
+                  <b style="color: rgb(115, 115, 115); font-size: 16px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">Product History Report</b> is a free Odoo 20 module that
                   adds a <b style="color: rgb(115, 115, 115); font-size: 16px; font-style: normal; font-weight: 700; letter-spacing: normal; line-height: 26.4px; text-align: center; text-transform: none; white-space: normal">Stock History</b> button to every product form. One
                   click gives you twelve months of stock in, stock out and
                   quantity on hand &mdash; as a chart, a pivot or a list, built
@@ -562,7 +564,7 @@
                </h2>
                <p class="lead muted" style="margin: 0 0 14px; color: rgb(82, 82, 82); font-size: 17px; line-height: 27.54px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal; max-width: 760px; margin-bottom: 22px">
                   Every line below is a behaviour of the module as shipped in
-                  19.0.1.0.0. Nothing here is planned, optional or on a roadmap.
+                  20.0.1.0.0. Nothing here is planned, optional or on a roadmap.
                </p>
 
                <div class="featgrid row" style="margin-left: -24px; margin-right: -24px; margin-top: 0px">
@@ -1024,9 +1026,9 @@
                         </p>
                      </div>
                      <div class="lim" style="padding: 14px 0; border-top: 1px solid #ece4f3">
-                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Odoo 19.0</h4>
+                        <h4 style="letter-spacing: -0.225px; color: rgb(39, 1, 64); margin: 0 0 4px; font-size: 15px; font-weight: 700; font-style: normal; line-height: 24.75px; text-align: start; text-transform: none; white-space: normal">Odoo 20.0</h4>
                         <p style="margin: 0; font-size: 13.5px; color: rgb(82, 82, 82); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
-                           This listing is the 19.0 build. If you need it on
+                           This listing is the 20.0 build. If you need it on
                            another version, write to us and we will tell you
                            honestly what it takes.
                         </p>
@@ -1048,7 +1050,7 @@
                      <span class="ic" style="padding-top: 2px; margin-right: 12px; min-width: 20px"><img class="phrico-20" src="./assets/icons/ic-gauge.png" alt="" style="max-width: none; width: 20px; height: 20px; display: inline-block; vertical-align: -4px; color: rgb(82, 82, 82); font-size: 16px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 26.4px; text-align: start; text-transform: none; white-space: normal; min-width: 20px"></span>
                      <div>
                         <p class="k" style="margin: 0 0 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.84px; text-transform: uppercase; color: rgb(115, 115, 115); font-style: normal; line-height: 17.325px; text-align: start; white-space: normal">Odoo version</p>
-                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">19.0 &mdash; Community or Enterprise</p>
+                        <p class="v" style="margin: 0; font-size: 13.5px; color: rgb(23, 23, 23); line-height: 20.25px; font-style: normal; font-weight: 400; letter-spacing: normal; text-align: start; text-transform: none; white-space: normal">20.0 &mdash; Community or Enterprise</p>
                      </div>
                   </div>
                   </div>
@@ -1218,7 +1220,7 @@
                      <summary class="d-flex align-items-start justify-content-between" style="padding: 16px 0; font-size: 15.5px; font-weight: 700; color: rgb(39, 1, 64); font-style: normal; letter-spacing: normal; line-height: 25.575px; text-align: start; text-transform: none; white-space: normal; display: flex">Which Odoo versions does it work with?<img class="phrico-16 phr-chev" src="./assets/icons/ic-chevron.png" alt="" style="width: 16px; height: 16px; display: inline-block; margin: 4px 6px 0 16px; min-width: 16px; max-width: none"></summary>
                      <div class="a" style="padding: 0 34px 18px 0; font-size: 14.5px; color: #525252; line-height: 23.925px">
                         <p style="margin: 0; color: rgb(82, 82, 82); font-size: 14.5px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 23.925px; text-align: start; text-transform: none; white-space: normal">
-                           This is the 19.0 build, and it works on both
+                           This is the 20.0 build, and it works on both
                            Community and Enterprise. It depends only on
                            <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.05px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 21.5325px; text-align: start; text-transform: none; white-space: normal">base</code> and <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.05px; background-color: #f4eef8; color: rgb(39, 1, 64); padding: 1px 5px; border-radius: 6px; font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 21.5325px; text-align: start; text-transform: none; white-space: normal">stock</code>, so nothing
                            else has to be installed first.
@@ -1457,7 +1459,7 @@
                   </p>
                   <div class="rel" style="border-left-width: 2px; border-left-style: solid; border-left-color: #ece4f3; padding-left: 22px; margin-left: 6px">
                      <div class="relitem" style="padding-bottom: 22px">
-                        <span class="v" style="font-size: 15px; font-weight: 800; color: rgb(39, 1, 64); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; line-height: 24.75px">19.0.1.0.0</span><span class="badge" style="display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.7px; padding: 3px 8px; border-radius: 6px; background-color: #f4eef8; color: rgb(39, 1, 64); margin-left: 8px; vertical-align: 2px; line-height: 16.5px">NEW</span>
+                        <span class="v" style="font-size: 15px; font-weight: 800; color: rgb(39, 1, 64); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; line-height: 24.75px">20.0.1.0.0</span><span class="badge" style="display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.7px; padding: 3px 8px; border-radius: 6px; background-color: #f4eef8; color: rgb(39, 1, 64); margin-left: 8px; vertical-align: 2px; line-height: 16.5px">NEW</span>
                         <p style="margin: 6px 0 0; font-size: 13.5px; color: rgb(115, 115, 115); font-style: normal; font-weight: 400; letter-spacing: normal; line-height: 22.275px; text-align: start; text-transform: none; white-space: normal">
                            First public release. Adds the Stock History button
                            to the product form; monthly report of stock in,
@@ -1466,8 +1468,8 @@
                            product, date, product category and unit of measure;
                            opening-balance aggregation for periods older than
                            the window; multi-company scoping to the companies
-                           active in the session. Ships with eight automated
-                           integration tests.
+                           active in the session. Ships with thirteen automated
+                           integration tests and two browser tour tests.
                         </p>
                      </div>
                   </div>

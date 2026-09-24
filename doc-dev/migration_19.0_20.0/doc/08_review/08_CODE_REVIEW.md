@@ -83,3 +83,27 @@ Business Logic (manual): tidak ada perubahan logika — `models/` 0 baris diff t
 - [ ] ❌ Ditolak
 
 **Catatan gate:** CR-01 adalah kerentanan yang sudah ada sejak 17.0 dan byte-identik di 19.0. Memperbaikinya = perubahan kode di luar kompatibilitas 20.0, yang menurut CLAUDE.md butuh persetujuan eksplisit pemilik modul. Karena itu CR-01 tidak memblokir gate migrasi, tapi **WAJIB dieskalasi** ke dev (MF-10, prioritas Kritis) dan dilaporkan di ringkasan akhir sesi. Kalau dev menyetujui fix, itu dikerjakan sebagai perubahan disengaja tercatat (intake §5) + test regresi.
+
+---
+
+## H. Addendum re-review pasca Step 9 — SCOPE-02 (fix MF-10) & SCOPE-03 (2026-09-24)
+
+Diff yang direview (satu-satunya perubahan `models/` di migrasi ini):
+```
++    @api.private
+     def recreate_view(self, product_template_id, companies):
++        # Security fix 20.0 (FINDINGS.md MF-10): ...
++        product_template_id = int(product_template_id)
++        companies = ','.join(str(int(company_id)) for company_id in str(companies).split(','))
+```
+
+| Cek | Hasil |
+|---|---|
+| RPC ditutup | `@api.private` → `get_public_method` raise `AccessError` (`odoo20/odoo/orm/models.py:219-223`); dibuktikan `test_ac_07_01`. Pemanggil satu-satunya (`product_template.action_open_stock_history`, server-side) tidak terpengaruh. Tidak ada override `recreate_view` di `odoo20`/`enterprise20` (Step 2 §0e). |
+| Input ke teks SQL | Hanya digit + koma yang bisa lolos casting → teks SQL tidak bisa berisi apapun selain id. Dibuktikan `test_ac_07_02`. |
+| Behavior input sah | Nilai hasil casting untuk `self.id` / `','.join(map(str, env.companies.ids))` identik dengan input asli → teks SQL byte-identik → AC-02..AC-05 tetap PASS (Run C 15/15, Run E 14+1 skip). |
+| Edge case | `companies` berspasi (`"1, 2"`) tetap diterima (`int(" 2")`); string kosong → `ValueError` (di 19.0 juga gagal, di SQL). Multi-record `self` tidak dipakai method ini. |
+| Guideline | `odoo-security` "Default to private methods" (sanctioned fix `@api.private` bila rename memecah pemanggil) terpenuhi. "Parameterize SQL": interpolasi masih f-string, tapi hanya untuk integer tervalidasi — rewrite ke `SQL()` berparameter sengaja tidak dilakukan (diff minimal, P3). 🔵 info. |
+| SCOPE-03 | `index.html`: 18 baris, hanya penanda versi modul ini + jumlah test; link `/apps/modules/19.0/...` modul lain utuh. README/LISEZMOI root 1 baris masing-masing. |
+
+**Status CR-01:** ✅ RESOLVED di 20.0 (perubahan disengaja disetujui dev). 17.0/18.0/19.0 tetap rentan (keputusan dev). **Verdict tetap ✅ Lulus** — 0 🔴 terbuka.

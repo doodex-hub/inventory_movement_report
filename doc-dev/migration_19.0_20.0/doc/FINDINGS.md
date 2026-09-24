@@ -17,9 +17,9 @@
 | MF-05 | Ikon stat button `fa-signal` tidak dirender di 20.0 (Font Awesome → Material Symbols) | 1 | `[GAP-MIGRASI]` | Sedang | ✅ Diputuskan AI (low-risk, preseden native): `android_cell_5_bar` — lihat detail |
 | MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
-| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | 🔓 Terbuka — tugas dev (re-derive via `tools/variant.py`), tidak diedit AI |
+| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Disesuaikan atas permintaan dev 2026-09-24 (index.html + README/LISEZMOI root → 20.0) |
 | MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; ✅ DIKONFIRMASI ada di 19.0 (baseline run Step 9) |
-| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | 🔓 Terbuka — ESKALASI ke dev; TIDAK difix (butuh persetujuan) |
+| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | ✅ DIPERBAIKI di 20.0 (disetujui dev 2026-09-24) — 17.0/18.0/19.0 BELUM diperbaiki |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -112,7 +112,7 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 **Deskripsi:** method publik (tanpa `_`/`@api.private`) → dapat dipanggil via `/web/dataset/call_kw` (`auth="user"`). Argumen `product_template_id` dan `companies` diinterpolasi f-string ke SQL `CREATE VIEW` lalu `self._cr.execute(query)` tanpa parameter. User login mana pun (internal maupun portal — model ini bahkan tidak butuh ACL untuk pemanggilan method) bisa mengirim string berisi SQL tambahan → dieksekusi dengan hak DB owner Odoo (baca/ubah/hapus data apapun). Kode byte-identik sejak 17.0 → bukan regresi migrasi.
 **Dampak di 20.0:** identik dengan 19.0 (masih rentan). Berbasis analisis kode statis (CR-01); probe eksploitasi sengaja tidak dijalankan.
 **Rekomendasi (menunggu keputusan dev — tidak dikerjakan AI tanpa persetujuan):** fix minimal tanpa mengubah hasil laporan: (1) tandai `@api.private` (atau rename `_recreate_view` + update pemanggil di `product_template.py`), DAN (2) paksa integer sebelum interpolasi (`int(product_template_id)`, `','.join(str(int(c)) for c in ...)`) atau pakai `odoo.tools.SQL` berparameter. Tambah test regresi RPC.
-**Keputusan pemilik modul:** *(kosong — ESKALASI)*
+**Keputusan pemilik modul:** ✅ Dev 2026-09-24 via chat: "ok kerjakan dan nanti catat baru di fixing di 20, versi sebelumnya belum". **Dikerjakan di 20.0 (perubahan disengaja SCOPE-02):** `recreate_view()` diberi `@api.private` (tidak bisa dipanggil lewat RPC; pemanggilan server-side dari tombol tetap jalan) + kedua argumen dipaksa integer sebelum masuk teks SQL. Hasil laporan untuk input sah identik. Test regresi `test_ac_07_01`/`test_ac_07_02`. Run C 15/15, Run E 14+1 skip (`09_DEV_TESTING.md` §Re-run). **Branch `migration/19.0`, `19.0`, `18.0`, `17.0` TETAP rentan** — fix hanya di 20.0 sesuai keputusan dev.
 
 ---
 
@@ -135,7 +135,7 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 **Deskripsi:** header komentar `index.html` sendiri menyatakan file itu "DERIVED, NOT HAND-WRITTEN — Generated from the 17.0 source with tools/variant.py. Edit the 17.0 source and re-derive; do not patch this file by hand". Karena itu AI port apa adanya (sesuai persetujuan dev "port aset store") dan TIDAK mengedit manual. README/LISEZMOI di luar scope yang disetujui.
 **Dampak:** non-fungsional — listing App Store 20.0 akan menampilkan "Odoo 19" sampai varian 20.0 di-derive.
 **Rekomendasi:** dev menjalankan `tools/variant.py` (di luar repo ini) untuk varian 20.0 dan mengganti `index.html`; sekaligus perbarui baris "Odoo version" di README/LISEZMOI kalau diinginkan.
-**Keputusan pemilik modul:** *(kosong)*
+**Keputusan pemilik modul:** ✅ Dev 2026-09-24 via chat: "sesuaikan". **Dikerjakan (SCOPE-03):** `index.html` — hanya penanda versi modul ini (judul, meta description, header komentar, chip "Odoo 20.0", tagline, "20.0 build", Requirements, entri Releases `20.0.1.0.0`) + kalimat jumlah test disesuaikan ("thirteen automated integration tests and two browser tour tests"). Link cross-sell ke modul lain (`/apps/modules/19.0/...`) dan teks "Flow Survey Reader 19.0" TIDAK diubah (merujuk versi modul lain yang memang ada di store). Header komentar diberi catatan "ADJUSTED BY HAND FROM THE 19.0 VARIANT … Port the same edits into the 17.0 source / tools/variant.py before the next re-derive" — **dev perlu menyinkronkan `tools/variant.py` supaya perubahan ini tidak hilang saat re-derive**. `README.md`/`LISEZMOI.md` root → "20.0" (sekarang identik dengan salinan di modul).
 
 ---
 

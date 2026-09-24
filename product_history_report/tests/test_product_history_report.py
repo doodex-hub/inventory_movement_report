@@ -5,6 +5,8 @@ from datetime import date, timedelta
 
 from lxml import etree
 
+from odoo.exceptions import AccessError
+from odoo.models import get_public_method
 from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 from odoo.tools import mute_logger
@@ -238,3 +240,21 @@ class TestProductHistoryReport(TransactionCase):
         rows = self.env['stock.history.view'].with_user(portal_user).search(
             [('product_template_id', '=', self.product.id)])
         self.assertTrue(rows, "User portal tetap bisa search stock.history.view (ACL terbuka semua user, lihat FINDINGS.md MF-03)")
+
+    # --- Security fix 20.0 (FINDINGS.md MF-10, disetujui dev 2026-09-24) ---
+
+    # --- AC-07-01 : recreate_view tidak bisa dipanggil lewat RPC ---
+    def test_ac_07_01_recreate_view_not_callable_over_rpc(self):
+        with self.assertRaises(AccessError):
+            get_public_method(self.env['stock.history.view'], 'recreate_view')
+        # tombol tetap memakai jalur yang sama (pemanggilan Python server-side)
+        action = self.product.action_open_stock_history()
+        self.assertEqual(action['res_model'], 'stock.history.view')
+
+    # --- AC-07-02 : argumen non-integer ditolak sebelum menyentuh SQL ---
+    def test_ac_07_02_recreate_view_rejects_non_integer_arguments(self):
+        companies = self._companies_str(self.env.companies)
+        with self.assertRaises(ValueError):
+            self.env['stock.history.view'].recreate_view('abc', companies)
+        with self.assertRaises(ValueError):
+            self.env['stock.history.view'].recreate_view(self.product.id, 'abc')

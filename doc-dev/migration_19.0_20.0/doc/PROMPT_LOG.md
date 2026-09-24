@@ -15,10 +15,10 @@
 | 6 — Code Migration (semua fase A-G2) | 0 | 0 | idem |
 | 7 — Data Migration Scripts | — | — | N/A (port kode saja) |
 | 8 — Code Review | 0 | 0 | idem |
-| 9 — Dev Testing | 0 | 0 | idem |
+| 9 — Dev Testing (+ fix pasca-gate) | 1 | 0 | Prompt dev: setujui fix MF-10 di 20.0 (catat sebagai fix baru, versi sebelumnya belum) + "sesuaikan" MF-08 → SCOPE-02/03, re-run Run C/E |
 | 10 — QA Testing | | | Belum — menunggu slot dari dev |
 | 11 — UAT Sign-off | | | Belum |
-| **Total** | 2 | 0 | |
+| **Total** | 3 | 0 | |
 
 ## Catatan Definisi
 

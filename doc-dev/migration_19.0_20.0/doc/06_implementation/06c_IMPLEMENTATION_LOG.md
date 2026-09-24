@@ -108,3 +108,9 @@ Dicatat di `migration-tool/migration-records/product_history_report_19.0_20.0/SU
 ## Addendum Step 9 (2026-09-24)
 
 - `static/tests/tours/stock_history_form_tour.js`: tambah step pertama yang membuka dropdown **More** di button box HANYA bila tombol "Stock History" tidak ada di bagian terlihat — Run E gagal tanpa ini karena modul Enterprise menambah stat button (logika overflow `ButtonBox` identik 19.0/20.0). Test code saja; kode produksi tidak berubah. Detail: `09_DEV_TESTING.md` §Loop.
+
+## Addendum pasca Step 9 — SCOPE-02 & SCOPE-03 (disetujui dev 2026-09-24)
+
+- **SCOPE-02 (MF-10):** `models/stock_history_view.py` — `@api.private` di atas `recreate_view` + 2 baris casting integer (plus komentar rujukan MF-10). Body SQL tidak disentuh. Test baru `test_ac_07_01_recreate_view_not_callable_over_rpc`, `test_ac_07_02_recreate_view_rejects_non_integer_arguments` (+ import `AccessError`, `get_public_method`).
+- **SCOPE-03 (MF-08):** `static/description/index.html` 16 baris penanda versi + 2 baris jumlah test; `README.md`/`LISEZMOI.md` root "20.0".
+- **Re-run:** Run C `docker-env/logs/run-community-20260924-150118.log` — `0 failed, 0 error(s) of 17 tests` (15 method modul); Run E `docker-env/logs/run-enterprise-20260924-150648.log` — `0 failed, 0 error(s) of 17 tests` (14 pass + 1 skip by design).

@@ -21,7 +21,12 @@ class stock_history_view(models.Model):
     uom_id = fields.Many2one('uom.uom')
     categ_id = fields.Many2one('product.category', string="Category", readonly=True)
 
+    @api.private
     def recreate_view(self, product_template_id, companies):
+        # Security fix 20.0 (FINDINGS.md MF-10): not callable over RPC, and both arguments are
+        # interpolated into the SQL below, so only integers (comma-separated for companies) pass.
+        product_template_id = int(product_template_id)
+        companies = ','.join(str(int(company_id)) for company_id in str(companies).split(','))
         tools.drop_view_if_exists(self._cr, 'stock_history_view')
         query = f"""
             CREATE VIEW stock_history_view AS (

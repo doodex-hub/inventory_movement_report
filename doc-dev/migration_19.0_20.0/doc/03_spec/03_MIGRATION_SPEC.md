@@ -109,3 +109,14 @@ N/A — port kode saja. (Catatan untuk kalau suatu saat jadi upgrade instance: s
 - Memperbaiki MF-01..MF-04 (bug warisan).
 - Mengganti `self._cr` → `self.env.cr`, menambah `_description`, membersihkan dead import/dead action (bukan wajib kompatibilitas).
 - Mengedit manual `static/description/index.html` (masih menyebut "Odoo 19") dan README/LISEZMOI di ROOT repo (masih "17.0") — dicatat MF-08, jadi tugas dev lewat tooling `tools/variant.py` mereka. *(Koreksi Step 6: README/LISEZMOI level MODUL diperbaiki ke "20.0" di Fase A6 — `06a` mewajibkan housekeeping versi basi README modul.)*
+
+## 5. Addendum pasca Step 9 — perubahan disengaja disetujui dev (2026-09-24)
+
+| File/simbol | Ref | Strategi | Risiko | Ref BSL |
+|---|---|---|---|---|
+| `models/stock_history_view.py` `recreate_view()` | SCOPE-02 / MF-10 | Tambah `@api.private` (blok RPC via `get_public_method`, `odoo20/odoo/orm/models.py:219-223`) + `product_template_id = int(...)`, `companies = ','.join(str(int(c)) for c in str(companies).split(','))` di awal method, sebelum `drop_view_if_exists`. Body SQL tidak diubah. Pemanggil (`product_template.py`, test) tidak perlu diubah — signature sama. | Rendah — input sah (id integer, string id dipisah koma) menghasilkan teks SQL identik | BSL-002 (mekanisme drop+recreate tetap), BSL-009 |
+| `tests/test_product_history_report.py` | SCOPE-02 | +2 test: `test_ac_07_01` (RPC ditolak `AccessError`, tombol tetap jalan), `test_ac_07_02` (argumen non-integer → `ValueError`) | Rendah | — |
+| `static/description/index.html` | SCOPE-03 / MF-08 | Penanda versi modul ini → 20.0 + jumlah test; cross-sell modul lain tidak diubah | Rendah | BSL-015 |
+| `README.md`, `LISEZMOI.md` (root repo) | SCOPE-03 / MF-08 | "17.0" → "20.0" | Rendah | — |
+
+**Catatan fidelity:** SCOPE-02 adalah satu-satunya perubahan pada `models/` di migrasi ini — disengaja & disetujui, bukan port. 17.0/18.0/19.0 tetap rentan (keputusan dev).

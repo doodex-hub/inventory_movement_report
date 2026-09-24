@@ -127,3 +127,17 @@ Then instalasi sukses (view form produk gabungan `quality_control` + modul ini v
 | BSL-013 | AC-01-01, 01-04, 01-05 |
 | BSL-014 | Code identity `models/stock_history_view.py` (Step 8) |
 | BSL-015 | Diverifikasi Step 8 (isi manifest) |
+
+---
+
+## AC-07 — Hardening keamanan 20.0 (SCOPE-02, disetujui dev 2026-09-24 — PERUBAHAN DISENGAJA, bukan identik 19.0)
+
+**AC-07-01** (verifies `BSL-002` jalur tombol; MF-10)
+Given modul terinstal di 20.0
+When `recreate_view` diminta sebagai method publik (jalur RPC `call_kw` → `get_public_method`)
+Then ditolak dengan `AccessError` — **berbeda dari 19.0 (disengaja)**; klik tombol "Stock History" (pemanggilan server-side) tetap mengembalikan action `stock.history.view` seperti 19.0.
+
+**AC-07-02** (MF-10)
+Given argumen `product_template_id` atau `companies` bukan integer
+When `recreate_view` dipanggil
+Then `ValueError` sebelum SQL apapun dieksekusi — **berbeda dari 19.0 (disengaja)**. Input sah (id integer, id company dipisah koma) tetap menghasilkan laporan identik (dibuktikan AC-02..AC-04).

@@ -118,13 +118,13 @@ Cross-cutting, LATEN: `HOTFIX_REVIEW.md` + `HOTFIX_LOG.md` di root `doc/` — di
 
 ## Status saat ini
 
-**Step 1–9 selesai & lulus gate (2026-09-24, satu sesi). ⏸️ STOP WAJIB sebelum Step 10 — MENUNGGU SLOT dari dev.** Instruksi dev: Step 10 (QA, browser live) dibatasi maks 2 repo kecil bersamaan ATAU 1 repo besar sendirian (kontensi browser/Docker, MF-46 project lain) — JANGAN mulai Step 10 sampai dev eksplisit bilang giliran repo ini.
+**Step 1–9 selesai & lulus gate (2026-09-24) + fix MF-10/MF-08 pasca-gate (disetujui dev, Step 8/9 di-re-run). ⏸️ STOP WAJIB sebelum Step 10 — MENUNGGU SLOT dari dev.** Instruksi dev: Step 10 (QA, browser live) dibatasi maks 2 repo kecil bersamaan ATAU 1 repo besar sendirian (kontensi browser/Docker, MF-46 project lain) — JANGAN mulai Step 10 sampai dev eksplisit bilang giliran repo ini.
 
 Ringkasan hasil:
 - Perubahan kode (commit `64152a6` + fix tour Step 9): `ir.model.access.csv` → `security/ir.access.csv` (`base.group_everyone`, `crud`, identik output skrip resmi `upgrade_code 19.4-00-ir-access`), ikon `fa-signal` → `android_cell_5_bar`, versi `20.0.1.0.0`, aset store dari branch rilis `19.0` (disetujui dev), README modul "20.0", test: `product_uom`→`uom_id` + 3 Integration + tour form edition-agnostic. `models/` byte-identik 19.0.
 - Step 9: Run C (Community) 13/13 PASS, Run E (Enterprise: `stock_enterprise`, `quality_control`, `stock_barcode`) 12 PASS + 1 skip by design, baseline 19.0 10/10 PASS.
-- **ESKALASI terbuka — MF-10 (Kritis, warisan sejak 17.0):** `stock.history.view.recreate_view()` publik + f-string SQL → SQL injection via RPC oleh user login mana pun. TIDAK difix (butuh persetujuan dev, CLAUDE.md). Perlu keputusan dev: fix minimal sebagai perubahan disengaja, atau biarkan.
-- Terbuka lain (non-blocking): MF-08 (index.html store masih "Odoo 19" — re-derive via `tools/variant.py` dev; README root "17.0"), MF-01..04/MF-09 warisan dipertahankan.
+- **MF-10 (Kritis, warisan sejak 17.0) — ✅ DIPERBAIKI di 20.0** atas persetujuan dev 2026-09-24 (SCOPE-02): `recreate_view()` diberi `@api.private` + argumen dipaksa integer; test `test_ac_07_01/02`; re-run Run C 15/15, Run E 14+1 skip. **Branch 17.0/18.0/19.0 BELUM diperbaiki** (keputusan dev).
+- MF-08 ✅ disesuaikan atas permintaan dev (SCOPE-03): `index.html` store + README/LISEZMOI root → 20.0 — dev perlu sinkronkan `tools/variant.py` sebelum re-derive berikutnya. Warisan dipertahankan: MF-01..04, MF-09.
 
 **Saat dev memberi slot Step 10:** jalankan `templates/10_BUSINESS_FLOW_MIGRATION.md` pakai Tour + Integration (lesson 17→18/18→19) + Playwright MCP untuk verifikasi visual ikon (server: `docker compose up odoo` di `docker-env/`, port 8093, install modul dulu). Lalu Step 11.
 

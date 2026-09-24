@@ -66,7 +66,7 @@ Eksekusi Mode C/D lewat `docker-env/run-test.sh` (Odoo 20.0 build-from-source `o
 | 3 | Run C ulang (`run-community-20260924-144814.log`) | ✅ 0 failed of 15 | regresi-check setelah ubah tour | — |
 
 ### Tidak dijalankan
-- Probe eksploitasi untuk MF-10 (SQL injection via RPC) sengaja **tidak** dijalankan. Finding tetap berbasis analisis kode statis (`08_CODE_REVIEW.md` CR-01) dan dieskalasi ke dev.
+- Probe eksploitasi untuk MF-10 (SQL injection via RPC) sengaja **tidak** dijalankan. Finding tetap berbasis analisis kode statis (`08_CODE_REVIEW.md` CR-01) dan dieskalasi ke dev. Setelah dev menyetujui, MF-10 diperbaiki di 20.0 (SCOPE-02) — lihat §Re-run di bawah.
 
 ## Kontribusi ke Knowledge Base
 
@@ -76,3 +76,19 @@ Eksekusi Mode C/D lewat `docker-env/run-test.sh` (Odoo 20.0 build-from-source `o
 
 - [x] ✅ Semua AC pass — Run C 13/13, Run E 12/12 + 1 skip by design, baseline 19.0 10/10. **Siap Step 10 — menunggu slot dari dev (STOP WAJIB sesuai instruksi).**
 - [ ] ❌ Ada yang gagal
+
+---
+
+## Re-run pasca SCOPE-02/SCOPE-03 (2026-09-24)
+
+| Run | Log | Hasil |
+|---|---|---|
+| Run C — Community | `docker-env/logs/run-community-20260924-150118.log` | exit 0 — **`0 failed, 0 error(s) of 17 tests`**; 15 method modul (13 Integration termasuk `test_ac_07_01`, `test_ac_07_02` + 2 Tour, keduanya "tour succeeded") |
+| Run E — Enterprise | `docker-env/logs/run-enterprise-20260924-150648.log` | exit 0 — **`0 failed, 0 error(s) of 17 tests`**; 14 pass + 1 skip by design (tour Community) |
+
+| AC | Integration | Run C | Run E |
+|---|---|---|---|
+| AC-07-01 (RPC ditolak, tombol tetap jalan) | `test_ac_07_01_recreate_view_not_callable_over_rpc` | Pass | Pass |
+| AC-07-02 (argumen non-integer ditolak) | `test_ac_07_02_recreate_view_rejects_non_integer_arguments` | Pass | Pass |
+
+Semua AC-01..AC-06 tetap Pass → fix tidak mengubah hasil laporan. **Verdict tetap ✅ Lulus — siap Step 10, menunggu slot dev.**
