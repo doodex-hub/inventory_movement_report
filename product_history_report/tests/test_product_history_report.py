@@ -83,11 +83,20 @@ class TestProductHistoryReport(TransactionCase):
         # `write({'date': ...})` lewat ORM setelah validate TIDAK berefek ke kolom DB (root cause
         # belum ditelusuri lebih jauh — di luar scope BACKFILL untuk memperbaiki behavior Odoo
         # core). Test-only workaround: UPDATE langsung ke tabel via cursor, lalu invalidate cache.
+        # Migrasi 19.0->20.0 (FINDINGS.md MF-11): di 20.0 `button_validate()` masih menyisakan write
+        # ORM tertunda ke `stock_move_line`; tanpa flush dulu, write itu ter-flush SETELAH UPDATE di
+        # bawah dan menimpa tanggal jadi "sekarang" secara diam-diam (test tetap hijau tapi tidak
+        # menguji tanggal lama). Flush dulu, lalu pastikan tanggal benar-benar tersimpan.
+        self.env.flush_all()
         self.env.cr.execute(
             "UPDATE stock_move_line SET date = %s WHERE id IN %s",
             (move_date, tuple(move.move_line_ids.ids)),
         )
         move.move_line_ids.invalidate_recordset(['date'])
+        self.env.flush_all()
+        self.env.cr.execute("SELECT date::date FROM stock_move_line WHERE id IN %s", (tuple(move.move_line_ids.ids),))
+        self.assertEqual({row[0] for row in self.env.cr.fetchall()}, {move_date},
+                         "Tanggal move line fixture harus benar-benar mundur ke move_date")
         return move
 
     def _companies_str(self, companies):

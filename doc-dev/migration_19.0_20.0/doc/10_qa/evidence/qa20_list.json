@@ -1,0 +1,27 @@
+{
+  "heads": [
+    "Date",
+    "Product",
+    "Category",
+    "Uom",
+    "Input",
+    "Output",
+    "Stock Quantity uom"
+  ],
+  "count": 13,
+  "rows": [
+    "Sep 30, 2025 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 100.000000",
+    "Oct 31, 2025 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 100.000000",
+    "Nov 30, 2025 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 100.000000",
+    "Dec 31, 2025 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 100.000000",
+    "Jan 31 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 100.000000",
+    "Feb 28 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 100.000000",
+    "Mar 31 | QA20 CVC Product |  | Units | 40.000000 | 0.000000 | 140.000000",
+    "Apr 30 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 140.000000",
+    "May 31 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 140.000000",
+    "Jun 30 | QA20 CVC Product |  | Units | 0.000000 | 15.000000 | 125.000000",
+    "Jul 31 | QA20 CVC Product |  | Units | 0.000000 | 0.000000 | 125.000000",
+    "Aug 31 | QA20 CVC Product |  | Units | 7.000000 | 0.000000 | 132.000000",
+    "Sep 30 | QA20 CVC Product |  | Units | 9.000000 | 4.000000 | 137.000000"
+  ]
+}

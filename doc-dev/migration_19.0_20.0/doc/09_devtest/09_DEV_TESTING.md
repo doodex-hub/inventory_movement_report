@@ -92,3 +92,16 @@ Eksekusi Mode C/D lewat `docker-env/run-test.sh` (Odoo 20.0 build-from-source `o
 | AC-07-02 (argumen non-integer ditolak) | `test_ac_07_02_recreate_view_rejects_non_integer_arguments` | Pass | Pass |
 
 Semua AC-01..AC-06 tetap Pass → fix tidak mengubah hasil laporan. **Verdict tetap ✅ Lulus — siap Step 10, menunggu slot dev.**
+
+---
+
+## Re-run pasca loop-back Step 10 — MF-11 (2026-09-24)
+
+Helper `_make_move` diperbaiki (flush sebelum UPDATE tanggal + assert tanggal tersimpan) setelah Step 10 membuktikan tanggal fixture tertimpa di 20.0.
+
+| Run | Log | Hasil |
+|---|---|---|
+| Run C — Community | `docker-env/logs/run-community-20260924-153554.log` | exit 0 — `0 failed, 0 error(s) of 17 tests` (15 method modul, 2 tour succeeded) |
+| Run E — Enterprise | `docker-env/logs/run-enterprise-20260924-154035.log` | exit 0 — `0 failed, 0 error(s) of 17 tests` (14 pass + 1 skip by design) |
+
+Assert baru di helper lolos di semua 6 pemanggilan `_make_move` → AC-02-01 (saldo pembuka dari move 450 hari lalu), AC-03-01, AC-03-02, AC-04-01 sekarang benar-benar menguji tanggal yang dimaksud. **Verdict tetap ✅ Lulus.**

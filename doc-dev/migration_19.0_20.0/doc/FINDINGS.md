@@ -20,6 +20,8 @@
 | MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Disesuaikan atas permintaan dev 2026-09-24 (index.html + README/LISEZMOI root → 20.0) |
 | MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; ✅ DIKONFIRMASI ada di 19.0 (baseline run Step 9) |
 | MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | ✅ DIPERBAIKI di 20.0 (disetujui dev 2026-09-24) — 17.0/18.0/19.0 BELUM diperbaiki |
+| MF-11 | Helper test `_make_move`: tanggal fixture tertimpa diam-diam di 20.0 (write ORM tertunda setelah `button_validate()`) → AC-02-01/03-01 sempat hijau tanpa menguji tanggal lama | 10 | `[GAP-MIGRASI]` (test-harness) | Sedang | ✅ Diperbaiki di test (flush + assert tanggal), re-run PASS |
+| MF-12 | `RecursionError` native (mail_bot OdooBot → `discuss.channel._compute_member_indices`) saat bootstrap web client pertama admin di 20.0 Enterprise | 10 | `[GAP-MIGRASI]` (native, bukan modul) | Rendah | 🔓 Info — sekali terjadi, reload normal; tidak menyentuh modul |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -142,3 +144,24 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 ## Cara Pakai
 
 Lihat `migration-tool/templates/FINDINGS.md` §Cara Pakai.
+
+---
+
+### MF-11 — Tanggal fixture test tertimpa diam-diam di 20.0
+**Ditemukan di:** Step 10 (2026-09-24), saat Cross-Version Compare (seed pertama menunjukkan semua move menumpuk di bulan berjalan di 20.0)
+**Tag:** `[GAP-MIGRASI]` — perilaku ORM 20.0, dampak hanya ke test-harness (kode modul benar)
+**Ref:** AC-02-01, AC-03-01, AC-04-01, `10_BUSINESS_FLOW_MIGRATION.md` §Loop-back
+**Lokasi:** `product_history_report/tests/test_product_history_report.py` `_make_move()`
+**Deskripsi:** helper memundurkan tanggal lewat `UPDATE stock_move_line SET date` lalu `invalidate_recordset(['date'])`. Di 20.0, setelah `button_validate()` masih ada write ORM tertunda ke `stock_move_line`; write itu ter-flush SETELAH UPDATE dan menimpa tanggal jadi "sekarang". Bukti probe (`odoo-bin shell`, pola persis helper): 19.0 → tanggal tersimpan `2025-07-01`; 20.0 → `2026-09-24`. Test tetap hijau karena AC-02-01 hanya cek qty kumulatif akhir dan AC-03-01 punya fallback "baris terakhir" — jadi saldo pembuka >13 bulan TIDAK benar-benar teruji di 20.0 sebelum fix.
+**Tindakan:** `env.flush_all()` sebelum UPDATE + assert tanggal di DB = `move_date`. Re-run Run C & Run E `0 failed of 17` — test kini menguji tanggal sesungguhnya. Kode modul benar: Cross-Version Compare dengan seed yang di-flush menghasilkan 15/15 baris identik 19.0↔20.0.
+**Keputusan pemilik modul:** tidak perlu (perbaikan test).
+
+---
+
+### MF-12 — `RecursionError` native OdooBot di bootstrap web client pertama (20.0 Enterprise)
+**Ditemukan di:** Step 10 (2026-09-24), login pertama admin di server QA 20.0 (`odoo20` `b0329e93ae8` + `enterprise20` `bbccc6bce1`)
+**Tag:** `[GAP-MIGRASI]` — bug native Odoo 20.0, BUKAN modul ini
+**Lokasi:** `odoo20/addons/mail_bot/models/res_users.py:27-32` `_init_odoobot` → `mail/models/discuss/discuss_channel.py:1809` `_get_or_create_chat` → `_compute_member_indices` (:409) → rekursi; tidak ada frame `product_history_report`.
+**Deskripsi:** request `/odoo/action-…` pertama setelah login → HTTP 500. Reload berikutnya normal (chat OdooBot sudah terinisialisasi). Tour test tidak terkena.
+**Dampak:** tidak ada ke modul; catatan untuk instalasi 20.0 baru (build pre-release).
+**Keputusan pemilik modul:** tidak perlu (native).

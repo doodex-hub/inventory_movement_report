@@ -118,7 +118,7 @@ Cross-cutting, LATEN: `HOTFIX_REVIEW.md` + `HOTFIX_LOG.md` di root `doc/` — di
 
 ## Status saat ini
 
-**Step 1–9 selesai & lulus gate (2026-09-24) + fix MF-10/MF-08 pasca-gate (disetujui dev, Step 8/9 di-re-run). ⏸️ STOP WAJIB sebelum Step 10 — MENUNGGU SLOT dari dev.** Instruksi dev: Step 10 (QA, browser live) dibatasi maks 2 repo kecil bersamaan ATAU 1 repo besar sendirian (kontensi browser/Docker, MF-46 project lain) — JANGAN mulai Step 10 sampai dev eksplisit bilang giliran repo ini.
+**Step 1–10 selesai & lulus gate (2026-09-24).** Step 10 dijalankan setelah dev memberi slot ("lanjut step 10"): Playwright MCP live (19.0 & 20.0 Enterprise berdampingan) + Cross-Version Compare data identik (15/15 baris laporan identik) + loop-back test MF-11. **Berikutnya: Step 11 UAT** (`templates/11_UAT_CHECKLIST.md`) — AI hanya generate checklist, sign-off oleh dev/business user.
 
 Ringkasan hasil:
 - Perubahan kode (commit `64152a6` + fix tour Step 9): `ir.model.access.csv` → `security/ir.access.csv` (`base.group_everyone`, `crud`, identik output skrip resmi `upgrade_code 19.4-00-ir-access`), ikon `fa-signal` → `android_cell_5_bar`, versi `20.0.1.0.0`, aset store dari branch rilis `19.0` (disetujui dev), README modul "20.0", test: `product_uom`→`uom_id` + 3 Integration + tour form edition-agnostic. `models/` byte-identik 19.0.
@@ -126,7 +126,7 @@ Ringkasan hasil:
 - **MF-10 (Kritis, warisan sejak 17.0) — ✅ DIPERBAIKI di 20.0** atas persetujuan dev 2026-09-24 (SCOPE-02): `recreate_view()` diberi `@api.private` + argumen dipaksa integer; test `test_ac_07_01/02`; re-run Run C 15/15, Run E 14+1 skip. **Branch 17.0/18.0/19.0 BELUM diperbaiki** (keputusan dev).
 - MF-08 ✅ disesuaikan atas permintaan dev (SCOPE-03): `index.html` store + README/LISEZMOI root → 20.0 — dev perlu sinkronkan `tools/variant.py` sebelum re-derive berikutnya. Warisan dipertahankan: MF-01..04, MF-09.
 
-**Saat dev memberi slot Step 10:** jalankan `templates/10_BUSINESS_FLOW_MIGRATION.md` pakai Tour + Integration (lesson 17→18/18→19) + Playwright MCP untuk verifikasi visual ikon (server: `docker compose up odoo` di `docker-env/`, port 8093, install modul dulu). Lalu Step 11.
+**Step 10 selesai** — bukti di `doc/10_qa/evidence/`, checklist manusia di `doc/10_qa/human_qa/`. Temuan baru: MF-11 (helper test tanggal tertimpa di 20.0, sudah difix di test), MF-12 (bug native OdooBot, info).
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -145,7 +145,7 @@ Ringkasan cepat — detail lengkap tiap step ada di field `Status:` di header ma
 | 7 | Data Migration Scripts | `07_DATA_MIGRATION_PLAN.md` + script — cuma kalau upgrade instance | — N/A (port kode saja, dikonfirmasi dev) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (0 🔴 akibat migrasi; 1 🔴 warisan MF-10 dieskalasi) |
 | 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (Run C 13/13, Run E 12+1 skip, baseline 19.0 10/10) |
-| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⏸️ Siap — MENUNGGU SLOT dari dev (jangan mulai otomatis) | — |
+| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (12/12 skenario DIKONFIRMASI, Cross-Version Compare 19↔20 tanpa regresi) |
 | 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.

@@ -1,0 +1,70 @@
+{
+  "headRows": [
+    [
+      "Total"
+    ],
+    [
+      "September 2025",
+      "October 2025",
+      "November 2025",
+      "December 2025",
+      "January 2026",
+      "February 2026",
+      "March 2026",
+      "April 2026",
+      "May 2026",
+      "June 2026",
+      "July 2026",
+      "August 2026",
+      "September 2026"
+    ],
+    [
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM",
+      "Input",
+      "Output",
+      "Stock Quantity UOM"
+    ]
+  ],
+  "bodyRows": [
+    "Total | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 40.000000 | 0.000000 | 140.000000 | 0.000000 | 0.000000 | 140.000000 | 0.000000 | 0.000000 | 140.000000 | 0.000000 | 15.000000 | 125.000000 | 0.000000 | 0.000000 | 125.000000 | 7.000000 | 0.000000 | 132.000000 | 9.000000 | 4.000000 | 137.000000 | 56.000000 | 19.000000 | 1,539.000000",
+    "QA20 CVC Product | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 0.000000 | 0.000000 | 100.000000 | 40.000000 | 0.000000 | 140.000000 | 0.000000 | 0.000000 | 140.000000 | 0.000000 | 0.000000 | 140.000000 | 0.000000 | 15.000000 | 125.000000 | 0.000000 | 0.000000 | 125.000000 | 7.000000 | 0.000000 | 132.000000 | 9.000000 | 4.000000 | 137.000000 | 56.000000 | 19.000000 | 1,539.000000"
+  ]
+}
