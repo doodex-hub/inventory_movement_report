@@ -19,6 +19,7 @@
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
 | MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | 🔓 Terbuka — tugas dev (re-derive via `tools/variant.py`), tidak diedit AI |
 | MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; dikonfirmasi baseline 19.0 di Step 9 |
+| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | 🔓 Terbuka — ESKALASI ke dev; TIDAK difix (butuh persetujuan); bukti empiris Step 9 |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -33,7 +34,7 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 **Tag:** `[DIWARISI-SOURCE]`
 **Ref:** `BSL-002`
 **Lokasi:** `product_history_report/models/stock_history_view.py:24-110` (`recreate_view`), dipanggil dari `models/product_template.py:19`
-**Deskripsi:** DROP+CREATE VIEW global `stock_history_view` tanpa locking, di-scope ke satu produk+company lewat f-string SQL. Nilai yang disisipkan (`product_template_id` = `self.id` integer, `companies` = join dari `env.companies.ids` integer) bukan input user bebas, jadi f-string ini tidak dianggap injection vector di alur normal — tetap dipertahankan apa adanya.
+**Deskripsi:** DROP+CREATE VIEW global `stock_history_view` tanpa locking, di-scope ke satu produk+company lewat f-string SQL. Di alur tombol, nilai yang disisipkan (`self.id`, `env.companies.ids`) berupa integer. **KOREKSI Step 8:** klaim awal "bukan input user bebas" SALAH — `recreate_view()` adalah method publik yang bisa dipanggil langsung lewat RPC dengan argumen string sembarang → lihat MF-10 (SQL injection).
 **Dampak di 20.0:** identik dengan 19.0 — dipertahankan.
 **Rekomendasi:** tidak ada tindakan saat migrasi.
 **Keputusan pemilik modul:** *(kosong — belum pernah diputuskan sejak F-01 2026-08-07)*
@@ -100,6 +101,18 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 **Deskripsi:** manifest hanya `base`, `stock`; dev menjawab "enterprise kemungkinan depend".
 **Tindakan:** Step 2 analisis `enterprise20` untuk modul yang menyentuh form `product.template`/tabel stock (kandidat awal `quality_control`); Step 9 run tambahan dengan addons Enterprise terpasang.
 **Keputusan pemilik modul:** ✅ jawaban dev di atas (2026-09-24). Kalau ternyata ada modul Enterprise spesifik yang dimaksud, dev bisa menyebutkannya kapan saja.
+
+---
+
+### MF-10 — SQL injection via RPC pada `stock.history.view.recreate_view()`
+**Ditemukan di:** Step 8 (2026-09-24), sweep skill `odoo-security`
+**Tag:** `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]`
+**Ref:** `BSL-002`, `08_CODE_REVIEW.md` CR-01, MF-01
+**Lokasi:** `product_history_report/models/stock_history_view.py:24-110`
+**Deskripsi:** method publik (tanpa `_`/`@api.private`) → dapat dipanggil via `/web/dataset/call_kw` (`auth="user"`). Argumen `product_template_id` dan `companies` diinterpolasi f-string ke SQL `CREATE VIEW` lalu `self._cr.execute(query)` tanpa parameter. User login mana pun (internal maupun portal — model ini bahkan tidak butuh ACL untuk pemanggilan method) bisa mengirim string berisi SQL tambahan → dieksekusi dengan hak DB owner Odoo (baca/ubah/hapus data apapun). Kode byte-identik sejak 17.0 → bukan regresi migrasi.
+**Dampak di 20.0:** identik dengan 19.0 (masih rentan). Bukti empiris: Step 9 (`09_DEV_TESTING.md` §Probe keamanan).
+**Rekomendasi (menunggu keputusan dev — tidak dikerjakan AI tanpa persetujuan):** fix minimal tanpa mengubah hasil laporan: (1) tandai `@api.private` (atau rename `_recreate_view` + update pemanggil di `product_template.py`), DAN (2) paksa integer sebelum interpolasi (`int(product_template_id)`, `','.join(str(int(c)) for c in ...)`) atau pakai `odoo.tools.SQL` berparameter. Tambah test regresi RPC.
+**Keputusan pemilik modul:** *(kosong — ESKALASI)*
 
 ---
 
