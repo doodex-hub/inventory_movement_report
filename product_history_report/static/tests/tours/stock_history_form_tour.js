@@ -13,6 +13,21 @@ registry.category("web_tour.tours").add("stock_history_form_tour", {
     url: "/odoo",
     steps: () => [
         {
+            // ButtonBox shows a limited number of stat buttons (per screen size, same logic in 19.0
+            // and 20.0) and moves the rest into the "More" dropdown. With Enterprise modules
+            // (quality_control, ...) the product form has more stat buttons, so this one can land in
+            // the dropdown: open it only when the button is not in the visible part of the box.
+            trigger: ".o-form-buttonbox",
+            content: "Open the 'More' stat buttons dropdown if Stock History is not directly visible",
+            run() {
+                const box = document.querySelector(".o-form-buttonbox");
+                const more = box.querySelector(".o_button_more");
+                if (more && !box.querySelector('button[name="action_open_stock_history"]')) {
+                    more.click();
+                }
+            },
+        },
+        {
             trigger: 'button[name="action_open_stock_history"] i.o_button_icon[data-icon="android_cell_5_bar"]',
             content: "The Stock History stat button renders the Material Symbols signal icon (not fa-signal)",
         },

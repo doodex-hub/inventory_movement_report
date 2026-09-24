@@ -18,8 +18,8 @@
 | MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
 | MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | 🔓 Terbuka — tugas dev (re-derive via `tools/variant.py`), tidak diedit AI |
-| MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; dikonfirmasi baseline 19.0 di Step 9 |
-| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | 🔓 Terbuka — ESKALASI ke dev; TIDAK difix (butuh persetujuan); bukti empiris Step 9 |
+| MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; ✅ DIKONFIRMASI ada di 19.0 (baseline run Step 9) |
+| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | 🔓 Terbuka — ESKALASI ke dev; TIDAK difix (butuh persetujuan) |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -110,7 +110,7 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 **Ref:** `BSL-002`, `08_CODE_REVIEW.md` CR-01, MF-01
 **Lokasi:** `product_history_report/models/stock_history_view.py:24-110`
 **Deskripsi:** method publik (tanpa `_`/`@api.private`) → dapat dipanggil via `/web/dataset/call_kw` (`auth="user"`). Argumen `product_template_id` dan `companies` diinterpolasi f-string ke SQL `CREATE VIEW` lalu `self._cr.execute(query)` tanpa parameter. User login mana pun (internal maupun portal — model ini bahkan tidak butuh ACL untuk pemanggilan method) bisa mengirim string berisi SQL tambahan → dieksekusi dengan hak DB owner Odoo (baca/ubah/hapus data apapun). Kode byte-identik sejak 17.0 → bukan regresi migrasi.
-**Dampak di 20.0:** identik dengan 19.0 (masih rentan). Bukti empiris: Step 9 (`09_DEV_TESTING.md` §Probe keamanan).
+**Dampak di 20.0:** identik dengan 19.0 (masih rentan). Berbasis analisis kode statis (CR-01); probe eksploitasi sengaja tidak dijalankan.
 **Rekomendasi (menunggu keputusan dev — tidak dikerjakan AI tanpa persetujuan):** fix minimal tanpa mengubah hasil laporan: (1) tandai `@api.private` (atau rename `_recreate_view` + update pemanggil di `product_template.py`), DAN (2) paksa integer sebelum interpolasi (`int(product_template_id)`, `','.join(str(int(c)) for c in ...)`) atau pakai `odoo.tools.SQL` berparameter. Tambah test regresi RPC.
 **Keputusan pemilik modul:** *(kosong — ESKALASI)*
 
@@ -118,7 +118,7 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 
 ### MF-09 — `ERROR Model stock.history.view has no table.` di log install/registry load
 **Ditemukan di:** Step 6 G1 #2 (2026-09-24)
-**Tag:** `[DIWARISI-SOURCE]` (dugaan kuat — dikonfirmasi di baseline 19.0 Step 9)
+**Tag:** `[DIWARISI-SOURCE]` — ✅ DIKONFIRMASI 2026-09-24: baseline run kode `migration/19.0` di Odoo 19.0 juga mencatat ERROR ini ×2 (`09_DEV_TESTING.md` §Baseline)
 **Ref:** `BSL-002`, `BSL-014`, `06c_IMPLEMENTATION_LOG.md` G1 #2
 **Lokasi:** `product_history_report/models/stock_history_view.py` (`_auto = False`, tidak ada `init()`); pesan dari `odoo20/odoo/orm/registry.py:1059` (logika identik `odoo19/odoo/orm/registry.py:996`)
 **Deskripsi:** model `_auto=False` tanpa `init()` → registry tidak menemukan tabel/view `stock_history_view` sampai tombol "Stock History" pertama kali diklik (`recreate_view()`), lalu mencatat ERROR tiap registry load. Tidak memblokir install/test (G1/G2 exit 0).

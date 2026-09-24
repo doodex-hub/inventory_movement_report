@@ -118,12 +118,15 @@ Cross-cutting, LATEN: `HOTFIX_REVIEW.md` + `HOTFIX_LOG.md` di root `doc/` — di
 
 ## Status saat ini
 
-**Step 0 — Conditioning selesai (2026-09-24).** Branch `migration/20.0` dibuat dari `migration/19.0` (HEAD `f57dee4`, setelah "Step 11 gate passed … MIGRASI 18.0->19.0 SELESAI" `aea668c`). `.claude/settings.json` diperbarui (deny list native 19/20, `git show` diizinkan), CLAUDE.md ini ditulis ulang, skeleton `doc-dev/migration_19.0_20.0/doc/` dibuat (folder kosong + `.gitkeep`). **Step 1 Intake belum mulai** — sesi eksekusi berikutnya mulai dari Step 1.
+**Step 1–9 selesai & lulus gate (2026-09-24, satu sesi). ⏸️ STOP WAJIB sebelum Step 10 — MENUNGGU SLOT dari dev.** Instruksi dev: Step 10 (QA, browser live) dibatasi maks 2 repo kecil bersamaan ATAU 1 repo besar sendirian (kontensi browser/Docker, MF-46 project lain) — JANGAN mulai Step 10 sampai dev eksplisit bilang giliran repo ini.
 
-Open item untuk Step 1 intake (dicatat saat conditioning, belum diputuskan):
-- CLAUDE.md lama menyebut branch hasil migrasi `migration/19.0_target`, tapi nama aktual branch-nya `migration/19.0` (lokal = `origin/migration/19.0`). Semua rujukan di file ini sudah pakai nama aktual.
-- Inkonsistensi dokumen lama 18→19: tabel "Status per Step" di CLAUDE.md lama dan header `doc-dev/migration_18.0_19.0/doc/01_intake/01a_MIGRATION_INTAKE.md` masih menulis Step 1 "⏳ Menunggu review user", padahal commit `fb720bf` "Step 1 gate passed: Intake & Baseline Spec disetujui" ada di riwayat — gate sebenarnya sudah lulus, dokumennya saja yang basi. 2 open item minor di 01a (dependency Enterprise/OCA tak terlihat dari manifest; dokumen pelengkap di luar repo) tidak pernah dijawab eksplisit — tanyakan di Step 1 project ini.
-- Branch rilis `19.0`/`staging/19.0` berisi 5 commit pasca-migrasi yang TIDAK ada di `migration/19.0` (commit "cleaning" + aset store: `banner.gif`, `icon.png`, folder `assets`, `index.html`, fix key `images` di manifest). Putuskan di intake apakah aset store perlu di-port ke 20.0.
+Ringkasan hasil:
+- Perubahan kode (commit `64152a6` + fix tour Step 9): `ir.model.access.csv` → `security/ir.access.csv` (`base.group_everyone`, `crud`, identik output skrip resmi `upgrade_code 19.4-00-ir-access`), ikon `fa-signal` → `android_cell_5_bar`, versi `20.0.1.0.0`, aset store dari branch rilis `19.0` (disetujui dev), README modul "20.0", test: `product_uom`→`uom_id` + 3 Integration + tour form edition-agnostic. `models/` byte-identik 19.0.
+- Step 9: Run C (Community) 13/13 PASS, Run E (Enterprise: `stock_enterprise`, `quality_control`, `stock_barcode`) 12 PASS + 1 skip by design, baseline 19.0 10/10 PASS.
+- **ESKALASI terbuka — MF-10 (Kritis, warisan sejak 17.0):** `stock.history.view.recreate_view()` publik + f-string SQL → SQL injection via RPC oleh user login mana pun. TIDAK difix (butuh persetujuan dev, CLAUDE.md). Perlu keputusan dev: fix minimal sebagai perubahan disengaja, atau biarkan.
+- Terbuka lain (non-blocking): MF-08 (index.html store masih "Odoo 19" — re-derive via `tools/variant.py` dev; README root "17.0"), MF-01..04/MF-09 warisan dipertahankan.
+
+**Saat dev memberi slot Step 10:** jalankan `templates/10_BUSINESS_FLOW_MIGRATION.md` pakai Tour + Integration (lesson 17→18/18→19) + Playwright MCP untuk verifikasi visual ikon (server: `docker compose up odoo` di `docker-env/`, port 8093, install modul dulu). Lalu Step 11.
 
 > AI: update bagian ini sendiri di akhir tiap sesi kerja, supaya sesi berikutnya tahu persis harus lanjut dari mana tanpa tanya ulang ke user.
 
@@ -141,8 +144,8 @@ Ringkasan cepat — detail lengkap tiap step ada di field `Status:` di header ma
 | 6 | Code Migration | kode `product_history_report/` + `06c_IMPLEMENTATION_LOG.md` | ✅ Selesai (G2 PASS 13/13) | — (disiplin per-fase A1→G2) |
 | 7 | Data Migration Scripts | `07_DATA_MIGRATION_PLAN.md` + script — cuma kalau upgrade instance | — N/A (port kode saja, dikonfirmasi dev) | — |
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (0 🔴 akibat migrasi; 1 🔴 warisan MF-10 dieskalasi) |
-| 9 | Dev Testing | `09_DEV_TESTING.md` | ⬜ Belum mulai | — |
-| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⬜ Belum mulai | — |
+| 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (Run C 13/13, Run E 12+1 skip, baseline 19.0 10/10) |
+| 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` | ⏸️ Siap — MENUNGGU SLOT dari dev (jangan mulai otomatis) | — |
 | 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.

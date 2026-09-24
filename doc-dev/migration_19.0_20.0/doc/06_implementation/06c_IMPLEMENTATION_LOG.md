@@ -104,3 +104,7 @@ Disiplin per fase A1→G2 (`06a`). Mode eksekusi G1/G2: **C (AI jalankan langsun
 ## Kontribusi ke Knowledge Base
 
 Dicatat di `migration-tool/migration-records/product_history_report_19.0_20.0/SUMMARY.md` (bukan langsung ke `knowledge/`): verifikasi empiris G1 #1 untuk entry `ir.access`, cara memakai `odoo-bin upgrade_code --script 19.4-00-ir-access` sebagai oracle konversi, gotcha `--without-demo=all`.
+
+## Addendum Step 9 (2026-09-24)
+
+- `static/tests/tours/stock_history_form_tour.js`: tambah step pertama yang membuka dropdown **More** di button box HANYA bila tombol "Stock History" tidak ada di bagian terlihat — Run E gagal tanpa ini karena modul Enterprise menambah stat button (logika overflow `ButtonBox` identik 19.0/20.0). Test code saja; kode produksi tidak berubah. Detail: `09_DEV_TESTING.md` §Loop.
