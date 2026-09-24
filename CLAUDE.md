@@ -118,7 +118,7 @@ Cross-cutting, LATEN: `HOTFIX_REVIEW.md` + `HOTFIX_LOG.md` di root `doc/` — di
 
 ## Status saat ini
 
-**Step 1–10 selesai & lulus gate (2026-09-24).** Step 10 dijalankan setelah dev memberi slot ("lanjut step 10"): Playwright MCP live (19.0 & 20.0 Enterprise berdampingan) + Cross-Version Compare data identik (15/15 baris laporan identik) + loop-back test MF-11. **Berikutnya: Step 11 UAT** (`templates/11_UAT_CHECKLIST.md`) — AI hanya generate checklist, sign-off oleh dev/business user.
+**✅ MIGRASI 19.0→20.0 SELESAI (2026-09-24).** Step 1–11 lulus gate; Step 11 sign-off dev (Kuncoro) via chat berdasarkan test AI. Titik-nol hotfix: `doc/MIGRATION_CLOSED.md`. Commit baru di `migration/20.0` setelah SHA itu → jalankan `templates/HOTFIX_REVIEW.md`. Sisa tugas dev (di luar AI): `git push`, sinkron `tools/variant.py` (MF-08), opsional backport MF-10 ke 19.0/18.0/17.0.
 
 Ringkasan hasil:
 - Perubahan kode (commit `64152a6` + fix tour Step 9): `ir.model.access.csv` → `security/ir.access.csv` (`base.group_everyone`, `crud`, identik output skrip resmi `upgrade_code 19.4-00-ir-access`), ikon `fa-signal` → `android_cell_5_bar`, versi `20.0.1.0.0`, aset store dari branch rilis `19.0` (disetujui dev), README modul "20.0", test: `product_uom`→`uom_id` + 3 Integration + tour form edition-agnostic. `models/` byte-identik 19.0.
@@ -146,7 +146,7 @@ Ringkasan cepat — detail lengkap tiap step ada di field `Status:` di header ma
 | 8 | Code Review | `08_CODE_REVIEW.md` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (0 🔴 akibat migrasi; 1 🔴 warisan MF-10 dieskalasi) |
 | 9 | Dev Testing | `09_DEV_TESTING.md` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (Run C 13/13, Run E 12+1 skip, baseline 19.0 10/10) |
 | 10 | QA Testing | `10_BUSINESS_FLOW_MIGRATION.md` + `human_qa/` | ✔️ Lulus | ✔️ Lulus 2026-09-24 (12/12 skenario DIKONFIRMASI, Cross-Version Compare 19↔20 tanpa regresi) |
-| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ⬜ Belum mulai | — |
+| 11 | UAT Sign-off | `11_UAT_CHECKLIST.md` | ✔️ Sign-off | ✔️ 2026-09-24 — dev (Kuncoro) via chat, dasar: test AI |
 
 Legenda status: ⬜ Belum mulai · 🔄 Sedang dikerjakan · ✅ Draft/selesai ditulis · ✔️ Disetujui/lulus gate.
 
