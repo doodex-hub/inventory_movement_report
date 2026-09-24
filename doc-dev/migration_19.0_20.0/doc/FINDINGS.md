@@ -17,7 +17,7 @@
 | MF-05 | Ikon stat button `fa-signal` tidak dirender di 20.0 (Font Awesome → Material Symbols) | 1 | `[GAP-MIGRASI]` | Sedang | ✅ Diputuskan AI (low-risk, preseden native): `android_cell_5_bar` — lihat detail |
 | MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
-| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Disesuaikan atas permintaan dev 2026-09-24 (index.html + README/LISEZMOI root → 20.0) |
+| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Disesuaikan atas permintaan dev 2026-09-24 (index.html + README/LISEZMOI root → 20.0); sinkron `tools/variant.py` = DI LUAR SCOPE (task publish, keputusan dev) |
 | MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; ✅ DIKONFIRMASI ada di 19.0 (baseline run Step 9) |
 | MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | ✅ DIPERBAIKI di 20.0 (disetujui dev 2026-09-24) — 17.0/18.0/19.0 BELUM diperbaiki |
 | MF-11 | Helper test `_make_move`: tanggal fixture tertimpa diam-diam di 20.0 (write ORM tertunda setelah `button_validate()`) → AC-02-01/03-01 sempat hijau tanpa menguji tanggal lama | 10 | `[GAP-MIGRASI]` (test-harness) | Sedang | ✅ Diperbaiki di test (flush + assert tanggal), re-run PASS |
@@ -165,3 +165,8 @@ Lihat `migration-tool/templates/FINDINGS.md` §Cara Pakai.
 **Deskripsi:** request `/odoo/action-…` pertama setelah login → HTTP 500. Reload berikutnya normal (chat OdooBot sudah terinisialisasi). Tour test tidak terkena.
 **Dampak:** tidak ada ke modul; catatan untuk instalasi 20.0 baru (build pre-release).
 **Keputusan pemilik modul:** tidak perlu (native).
+
+---
+
+### Update MF-08 (2026-09-24, pasca penutupan)
+**Keputusan pemilik modul:** ✅ Dev: "abaikan saja, itu di luar scope, itu scope task publish". Sinkronisasi perubahan `index.html` ke `tools/variant.py` (sumber generator halaman store, tidak ada di repo ini) **bukan bagian migrasi** — ditangani di task publish App Store. MF-08 ditutup untuk migrasi ini.

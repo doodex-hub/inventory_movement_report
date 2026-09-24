@@ -97,8 +97,8 @@ Diterima dev 2026-09-24 (disetujui di intake/chat, `03_MIGRATION_SPEC.md` §4-5)
 - [x] Rehearsal upgrade data produksi — **N/A**: port kode saja, instalasi baru di 20.0 (dikonfirmasi dev, Step 1).
 - [ ] Backup database sebelum instalasi di server produksi (standar operasional).
 - [x] README modul & root sudah "20.0" (A6 + SCOPE-03).
-- [ ] **Dev:** sinkronkan perubahan `static/description/index.html` ke sumber `tools/variant.py` sebelum re-derive store berikutnya (MF-08).
-- [ ] **Dev:** `git push` branch `migration/20.0` (manual) & proses rilis branch `20.0` sesuai alur repo.
+- [x] ~~Sinkron `index.html` ke `tools/variant.py`~~ — di luar scope migrasi, dipindah ke task publish (keputusan dev 2026-09-24, MF-08).
+- [x] `git push` branch `migration/20.0` — dilakukan dev 2026-09-24 (`origin/migration/20.0` = `a234b2c`). Proses rilis branch `20.0` = task publish.
 - [ ] Opsional: backport fix MF-10 ke 19.0/18.0/17.0 (di luar migrasi ini, keputusan dev).
 
 ## Sign-off

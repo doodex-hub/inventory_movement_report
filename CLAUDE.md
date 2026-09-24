@@ -118,7 +118,7 @@ Cross-cutting, LATEN: `HOTFIX_REVIEW.md` + `HOTFIX_LOG.md` di root `doc/` — di
 
 ## Status saat ini
 
-**✅ MIGRASI 19.0→20.0 SELESAI (2026-09-24).** Step 1–11 lulus gate; Step 11 sign-off dev (Kuncoro) via chat berdasarkan test AI. Titik-nol hotfix: `doc/MIGRATION_CLOSED.md`. Commit baru di `migration/20.0` setelah SHA itu → jalankan `templates/HOTFIX_REVIEW.md`. Sisa tugas dev (di luar AI): `git push`, sinkron `tools/variant.py` (MF-08), opsional backport MF-10 ke 19.0/18.0/17.0.
+**✅ MIGRASI 19.0→20.0 SELESAI (2026-09-24).** Step 1–11 lulus gate; Step 11 sign-off dev (Kuncoro) via chat berdasarkan test AI. Titik-nol hotfix: `doc/MIGRATION_CLOSED.md`. Commit baru di `migration/20.0` setelah SHA itu → jalankan `templates/HOTFIX_REVIEW.md`. Sudah di-push dev (`origin/migration/20.0` = `a234b2c`). Sisa opsional: backport MF-10 ke 19.0/18.0/17.0. Sinkron `tools/variant.py` (MF-08) = scope task publish, bukan migrasi.
 
 Ringkasan hasil:
 - Perubahan kode (commit `64152a6` + fix tour Step 9): `ir.model.access.csv` → `security/ir.access.csv` (`base.group_everyone`, `crud`, identik output skrip resmi `upgrade_code 19.4-00-ir-access`), ikon `fa-signal` → `android_cell_5_bar`, versi `20.0.1.0.0`, aset store dari branch rilis `19.0` (disetujui dev), README modul "20.0", test: `product_uom`→`uom_id` + 3 Integration + tour form edition-agnostic. `models/` byte-identik 19.0.
