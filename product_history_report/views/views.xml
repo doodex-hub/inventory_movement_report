@@ -10,7 +10,7 @@
 
 				<button string="Stock History" type="object"
                             name= "action_open_stock_history"
-                            class="oe_stat_button" icon="fa-signal"/>
+                            class="oe_stat_button" icon="android_cell_5_bar"/>
 			</button>
 
 		</field>

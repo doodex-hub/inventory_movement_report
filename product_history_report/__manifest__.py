@@ -15,17 +15,20 @@
     'website': "https://www.doodex.net/",
 
     'category': 'Warehouse',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
 
     'depends': ['base', 'stock'],
 
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/stock_history_view.xml',
         'views/views.xml',
     ],
     'application': False,
-    'images': ['static/description/banner.png'],
+    'images': [
+       'static/description/banner.gif',
+       'static/description/icon.png',
+    ],
     'license': 'LGPL-3',
 
     'assets': {

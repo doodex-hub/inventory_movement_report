@@ -3,6 +3,8 @@
 # Ref: doc-dev/backfill/spec/01B_ACCEPTANCE_CRITERIA.md, doc-dev/backfill/test/03B_TEST_PLAN.md
 from datetime import date, timedelta
 
+from lxml import etree
+
 from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 from odoo.tools import mute_logger
@@ -65,7 +67,7 @@ class TestProductHistoryReport(TransactionCase):
             'picking_id': picking.id,
             'product_id': self.product.product_variant_id.id,
             'product_uom_qty': qty,
-            'product_uom': self.product.uom_id.id,
+            'uom_id': self.product.uom_id.id,
             'location_id': src.id,
             'location_dest_id': dest.id,
             'company_id': company.id,
@@ -200,3 +202,39 @@ class TestProductHistoryReport(TransactionCase):
                 'date': date.today(),
                 'income': 1.0,
             })
+
+    # --- Migrasi 19.0->20.0 (DIFF-01/DIFF-02, 03_MIGRATION_SPEC.md) ---
+
+    # --- AC-01-04 : ikon tombol memakai nama Material Symbols, bukan Font Awesome ---
+    def test_ac_01_04_button_icon_is_material_signal(self):
+        arch = self.env['product.template'].get_view(view_type='form')['arch']
+        buttons = etree.fromstring(arch).xpath("//button[@name='action_open_stock_history']")
+        self.assertEqual(len(buttons), 1, "Tepat satu tombol Stock History di form product.template")
+        self.assertEqual(buttons[0].get('icon'), 'android_cell_5_bar',
+                         "20.0 merender icon lewat ligature Material Symbols; fa-signal tidak dirender (DIFF-02)")
+
+    # --- AC-05-03 : ACL 19.0 tanpa grup (1,1,1,1) = ir.access base.group_everyone crud ---
+    def test_ac_05_03_acl_record_is_group_everyone_crud(self):
+        access = self.env.ref('product_history_report.access_stock_history_view')
+        self.assertEqual(access._name, 'ir.access')
+        self.assertEqual(access.model_id.model, 'stock.history.view')
+        self.assertEqual(access.group_id, self.env.ref('base.group_everyone'))
+        self.assertEqual(access.operation, 'crud')
+        self.assertFalse(access.domain)
+        self.assertEqual(access.kind, 'permission',
+                         "Baris tanpa grup di ir.access = restriction; harus permission agar akses tetap terbuka (MF-03)")
+
+    # --- AC-05-04 : read terbuka juga untuk user portal (ACL 19.0 tanpa grup berlaku semua user) ---
+    def test_ac_05_04_read_open_for_portal_user(self):
+        companies = self._companies_str(self.env.companies)
+        self.env['stock.history.view'].recreate_view(self.product.id, companies)
+
+        portal_user = self.env['res.users'].create({
+            'name': 'MIGRATION20 Portal User',
+            'login': 'migration20_portal_user',
+            'group_ids': [(6, 0, [self.env.ref('base.group_portal').id])],
+        })
+        self.assertTrue(portal_user._is_portal())
+        rows = self.env['stock.history.view'].with_user(portal_user).search(
+            [('product_template_id', '=', self.product.id)])
+        self.assertTrue(rows, "User portal tetap bisa search stock.history.view (ACL terbuka semua user, lihat FINDINGS.md MF-03)")

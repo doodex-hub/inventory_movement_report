@@ -17,7 +17,8 @@
 | MF-05 | Ikon stat button `fa-signal` tidak dirender di 20.0 (Font Awesome → Material Symbols) | 1 | `[GAP-MIGRASI]` | Sedang | ✅ Diputuskan AI (low-risk, preseden native): `android_cell_5_bar` — lihat detail |
 | MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
-| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI masih "17.0" | 3 | `[PERLU-KEPUTUSAN]` | Rendah | 🔓 Terbuka — tugas dev (re-derive via `tools/variant.py`), tidak diedit AI |
+| MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | 🔓 Terbuka — tugas dev (re-derive via `tools/variant.py`), tidak diedit AI |
+| MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; dikonfirmasi baseline 19.0 di Step 9 |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -102,11 +103,22 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 
 ---
 
+### MF-09 — `ERROR Model stock.history.view has no table.` di log install/registry load
+**Ditemukan di:** Step 6 G1 #2 (2026-09-24)
+**Tag:** `[DIWARISI-SOURCE]` (dugaan kuat — dikonfirmasi di baseline 19.0 Step 9)
+**Ref:** `BSL-002`, `BSL-014`, `06c_IMPLEMENTATION_LOG.md` G1 #2
+**Lokasi:** `product_history_report/models/stock_history_view.py` (`_auto = False`, tidak ada `init()`); pesan dari `odoo20/odoo/orm/registry.py:1059` (logika identik `odoo19/odoo/orm/registry.py:996`)
+**Deskripsi:** model `_auto=False` tanpa `init()` → registry tidak menemukan tabel/view `stock_history_view` sampai tombol "Stock History" pertama kali diklik (`recreate_view()`), lalu mencatat ERROR tiap registry load. Tidak memblokir install/test (G1/G2 exit 0).
+**Dampak di 20.0:** identik — log noise, bukan kegagalan. Dipertahankan (menambah `init()` = perubahan behavior/refactor di luar scope).
+**Keputusan pemilik modul:** *(kosong)*
+
+---
+
 ### MF-08 — Konten store & README masih menyebut versi lama
 **Ditemukan di:** Step 3 (2026-09-24)
 **Tag:** `[PERLU-KEPUTUSAN]`
 **Ref:** `SCOPE-01`, `03_MIGRATION_SPEC.md` §4
-**Lokasi:** `product_history_report/static/description/index.html` (port dari branch `19.0`, baris 7, 10, 15, 429, 441, 1027: "Odoo 19"/"Odoo 19.0"/"module version 19.0.1.0.0"); `README.md:71`, `LISEZMOI.md:69`, `product_history_report/README.md:71`, `product_history_report/LISEZMOI.md:69` ("17.0" — basi sejak migrasi 17→18).
+**Lokasi:** `product_history_report/static/description/index.html` (port dari branch `19.0`, baris 7, 10, 15, 429, 441, 1027: "Odoo 19"/"Odoo 19.0"/"module version 19.0.1.0.0"); `README.md:71`, `LISEZMOI.md:69` di ROOT repo ("17.0"). *(Update Step 6: `product_history_report/README.md`/`LISEZMOI.md` level modul sudah diperbaiki ke "20.0" di Fase A6 sesuai `06a` — hanya salinan root yang tersisa.)*
 **Deskripsi:** header komentar `index.html` sendiri menyatakan file itu "DERIVED, NOT HAND-WRITTEN — Generated from the 17.0 source with tools/variant.py. Edit the 17.0 source and re-derive; do not patch this file by hand". Karena itu AI port apa adanya (sesuai persetujuan dev "port aset store") dan TIDAK mengedit manual. README/LISEZMOI di luar scope yang disetujui.
 **Dampak:** non-fungsional — listing App Store 20.0 akan menampilkan "Odoo 19" sampai varian 20.0 di-derive.
 **Rekomendasi:** dev menjalankan `tools/variant.py` (di luar repo ini) untuk varian 20.0 dan mengganti `index.html`; sekaligus perbarui baris "Odoo version" di README/LISEZMOI kalau diinginkan.

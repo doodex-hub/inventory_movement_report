@@ -66,7 +66,7 @@ Naviguez vers les Produits d'Inventaire pour visualiser le Rapport de Mouvement 
 Une fois installé, les nouveaux indicateurs seront disponibles dans le rapport d'analyse des ventes. Utilisez les filtres et les options de regroupement pour analyser les données selon vos besoins.
 
 ## Compatibilité
-Version d'Odoo : 17.0
+Version d'Odoo : 20.0
 
 ## Licence
 Ce module est sous licence [LGPLv3 licensed](./LICENSE)

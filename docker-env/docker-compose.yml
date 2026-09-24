@@ -1,42 +1,52 @@
-# docker-env/docker-compose.yml — Migration 18.0->19.0, product_history_report
-# G1 install test (Fase A2/A3 checkpoint) + Step 9 Dev Testing + Tour test (Mode D), Odoo 19.0.
-# Pakai build: Dockerfile.target (google-chrome-stable + websocket-client) untuk Tour headless.
-name: product_history_report_migration_19
+# docker-compose.yml — product_history_report, migrasi 19.0 -> 20.0
+# G1 install test (Step 6) + Step 9 Dev Testing (Integration + Tour Mode D), Odoo 20.0 build-from-source.
+# - `name:` unik supaya tidak bentrok dengan project lain yang jalan bersamaan di host
+#   (mis. pos_margin_sale_migration_20 di port 8078/8182).
+# - Port host 8093 (8092 dipakai project 18->19 modul ini).
+# - native-target (odoo20) + native-target-enterprise (enterprise20) di-mount READ-ONLY: container
+#   cuma MENJALANKAN core, tidak pernah menulisnya. Enterprise hanya masuk addons-path kalau
+#   run-test.sh dipanggil dengan EDITION=enterprise (Run E, MF-07).
+# - Service mailpit/greenmail tidak ada: modul tidak menyentuh email.
+# - Eksekusi test SELALU lewat ./run-test.sh (down -v + MSYS_NO_PATHCONV + sanity-check jumlah test).
+name: product_history_report_migration_20
 
 services:
-  db_target:
-    image: postgres:15
+  db:
+    image: postgres:16
     environment:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoo
       POSTGRES_DB: postgres
     volumes:
-      - target_db_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
 
-  odoo_target:
+  odoo:
     build:
       context: .
-      dockerfile: Dockerfile.target
-    shm_size: '2gb'
+      dockerfile: Dockerfile
+    image: product_history_report_migration_20-odoo
     depends_on:
-      - db_target
+      - db
+    shm_size: '2gb'
     environment:
-      HOST: db_target
-      USER: odoo
-      PASSWORD: odoo
+      # odoo-bin dijalankan langsung (bukan entrypoint image resmi) -> koneksi DB lewat env libpq.
+      PGHOST: db
+      PGUSER: odoo
+      PGPASSWORD: odoo
     ports:
-      - "8092:8069"
+      - "8093:8069"
     volumes:
-      - D:/Kuncoro/doodex/repo/inventory-movement-report-migration-19/product_history_report:/mnt/extra-addons/product_history_report
+      - ../product_history_report:/mnt/extra-addons/product_history_report
       - ./logs:/var/log/odoo
+      - D:/Kuncoro/doodex/repo/odoo20:/opt/odoo:ro
+      - D:/Kuncoro/doodex/repo/enterprise20:/opt/enterprise:ro
+    # Default (dipakai hanya kalau `docker compose up odoo`): server interaktif Community untuk eksplorasi
+    # manual / Step 10. --http-interface=0.0.0.0 WAJIB (default 127.0.0.1 tidak terjangkau port-forward).
     command: >
-      odoo -d product_history_report_target
-      -i product_history_report
-      --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
-      --test-enable
-      --test-tags=/product_history_report
-      --stop-after-init
-      --logfile=/var/log/odoo/odoo_target.log
+      -d product_history_report_20
+      --addons-path=/opt/odoo/addons,/opt/odoo/odoo/addons,/mnt/extra-addons
+      --http-interface=0.0.0.0
+      --without-demo=true
 
 volumes:
-  target_db_data:
+  db-data:
