@@ -2,7 +2,7 @@
 
 **Modul:** product_history_report
 **Migrasi:** 18.0 → 19.0
-**Terakhir update:** 2026-08-26
+**Terakhir update:** 2026-10-05 (hotfix keamanan pasca-rilis — lihat MF-13)
 
 ---
 
@@ -12,8 +12,11 @@
 |---|---|---|---|---|---|
 | MF-01 | SQL view global `stock_history_view` di-drop+recreate per klik, race condition antar user | 1 | `[DIWARISI-SOURCE]` | Tinggi | 🔓 Terbuka — pertahankan identik kecuali dev minta fix |
 | MF-02 | Transfer internal→internal dihitung ganda di income DAN outcome | 1 | `[DIWARISI-SOURCE]` | Sedang | 🔓 Terbuka — pertahankan identik |
-| MF-03 | ACL `stock.history.view` terbuka semua user internal tanpa `group_id` | 1 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik |
+| MF-03 | ACL `stock.history.view` tanpa grup — terbuka untuk semua user, TERMASUK portal/public | 1 / 2026-10-05 | `[DIWARISI-SOURCE]` | Sedang | ✅ DIPERBAIKI 2026-10-05 (19.0.1.0.1): `stock.group_stock_user`, baca saja — lihat MF-13 |
 | MF-04 | ORM cache stale kalau `recreate_view()` dipanggil >1x dalam environment sama | 1 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik |
+| MF-09 | `ERROR Model stock.history.view has no table.` di log registry load (model `_auto=False` tanpa `init()`) | 2026-10-05 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — dikonfirmasi ada di 19.0 (log Docker 2026-10-05); sengaja tidak dikerjakan |
+| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa memanggilnya | 2026-10-05 | `[DIWARISI-SOURCE]` | **Kritis** | ✅ DIPERBAIKI 2026-10-05 (19.0.1.0.1): `@api.private` + argumen dipaksa integer — lihat MF-10 & MF-13 |
+| MF-13 | Rilis hotfix 2026-10-05: fix MF-10 + ACL MF-03 (19.0.1.0.1) | 2026-10-05 | rilis | — | ✅ Dipublish 2026-10-05 |
 
 Keempat item ini adalah carry-over persis dari `doc-dev/migration_17.0_18.0/doc/FINDINGS.md` (MF-01..MF-04 di sana, aslinya `F-01`/`F-02`/`F-04`/`F-09` dari `doc-dev/backfill/FINDINGS.md`, 2026-08-07) — bug/quirk ini sudah dipertahankan identik lintas migrasi 17→18 dan belum pernah ada "Keputusan pemilik modul". ID dipertahankan sama (`MF-01`..`MF-04`) untuk konsistensi rujukan lintas project, bukan diberi ID baru.
 
@@ -46,6 +49,7 @@ Keempat item ini adalah carry-over persis dari `doc-dev/migration_17.0_18.0/doc/
 ---
 
 ### MF-03 — ACL `stock.history.view` terbuka semua user internal tanpa `group_id`
+> **Update 2026-10-05:** DIPERBAIKI di 19.0.1.0.1. Catatan lama ("semua user internal") tidak lengkap: reproduksi Docker 2026-10-05 menunjukkan user **portal** juga bisa `search_read` model ini (peringkat dinaikkan ke Sedang). ACL kini `stock.group_stock_user`, baca saja. Lihat MF-13.
 **Ditemukan di:** Step 1 (2026-08-26), diwarisi dari MF-03 (17→18), aslinya `F-04` (2026-08-07, dikonfirmasi test eksekusi nyata)
 **Tag:** `[DIWARISI-SOURCE]`
 **Ref:** `BSL-007` (`01b_BASELINE_SPEC.md`)
@@ -72,3 +76,49 @@ Keempat item ini adalah carry-over persis dari `doc-dev/migration_17.0_18.0/doc/
 ## Cara Pakai
 
 Lihat `migration-tool/templates/FINDINGS.md` §Cara Pakai. Ringkasnya: update file ini setiap step (1-11) menemukan gap/bug/ambiguitas baru yang butuh keputusan manusia.
+
+---
+
+### MF-09 — `Model stock.history.view has no table` di log registry load
+**Ditemukan di:** review pasca-rilis 2026-10-05
+**Tag:** `[DIWARISI-SOURCE]`
+**Lokasi:** `product_history_report/models/stock_history_view.py` (`_auto = False`, tanpa `init()`)
+**Deskripsi:** registry mencatat ERROR sampai tombol "Stock History" pertama diklik. Dikonfirmasi muncul di log Docker 19.0 pada 2026-10-05. Hanya noise log.
+**Keputusan pemilik modul:** 2026-10-05 dev: dibiarkan seperti ini.
+
+---
+
+### MF-10 — SQL injection via RPC pada `stock.history.view.recreate_view()`
+**Ditemukan di:** review pasca-rilis 2026-10-05 (ID disamakan dengan MF-10 di `migration_19.0_20.0`)
+**Tag:** `[DIWARISI-SOURCE]`
+**Lokasi:** `product_history_report/models/stock_history_view.py` (`recreate_view`)
+**Deskripsi:** method publik tanpa `@api.private`; `product_template_id` dan `companies` diinterpolasi f-string ke `CREATE VIEW`. Reproduksi Docker 2026-10-05 (kode rilis sebelum fix): user **internal** dan **portal** sama-sama BERHASIL memanggil `recreate_view` lewat `/web/dataset/call_kw`. Payload SQL berbahaya sengaja tidak dijalankan; dampak injection disimpulkan dari kode (argumen langsung masuk teks SQL).
+**Perbaikan:** `@api.private` + `int(product_template_id)` + companies dipaksa integer — sama dengan fix 20.0. Setelah fix: pemanggilan RPC ditolak ("Private methods ... cannot be called remotely"), tombol "Stock History" untuk user Inventory tetap jalan.
+**Keputusan pemilik modul:** 2026-10-05 dev: perbaiki di 18.0 dan 19.0 (membalik keputusan 2026-09-24 "versi sebelumnya belum"). 17.0 tidak disentuh.
+
+---
+
+### MF-13 — Rilis hotfix 2026-10-05 (19.0.1.0.1)
+**Perubahan kode (dari `origin/staging/19.0`, bukan dari `migration/19.0`):** `2af986e` (injection), `c9613c5` (ACL), `d0708d5` (bump)
+- `recreate_view`: `@api.private` + argumen dipaksa integer (MF-10).
+- `security`: akses `stock.history.view` dibatasi ke `stock.group_stock_user`, baca saja (MF-03). Sebelumnya: semua user (termasuk portal/public) dengan CRUD penuh.
+- Versi manifest `19.0.1.0.1`. Efek samping yang disetujui dev: user tanpa hak Inventory yang membuka form produk mendapat error akses saat klik "Stock History".
+
+**Bukti uji (Docker, skrip RPC sama sebelum dan sesudah, upgrade lewat `button_immediate_upgrade`):**
+
+| Skenario | Sebelum | Sesudah |
+|---|---|---|
+| `recreate_view` via RPC (internal / portal) | DITERIMA | ditolak |
+| Portal `search_read` stok | BISA | ditolak |
+| User internal tanpa grup Inventory baca | bisa | ditolak |
+| User Inventory: tombol + baca | jalan | jalan |
+| User Inventory create record | bisa | ditolak |
+
+**Test suite lama (diambil dari `migration/19.0`, dijalankan di salinan kode rilis; 9 test (8 integrasi + 1 tour)):**
+- `test_ac_03_01_customer_return_is_income_only` GAGAL di 19.0 baik SEBELUM maupun sesudah fix — bukan akibat hotfix; penyebab belum diselidiki.
+- Setelah fix gagal karena menegaskan akses lama (diharapkan): `test_ac_05_01_read_open_for_user_without_inventory_group`. Test ini ada di `tests/` branch `migration/19.0` dan BELUM diperbarui — tindak lanjut. Tour 19.0 tidak bisa dijalankan: Chrome headless gagal start di container (dbus) — tour 19.0 tidak teruji.
+
+**Belum teruji:** angka laporan dengan pergerakan stok nyata sebelum/sesudah (query SQL tidak diubah); tampilan browser.
+**Tidak dikerjakan (keputusan dev 2026-10-05: "masih biarkan"):** MF-01 (race view global), MF-02 (transfer internal ganda), MF-09 (log noise), kode mati/import tak terpakai, rujukan "Odoo 17" di `index.html` store.
+**Catatan audit operasional:** perubahan ACL berlaku setelah modul di-upgrade; ACL ada di data modul sehingga tidak ada sisa hak di database yang perlu dibersihkan.
+**Rilis:** `staging/19.0` fc0e847→d0708d5; `19.0` 27c978c→81b4634 (merge commit).
