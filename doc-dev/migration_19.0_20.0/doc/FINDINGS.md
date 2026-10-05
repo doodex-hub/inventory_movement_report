@@ -2,7 +2,7 @@
 
 **Modul:** product_history_report
 **Migrasi:** 19.0 → 20.0
-**Terakhir update:** 2026-09-24
+**Terakhir update:** 2026-10-05 (hotfix keamanan pasca-rilis — lihat MF-13)
 
 ---
 
@@ -12,16 +12,17 @@
 |---|---|---|---|---|---|
 | MF-01 | SQL view global `stock_history_view` di-drop+recreate per klik, race condition antar user | 1 | `[DIWARISI-SOURCE]` | Tinggi | 🔓 Terbuka — pertahankan identik |
 | MF-02 | Transfer internal→internal dihitung ganda di income DAN outcome | 1 | `[DIWARISI-SOURCE]` | Sedang | 🔓 Terbuka — pertahankan identik |
-| MF-03 | ACL `stock.history.view` tanpa grup — terbuka untuk semua user | 1 | `[DIWARISI-SOURCE]` + `[GAP-MIGRASI]` | Rendah | 🔓 Terbuka — pertahankan identik; bentuk ACL wajib dikonversi ke `ir.access` (DIFF-01) |
+| MF-03 | ACL `stock.history.view` tanpa grup — terbuka untuk semua user, TERMASUK portal/public | 1 / 2026-10-05 | `[DIWARISI-SOURCE]` | Sedang | ✅ DIPERBAIKI 2026-10-05 (20.0.1.0.1): `stock.group_stock_user`, baca saja — lihat MF-13 |
 | MF-04 | ORM cache stale kalau `recreate_view()` dipanggil >1x dalam environment sama | 1 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik |
 | MF-05 | Ikon stat button `fa-signal` tidak dirender di 20.0 (Font Awesome → Material Symbols) | 1 | `[GAP-MIGRASI]` | Sedang | ✅ Diputuskan AI (low-risk, preseden native): `android_cell_5_bar` — lihat detail |
 | MF-06 | Aset App Store branch rilis `19.0` tidak ada di `migration/19.0` | 1 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Diputuskan dev 2026-09-24: port ke 20.0 |
 | MF-07 | Dependency Enterprise "kemungkinan" — tidak di manifest | 1 | `[PERLU-KEPUTUSAN]` | Sedang | ✅ Dijawab dev 2026-09-24 ("enterprise kemungkinan depend") — ditangani lewat analisis Step 2 + varian test Step 9 |
 | MF-08 | Konten store `index.html` (port dari 19.0) masih menyebut "Odoo 19"; README/LISEZMOI ROOT repo masih "17.0" (README modul sudah diperbaiki A6) | 3 | `[PERLU-KEPUTUSAN]` | Rendah | ✅ Disesuaikan atas permintaan dev 2026-09-24 (index.html + README/LISEZMOI root → 20.0); sinkron `tools/variant.py` = DI LUAR SCOPE (task publish, keputusan dev) |
 | MF-09 | `ERROR Model stock.history.view has no table.` di log install (model `_auto=False` tanpa `init()`) | 6 | `[DIWARISI-SOURCE]` | Rendah | 🔓 Terbuka — pertahankan identik; ✅ DIKONFIRMASI ada di 19.0 (baseline run Step 9) |
-| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | ✅ DIPERBAIKI di 20.0 (disetujui dev 2026-09-24) — 17.0/18.0/19.0 BELUM diperbaiki |
+| MF-10 | **SQL injection via RPC**: `recreate_view()` publik + argumen di-f-string ke SQL — user login mana pun (termasuk portal) bisa eksekusi SQL arbitrer | 8 | `[DIWARISI-SOURCE]` + `[PERLU-KEPUTUSAN]` | **Kritis** | ✅ DIPERBAIKI di 20.0 (disetujui dev 2026-09-24); ✅ 18.0 & 19.0 diperbaiki 2026-10-05 (hotfix 2026-10-05); 17.0 BELUM |
 | MF-11 | Helper test `_make_move`: tanggal fixture tertimpa diam-diam di 20.0 (write ORM tertunda setelah `button_validate()`) → AC-02-01/03-01 sempat hijau tanpa menguji tanggal lama | 10 | `[GAP-MIGRASI]` (test-harness) | Sedang | ✅ Diperbaiki di test (flush + assert tanggal), re-run PASS |
 | MF-12 | `RecursionError` native (mail_bot OdooBot → `discuss.channel._compute_member_indices`) saat bootstrap web client pertama admin di 20.0 Enterprise | 10 | `[GAP-MIGRASI]` (native, bukan modul) | Rendah | 🔓 Info — sekali terjadi, reload normal; tidak menyentuh modul |
+| MF-13 | Rilis hotfix 2026-10-05: fix MF-10 + ACL MF-03 (20.0.1.0.1) | 2026-10-05 | rilis | — | ✅ Dipublish 2026-10-05 |
 
 MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md` (aslinya `F-01`/`F-02`/`F-04`/`F-09` di `doc-dev/backfill/FINDINGS.md`, 2026-08-07). ID dipertahankan sama lintas project.
 
@@ -55,6 +56,7 @@ MF-01..MF-04 carry-over persis dari `doc-dev/migration_18.0_19.0/doc/FINDINGS.md
 ---
 
 ### MF-03 — ACL `stock.history.view` tanpa grup, terbuka untuk semua user
+> **Update 2026-10-05:** DIPERBAIKI di 20.0.1.0.1. Catatan lama ("semua user internal") tidak lengkap: reproduksi Docker 2026-10-05 menunjukkan user **portal** juga bisa `search_read` model ini (peringkat dinaikkan ke Sedang). ACL kini `stock.group_stock_user`, baca saja. Lihat MF-13.
 **Ditemukan di:** Step 1 (2026-09-24), diwarisi (`F-04` backfill)
 **Tag:** `[DIWARISI-SOURCE]` + `[GAP-MIGRASI]` (bentuk teknisnya wajib berubah di 20.0)
 **Ref:** `BSL-007`, `DIFF-01` (`02_DIFF_ANALYSIS.md`)
@@ -170,3 +172,34 @@ Lihat `migration-tool/templates/FINDINGS.md` §Cara Pakai.
 
 ### Update MF-08 (2026-09-24, pasca penutupan)
 **Keputusan pemilik modul:** ✅ Dev: "abaikan saja, itu di luar scope, itu scope task publish". Sinkronisasi perubahan `index.html` ke `tools/variant.py` (sumber generator halaman store, tidak ada di repo ini) **bukan bagian migrasi** — ditangani di task publish App Store. MF-08 ditutup untuk migrasi ini.
+
+---
+
+### Update MF-10 (2026-10-05)
+Fix 20.0 dibawa juga ke 18.0 dan 19.0 (hotfix 2026-10-05) atas keputusan dev. Di 20.0 sendiri tidak ada perubahan kode MF-10; reproduksi Docker 2026-10-05 mengonfirmasi RPC `recreate_view` ditolak untuk user internal dan portal. 17.0 tetap belum diperbaiki.
+
+---
+
+### MF-13 — Rilis hotfix 2026-10-05 (20.0.1.0.1)
+**Perubahan kode (dari `origin/staging/20.0`, bukan dari `migration/20.0`):** `3d2a041` (ACL), `526256a` (bump)
+- `security`: akses `stock.history.view` dibatasi ke `stock.group_stock_user`, baca saja (MF-03). Sebelumnya: semua user (termasuk portal/public) dengan CRUD penuh.
+- Versi manifest `20.0.1.0.1`. Efek samping yang disetujui dev: user tanpa hak Inventory yang membuka form produk mendapat error akses saat klik "Stock History".
+
+**Bukti uji (Docker, skrip RPC sama sebelum dan sesudah, upgrade lewat `button_immediate_upgrade`):**
+
+| Skenario | Sebelum | Sesudah |
+|---|---|---|
+| `recreate_view` via RPC (internal / portal) | ditolak (sudah private) | ditolak |
+| Portal `search_read` stok | BISA | ditolak |
+| User internal tanpa grup Inventory baca | bisa | ditolak |
+| User Inventory: tombol + baca | jalan | jalan |
+| User Inventory create record | bisa | ditolak |
+
+**Test suite lama (diambil dari `migration/20.0`, dijalankan di salinan kode rilis; 17 test (15 integrasi + 2 tour)):**
+- `test_ac_03_01_customer_return_is_income_only` GAGAL di 20.0 baik SEBELUM maupun sesudah fix — bukan akibat hotfix; penyebab belum diselidiki.
+- Setelah fix gagal karena menegaskan akses lama (diharapkan): `test_ac_05_01_read_open_for_user_without_inventory_group`, `test_ac_05_03_acl_record_is_group_everyone_crud`, `test_ac_05_04_read_open_for_portal_user`. Test ini ada di `tests/` branch `migration/20.0` dan BELUM diperbarui — tindak lanjut.
+
+**Belum teruji:** angka laporan dengan pergerakan stok nyata sebelum/sesudah (query SQL tidak diubah); tampilan browser.
+**Tidak dikerjakan (keputusan dev 2026-10-05: "masih biarkan"):** MF-01 (race view global), MF-02 (transfer internal ganda), MF-09 (log noise), kode mati/import tak terpakai, rujukan "Odoo 17" di `index.html` store.
+**Catatan audit operasional:** perubahan ACL berlaku setelah modul di-upgrade; ACL ada di data modul sehingga tidak ada sisa hak di database yang perlu dibersihkan.
+**Rilis:** `staging/20.0` 086eb7a→526256a; `20.0` 086eb7a→526256a (fast-forward).
