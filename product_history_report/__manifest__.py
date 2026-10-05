@@ -15,7 +15,7 @@
     'website': "https://www.doodex.net/",
 
     'category': 'Warehouse',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
 
     'depends': ['base', 'stock'],
 
